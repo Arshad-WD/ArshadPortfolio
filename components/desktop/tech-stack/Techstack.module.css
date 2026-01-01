@@ -1,0 +1,68 @@
+.wrapper-stack {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.tech-stack-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.stack {
+  width: 100%;
+  font-size: 44vw;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  font-weight: 400;
+  text-align: center;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 45%;
+  transform: translate(-50%, -50%);
+}
+
+.container {
+  width: 100%;
+  height: 240vh;
+  position: relative;
+}
+
+.wrapper-stack {
+  position: relative;
+  top: 0;
+  width: 460vw;
+  height: 100vh;
+  will-change: transform;
+}
+
+.card {
+  width: 250px;
+  height: 250px;
+  border-radius: 20px;
+  overflow: hidden;
+  position: absolute;
+}
+
+.tech-stack-grid {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+
+:global(#card-1) { top: 50%; left: 12%; }
+:global(#card-2) { top: 20%; left: 38%; }
+:global(#card-3) { top: 55%; left: 53%; }
+:global(#card-4) { top: 5%; left: 27%; }
+:global(#card-5) { top: 40%; left: 70%; }
+:global(#card-6) { top: 60%; left: 80%; }
+:global(#card-7) { top: 5%; left: 60%; }
+:global(#card-8) { top: 10%; left: 95%; }
+
+@media (max-width: 900px) {
+  .wrapper-stack {
+    padding-top: 20em;
+  }
+}

@@ -1,26 +1,131 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Custom Font */
+@font-face {
+  font-family: "face";
+  src: url("/fonts/Transformers-Movie.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+html {
+  background-color: black;
+  color-scheme: dark;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Global styles */
+body {
+  background-color: black;
+  color: white;
+  overflow-x: hidden;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+.stroke-black {
+  -webkit-text-stroke: 2px black;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: black;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Neon Border Animation */
+@keyframes neon-border-animation {
+  0% {
+    background-position:
+      0% 0%,
+      100% 0%,
+      100% 100%,
+      0% 100%;
+  }
+  25% {
+    background-position:
+      100% 0%,
+      100% 0%,
+      100% 100%,
+      0% 100%;
+  }
+  50% {
+    background-position:
+      100% 0%,
+      100% 100%,
+      0% 100%,
+      0% 100%;
+  }
+  75% {
+    background-position:
+      100% 100%,
+      0% 100%,
+      0% 100%,
+      0% 0%;
+  }
+  100% {
+    background-position:
+      0% 0%,
+      0% 0%,
+      0% 100%,
+      0% 0%;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.neon-border {
+  position: relative;
+  z-index: 0;
+  border-radius: 1.5rem;
+  overflow: hidden;
+}
+
+.neon-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    linear-gradient(90deg, transparent, #00f0ff, transparent) top left / 100% 2px no-repeat,
+    linear-gradient(180deg, transparent, #00f0ff, transparent) top right / 2px 100% no-repeat,
+    linear-gradient(270deg, transparent, #00f0ff, transparent) bottom right / 100% 2px no-repeat,
+    linear-gradient(0deg, transparent, #00f0ff, transparent) bottom left / 2px 100% no-repeat;
+  animation: neon-border-animation 4s linear infinite;
+}
+
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+
+@font-face {
+  font-family: "LastTrunk";
+  src: url("/fonts/THELASTTRUNKS-Personal-Use-Only.ttf") format("truetype");
+  font-weight: lighter;
+  font-style: oblique;
+  font-display: swap;
+}
+
+@font-face{
+  font-family: "Montavie";
+  src: url("/fonts/Montavie.ttf") format("truetype");
+  font-weight:bold;
+  font-style:normal;
 }
