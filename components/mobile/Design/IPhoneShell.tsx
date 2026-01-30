@@ -2,89 +2,78 @@
 
 import { useEffect, useState } from "react";
 
-export default function iPhoneShell({ children }: { children: React.ReactNode }) {
-  const [time, setTime] = useState("00:00");
-  const [showColon, setShowColon] = useState(true);
-  const [battery, setBattery] = useState(52);
-  const [charging, setCharging] = useState(false);
+export default function IPhoneShell({ children }: { children: React.ReactNode }) {
+  const [scale, setScale] = useState(1);
 
-  // ⏰ Time with blinking colon
   useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      const hours = now.getHours();
-      const minutes = now.getMinutes().toString().padStart(2, "0");
-      const colon = showColon ? ":" : " ";
-      setTime(`${hours}${colon}${minutes}`);
+    const handleResize = () => {
+      const vh = window.innerHeight;
+      const targetHeight = 852; // Exact shell height
+      if (vh < targetHeight) {
+        setScale(vh / targetHeight);
+      } else {
+        setScale(1);
+      }
     };
-
-    updateTime();
-
-    const timeInterval = setInterval(updateTime, 1000);
-    const blinkInterval = setInterval(
-      () => setShowColon((v) => !v),
-      1000
-    );
-
-    return () => {
-      clearInterval(timeInterval);
-      clearInterval(blinkInterval);
-    };
-  }, [showColon]);
-
-  // 🔋 Fake battery drain / charge
-  useEffect(() => {
-    const batteryInterval = setInterval(() => {
-      setBattery((prev) => {
-        if (charging) {
-          if (prev >= 100) {
-            setCharging(false);
-            return 100;
-          }
-          return prev + 1;
-        } else {
-          if (prev <= 15) {
-            setCharging(true);
-            return prev;
-          }
-          return prev - 1;
-        }
-      });
-    }, 60000); // every minute
-
-    return () => clearInterval(batteryInterval);
-  }, [charging]);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-black">
+    <div className="flex justify-center items-center h-screen bg-black overflow-hidden py-4">
       <div
-         className="
-    relative
-    w-[390px] h-[760px]
-    rounded-[44px]
-    bg-[#0b0b0b]
-    overflow-hidden
-    shadow-[0_0_80px_rgba(0,0,0,0.8)]
-    border border-white/10
-
-    pt-[env(safe-area-inset-top)]
-    pb-[env(safe-area-inset-bottom)]
-    pl-[env(safe-area-inset-left)]
-    pr-[env(safe-area-inset-right)]
-  "
+         style={{ transform: `scale(${scale})`, transformOrigin: "center center" }}
+         className="relative w-[405px] h-[864px] shrink-0 transition-transform duration-300 ease-out"
       >
-        {/* Status Bar */}
-        <div className="absolute top-3 left-0 w-full px-6 flex justify-between text-xs text-gray-300 z-50">
-          <span>{time}</span>
+        {/* PHYSICAL BUTTONS (LEFT) */}
+        <div className="absolute left-[0px] top-[110px] w-[3px] h-8 bg-zinc-700 rounded-l-md shadow-[inset_-1px_0_1px_rgba(255,255,255,0.1)] z-10" /> {/* Action Button */}
+        <div className="absolute left-[0px] top-[166px] w-[3px] h-14 bg-zinc-700 rounded-l-md shadow-[inset_-1px_0_1px_rgba(255,255,255,0.1)] z-10" /> {/* Vol Up */}
+        <div className="absolute left-[0px] top-[236px] w-[3px] h-14 bg-zinc-700 rounded-l-md shadow-[inset_-1px_0_1px_rgba(255,255,255,0.1)] z-10" /> {/* Vol Down */}
+        
+        {/* PHYSICAL BUTTONS (RIGHT) */}
+        <div className="absolute right-[0px] top-[186px] w-[3px] h-24 bg-zinc-700 rounded-r-md shadow-[inset_1px_0_1px_rgba(255,255,255,0.1)] z-10" /> {/* Power */}
 
-          <span className="flex items-center gap-1">
-            ▮▮▮
-            {charging && <span className="text-green-400">⚡</span>}
-            🔋{battery}%
-          </span>
+        {/* OUTER TITANIUM FRAME */}
+        <div className="
+          absolute inset-[1px]
+          rounded-[60px]
+          bg-linear-to-b from-zinc-800 via-zinc-900 to-zinc-800
+          border-[1px] border-white/10
+          shadow-[0_0_0_1px_rgba(0,0,0,0.5),0_30px_60px_-12px_rgba(0,0,0,0.8)]
+        ">
+          {/* ANTENNA BANDS (TOP/BOTTOM) */}
+          <div className="absolute top-12 left-0 w-full h-[2px] bg-black/40" />
+          <div className="absolute bottom-12 left-0 w-full h-[2px] bg-black/40" />
+
+          {/* INNER PROTECTIVE RIM (Slightly lighter) */}
+          <div className="
+            absolute inset-[4px]
+            rounded-[56px]
+            bg-zinc-900
+            border-[0.5px] border-white/5
+            shadow-[inset_0_0_1px_1px_rgba(255,255,255,0.05)]
+          ">
+            {/* SCREEN CONTAINER (BLACK PROTECTIVE BORDER) */}
+            <div className="
+              absolute inset-[4px]
+              rounded-[52px]
+              bg-black
+              overflow-hidden
+              shadow-[0_0_0_2px_rgba(0,0,0,1)]
+            ">
+              {/* CONTENT AREA */}
+              <div className="relative w-full h-full bg-black">
+                {children}
+
+                {/* GLOSSY SURFACE REFLECTION */}
+                <div className="absolute inset-0 pointer-events-none z-[1000] opacity-30">
+                  <div className="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.1)_0%,transparent_50%)]" />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-
-        {children}
       </div>
     </div>
   );

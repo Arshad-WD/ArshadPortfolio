@@ -9,7 +9,14 @@ export type AppType =
   | "Contact"
   | "Google"
   | "Camera"
-  | "Photos";
+  | "Photos"
+  | "Settings"
+  | "Safari"
+  | "Mail"
+  | "Music"
+  | "Notes"
+  | "Maps"
+  | "AppStore";
 
 export interface AppLaunchPayload {
   app: AppType;

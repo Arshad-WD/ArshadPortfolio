@@ -1,7 +1,11 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import IPhoneShell from "@/components/mobile/Design/IPhoneShell"
+import IPhoneShell from "@/components/mobile/Design/IPhoneShell";
+import Preloader from "@/components/shared/Preloader";
+import { AnimatePresence, motion } from "framer-motion";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 const DesktopHome = dynamic(
   () => import("@/components/desktop/home/HomePage"),
@@ -14,33 +18,61 @@ const Mobile = dynamic(
 );
 
 export default function HomeClient() {
-  return (
-    <>
-      {/* Desktop */}
-      <div className="hidden sm:block">
-        <DesktopHome />
-      </div>
+  const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
-      {/* Mobile */}
-      <div className="block sm:hidden">
-        <IPhoneShell>
-          <Mobile />
-        </IPhoneShell>
-      </div>
-    </>
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  useEffect(() => {
+    if (!loading) {
+      const timer = setTimeout(() => {
+        ScrollTrigger.refresh();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [loading]);
+
+  if (isMobile === null) return <div className="fixed inset-0 bg-black" />;
+
+  return (
+    <main className="relative h-full w-full bg-black overflow-hidden font-sans">
+      <AnimatePresence mode="wait">
+        {loading ? (
+          <div key="preloader-container" className="fixed inset-0 z-[10000] bg-black">
+             {isMobile ? (
+               <IPhoneShell>
+                  <Preloader key="mobile-preloader" onComplete={() => setLoading(false)} />
+               </IPhoneShell>
+             ) : (
+               <Preloader key="desktop-preloader" onComplete={() => setLoading(false)} />
+             )}
+          </div>
+        ) : (
+          <motion.div 
+            key="content"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1 }}
+            className="h-full w-full"
+          >
+            {isMobile ? (
+              <div className="fixed inset-0 z-[9999] bg-black">
+                <IPhoneShell>
+                  <Mobile />
+                </IPhoneShell>
+              </div>
+            ) : (
+              <DesktopHome />
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </main>
   );
 }
 
-
-// "use client";
-
-// import IPhoneShell from "@/components/mobile/Design/IPhoneShell";
-// import Mobile from "@/components/mobile/Mobile";
-
-// export default function HomeClient() {
-//   return (
-//     <IPhoneShell>
-//       <Mobile />
-//     </IPhoneShell>
-//   );
-// }

@@ -5,85 +5,111 @@ import { useRef, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-
 gsap.registerPlugin(ScrollTrigger);
 
 const About = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
-  const descRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if(!headingRef.current || !descRef.current) return;
-    // Animate heading text
-    gsap.fromTo(
-      headingRef.current,
-      { WebkitTextStroke: "2px white", color: "transparent" },
-      {
-        WebkitTextStroke: "0px white",
-        color: "white",
-        scrollTrigger: {
-          trigger: headingRef.current,
-          start: "top 70%",
-          end: "top 20%",
-          scrub: true,
-        },
-      }
-    );
+    const ctx = gsap.context(() => {
+      if (!headingRef.current || !textRef.current) return;
 
-    
-    gsap.fromTo(
-      descRef.current.children,  
-      { opacity: 0 },  
-      {
-        opacity: 1,  
-        stagger: 0.1, 
-        scrollTrigger: {
-          trigger: descRef.current, 
-          start: "top 80%",  
-          end: "top 50%",  
-          scrub: true,
+      // Clean, elegant reveal for the main statement
+      gsap.fromTo(
+        headingRef.current,
+        { 
+          y: 40, 
+          opacity: 0,
         },
-      }
-    );
+        {
+          y: 0,
+          opacity: 1,
+          duration: 1.2,
+          ease: "expo.out",
+          scrollTrigger: {
+            trigger: headingRef.current,
+            start: "top 90%",
+            end: "top 60%",
+            scrub: 1,
+          },
+        }
+      );
+
+      // Subtle fade for the subtext
+      gsap.fromTo(
+        textRef.current,
+        { 
+          opacity: 0,
+          y: 20
+        },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: textRef.current,
+            start: "top 85%",
+            end: "top 70%",
+            scrub: 1,
+          },
+        }
+      );
+    }, containerRef);
+
+    return () => ctx.revert();
   }, []);
 
   return (
-    <div className="bg-black min-h-screen w-screen px-6 py-12 flex flex-col items-center">
-      {/* ABOUT ME Heading */}
-      <h1
-        ref={headingRef}
-        className="text-7xl sm:text-8xl md:text-9xl font-extrabold uppercase tracking-[-0.12em] relative text-white text-center"
-        style={{ WebkitTextStroke: "2px white", color: "transparent" }}
-      >
-        ABOUT ME
-      </h1>
+    <section 
+      ref={containerRef}
+      className="relative min-h-screen w-screen bg-black flex flex-col items-center justify-center px-6 overflow-hidden pt-32 pb-80"
+    >
+      <div className="z-10 max-w-5xl w-full text-center space-y-12">
+        <div className="space-y-4">
+            <span className="text-zinc-600 font-mono text-xs tracking-[0.6em] uppercase block">
+                The Philosophy
+            </span>
+            <h1
+                ref={headingRef}
+                className="text-6xl md:text-9xl font-black uppercase tracking-tighter leading-none text-white italic"
+            >
+                Simplicity <br />
+                <span className="text-zinc-800">In Complexity</span>
+            </h1>
+        </div>
 
-      {/* Description Section with Scroll Scrub Animation */}
-      <div
-        ref={descRef}
-        className="text-2xl text-gray-300 leading-relaxed max-w-2xl text-center mt-12 font-semibold"
-      >
-        {"I am in third year of my engineering, and I am passionate about building modern, interactive web experiences. I also enjoy learning cybersecurity, along with working with cutting-edge technologies like React, Tailwind CSS to create smooth, engaging interfaces.".split(" ").map((word, index) => (
-          <span key={index} className="word">
-            {word} &nbsp;
-          </span>
-        ))}
+        <p
+            ref={textRef}
+            className="text-xl md:text-3xl font-medium tracking-tight text-zinc-500 max-w-2xl mx-auto leading-relaxed"
+        >
+            Engineering modern digital environments where performance meets seamless aesthetics. Currently refining my craft in my third year of engineering.
+        </p>
+
+        <div className="pt-8">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.98 }}
+            className="px-10 py-5 bg-white text-black rounded-full font-black uppercase tracking-widest text-xs hover:bg-zinc-200 transition-colors shadow-2xl"
+          >
+            Connect
+          </motion.button>
+        </div>
       </div>
 
-      {/* Contact Button */}
-      <motion.button
-        ref={buttonRef}
-        whileHover={{ rotate: -12, y: 12, scale: 1.15 }}
-        transition={{ type: "spring", stiffness: 200, damping: 3 }}
-        className="px-12 py-4 text-2xl rounded-full text-white font-bold bg-linear-to-r 
-          from-black via-purple-700 to-orange-400 border-4 border-purple-500 
-          shadow-2xl hover:opacity-90 transition-all mt-12"
-      >
-        CONTACT ME
-      </motion.button>
-    </div>
+      {/* Subtle corner tag */}
+      <div className="absolute right-12 bottom-12 hidden md:block">
+        <p className="text-zinc-900 font-mono text-[10px] tracking-[0.4em] uppercase font-bold">
+            Arshad Chaudhary / 2024
+        </p>
+      </div>
+    </section>
   );
 };
 
 export default About;
+
+
+

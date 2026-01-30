@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata, Viewport } from "next";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://arshad-portfolio.vercel.app"),
   title: {
     default: "Arshad | Full Stack Developer",
     template: "%s | Arshad",
@@ -34,7 +35,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="relative text-white antialiased">{children}</body>
     </html>
   );
 }

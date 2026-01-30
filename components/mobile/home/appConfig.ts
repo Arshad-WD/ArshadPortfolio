@@ -14,4 +14,12 @@ export const APP_ICONS: Record<AppType, string> = {
   Google: "/icons/google.jpg",
   Camera: "/icons/camera.jpg",
   Photos: "/icons/gallery.jpg",
+
+  Settings: "/icons/settings.png",
+  Safari: "/icons/about.jpg",
+  Mail: "/icons/about.jpg",
+  Music: "/icons/about.jpg",
+  Notes: "/icons/about.jpg",
+  Maps: "/icons/about.jpg",
+  AppStore: "/icons/about.jpg",
 };

@@ -23,16 +23,17 @@ export default function Dock({
   return (
     <div
       className={`
-        absolute bottom-5 left-1/2 -translate-x-1/2
-        w-[92%] h-23
-        rounded-[28px]
-        bg-white/10 backdrop-blur-xl
-        border border-white/20
+        absolute bottom-12 left-1/2 -translate-x-1/2
+        w-[92%] h-[88px]
+        rounded-[32px]
+        bg-white/10 backdrop-blur-[25px]
+        border border-white/10
         flex justify-evenly items-center
-        px-4
-        z-40
-        transition-opacity duration-200
-        ${hidden ? "opacity-0 pointer-events-none" : "opacity-100"}
+        px-2
+        z-[200]
+        shadow-2xl
+        transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1)
+        ${hidden ? "opacity-0 pointer-events-none translate-y-32 scale-90" : "opacity-100 translate-y-0 scale-100"}
       `}
     >
       {DOCK_APPS.map((app) => {
@@ -44,17 +45,15 @@ export default function Dock({
             ref={ref}
             onClick={() => {
               if (!ref.current) return;
-              openApp(app, ref.current.getBoundingClientRect()); // ✅ rect passed
+              openApp(app, ref.current.getBoundingClientRect());
             }}
             className="
               relative
-              w-16 h-16
-              rounded-[18px]
-              bg-neutral-800
-              shadow-lg
-              flex items-center justify-center
-              active:scale-90
-              transition-transform
+              w-[62px] h-[62px]
+              rounded-[16px]
+              shadow-[0_8px_16px_-4px_rgba(0,0,0,0.5)]
+              active:scale-95
+              transition-all
             "
           >
             {notifications[app] && notifications[app]! > 0 && (

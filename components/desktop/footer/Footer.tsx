@@ -4,7 +4,8 @@ import { useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import type { FooterProps, SocialLink } from "./types";
+import { SOCIAL_LINKS } from "@/libs/data";
+import type { FooterProps } from "./types";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -16,92 +17,103 @@ export default function Footer(_: FooterProps) {
 
     gsap.fromTo(
       footerRef.current,
-      { opacity: 0, y: 100 },
+      { opacity: 0, y: 30 },
       {
         opacity: 1,
         y: 0,
-        duration: 1.5,
-        ease: "power3.out",
+        duration: 1,
+        ease: "power2.out",
         scrollTrigger: {
           trigger: footerRef.current,
-          start: "top 90%",
-          toggleActions: "play none none none",
+          start: "top 95%",
         },
       }
     );
   }, []);
 
-  const socials: SocialLink[] = [
-    {
-      icon: "/images/github.jpeg",
-      link: "https://github.com/Arshad-WD",
-      rounded: true,
-    },
-    {
-      icon: "/images/linkedin.jpeg",
-      link: "https://www.linkedin.com/in/arshad-chaudhary-388312288/",
-      rounded: false,
-    },
-    {
-      icon: "/images/x.jpeg",
-      link: "https://x.com/dark_arsha78045?s=21",
-      rounded: true,
-    },
-  ];
-
   return (
     <footer
       ref={footerRef}
-      className="relative w-full bg-[#0d0d0d] text-white pt-24 pb-12 px-6 md:px-16 overflow-hidden"
+      className="relative w-full bg-zinc-950 text-white pt-40 pb-20 px-6 md:px-16 overflow-hidden"
     >
-      {/* Slanted divider */}
-      <div className="absolute top-0 left-0 w-full h-20 bg-linear-to-r from-purple-600 to-indigo-600 -skew-y-3" />
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col lg:flex-row justify-between items-start gap-20 mb-40">
+            {/* Large Branding CTA */}
+            <div className="max-w-xl">
+                <h2 className="text-6xl md:text-8xl font-black uppercase tracking-tighter leading-[0.85] text-white transition-colors hover:text-zinc-800 duration-1000">
+                    Your Next <br />
+                    Big Idea <br />
+                    Starts Here.
+                </h2>
+                <div className="mt-16 flex items-center gap-8">
+                    <motion.a 
+                        href="mailto:contact@arshad.dev"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="px-12 py-6 bg-white text-black rounded-full font-black uppercase tracking-widest text-sm shadow-2xl hover:bg-zinc-200 transition-all"
+                    >
+                        Get In Touch
+                    </motion.a>
+                    <div className="flex flex-col">
+                        <span className="text-zinc-600 font-mono text-[10px] uppercase tracking-widest">Available for</span>
+                        <span className="text-white font-bold uppercase tracking-tight">Freelance & Full-time</span>
+                    </div>
+                </div>
+            </div>
 
-      <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-12 bg-linear-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">
-        Let's Connect & Build Together
-      </h2>
+            {/* Links Section */}
+            <div className="grid grid-cols-2 gap-20">
+                <div className="space-y-8">
+                    <span className="text-zinc-700 font-mono text-[10px] uppercase tracking-[0.4em]">Socials</span>
+                    <ul className="space-y-4">
+                        {SOCIAL_LINKS.map((social) => (
+                            <li key={social.name}>
+                                <a href={social.link} target="_blank" rel="noopener noreferrer" className="group flex items-center gap-3">
+                                    <div className="w-1 h-1 rounded-full bg-zinc-800 transition-all group-hover:w-4 group-hover:bg-white" />
+                                    <span className="text-zinc-400 font-bold uppercase tracking-widest text-xs group-hover:text-white transition-colors">{social.name}</span>
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
 
-            {/* Socials */}
-      <div className="flex gap-6 justify-center items-center flex-wrap">
-        {socials.map(({ icon, link, rounded }, index) => (
-          <motion.a
-            key={index}
-            href={link}
-            target="_blank"
-            rel="noopener noreferrer"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 * index, type: "spring" }}
-            className="group w-20 h-20 bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:scale-110 transition-all duration-300 shadow-md shadow-purple-500/20 hover:shadow-purple-400/30 overflow-hidden rounded-xl"
-          >
-            <motion.img
-              src={icon}
-              alt="social"
-              className={`w-10 h-10 transition-all duration-300 group-hover:scale-125 ${
-                rounded ? "rounded-full" : ""
-              }`}
-              animate={{ y: [0, -3, 0] }}
-              transition={{ repeat: Infinity, duration: 2 }}
-            />
-          </motion.a>
-        ))}
+                <div className="space-y-8">
+                    <span className="text-zinc-700 font-mono text-[10px] uppercase tracking-[0.4em]">Location</span>
+                    <div className="space-y-4">
+                        <p className="text-zinc-400 font-bold uppercase tracking-widest text-xs">New Delhi, India</p>
+                        <p className="text-zinc-600 font-mono text-[10px] uppercase leading-relaxed">
+                            Always working in <br /> 
+                            GMT +5:30 Timezone
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="flex flex-col md:flex-row justify-between items-center pt-20 border-t border-white/5 gap-8">
+            <span className="text-zinc-800 font-black text-4xl uppercase tracking-tighter hover:text-white transition-colors duration-700 select-none">
+                ARSHAD.DEV
+            </span>
+
+            <div className="flex items-center gap-10">
+                <span className="text-zinc-600 font-mono text-[10px] uppercase tracking-widest">
+                    © {new Date().getFullYear()} Chaudhary
+                </span>
+                <span className="text-zinc-600 font-mono text-[10px] uppercase tracking-widest hidden md:block">
+                    Built with obsession
+                </span>
+            </div>
+        </div>
       </div>
 
-      <div className="mt-16 pt-8 border-t border-white/10 text-center relative">
-        {/* subtle glow line */}
-        <div className="absolute left-1/2 -top-1px h-0.5 w-40 -translate-x-1/2 bg-linear-to-r from-purple-500 via-pink-500 to-orange-400 blur-sm" />
-
-        <p className="text-sm text-gray-400 leading-relaxed">
-          Crafted with{" "}
-          <span className="text-purple-400 font-medium">passion</span>,{" "}
-          <span className="text-pink-400">coffee ☕</span> &{" "}
-          <span className="text-orange-400">clean code 💻</span>
-        </p>
-
-        <p className="mt-2 text-xs text-gray-500 tracking-wide">
-          © {new Date().getFullYear()} Arshad • All rights reserved
-        </p>
+      {/* Background Decorative Large Text */}
+      <div className="absolute -bottom-20 -left-10 text-[35vw] font-black text-white/[0.02] uppercase tracking-tighter leading-none pointer-events-none select-none">
+        ARSHAD
       </div>
     </footer>
   );
 }
+
+
+

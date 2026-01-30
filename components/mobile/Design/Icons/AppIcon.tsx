@@ -73,7 +73,7 @@ export default function AppIcon({
       }}
     >
       {/* APP ICON */}
-      <div className="relative w-18 h-18 rounded-[18px] bg-neutral-800 shadow-lg overflow-hidden">
+      <div className="relative w-[60px] h-[60px] rounded-[13px] shadow-[0_8px_20px_-5px_rgba(0,0,0,0.5)] overflow-hidden">
         <img
           src={icon}
           alt={label}
@@ -103,7 +103,9 @@ export default function AppIcon({
       </div>
 
       {/* LABEL */}
-      <p className="mt-1 text-[11px] text-center text-gray-300 select-none">
+      <p 
+        className="mt-1.5 text-[11px] text-center font-medium select-none text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)] transition-opacity duration-300"
+      >
         {label}
       </p>
     </motion.div>

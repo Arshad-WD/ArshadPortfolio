@@ -4,15 +4,15 @@ export const COLS = 4;
  * 🔽 Reduce rows to make screen "shorter"
  * Try 4 or 5. iOS usually shows 4 rows.
  */
-export const ROWS = 4;
+export const ROWS = 6;
 
 
-export const CELL = 72;
-export const GAP = 18;
+export const CELL = 60;
+export const GAP = 26;
 
 
-export const START_X = 24;
-export const START_Y = 96;
+export const START_X = 27;
+export const START_Y = 110;
 
 // total grid size
 export const GRID_WIDTH =
