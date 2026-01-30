@@ -66,13 +66,13 @@ export default function HomeScreen({
         opacity: hidden ? 0 : 1,
         pointerEvents: hidden ? "none" : "auto",
       }}
-      transition={{ type: "spring", stiffness: 260, damping: 30 }}
+      transition={{ type: "spring", stiffness: 350, damping: 35, mass: 0.8 }}
       drag="x"
       dragConstraints={{
         left: -(pages.length - 1) * width,
         right: 0,
       }}
-      dragElastic={0.12}
+      dragElastic={0.2}
       onDragEnd={(_, info) => {
         if (info.offset.x < -120 && pageIndex < pages.length - 1) {
           setPageIndex((p) => p + 1);

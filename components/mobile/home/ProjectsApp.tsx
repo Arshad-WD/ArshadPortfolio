@@ -31,17 +31,20 @@ export default function ProjectsApp() {
                         <img 
                             src={project.img} 
                             alt={project.title} 
-                            className="w-full h-full object-cover opacity-80"
+                            loading="lazy"
+                            className="w-full h-full object-cover transition-opacity duration-500"
+                            onLoad={(e) => (e.currentTarget.style.opacity = "1")}
+                            style={{ opacity: 0 }}
                         />
-                        <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-transparent" />
+                        <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent" />
                         <div className="absolute bottom-4 left-5 right-5 flex justify-between items-center">
-                            <div>
-                                <h2 className="text-xl font-bold">{project.title}</h2>
-                                <p className="text-zinc-400 text-xs">{project.project}</p>
+                            <div className="flex-1 mr-4">
+                                <h2 className="text-lg font-black tracking-tight leading-tight">{project.title}</h2>
+                                <p className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest">{project.project}</p>
                             </div>
                             <button 
                                 onClick={() => openProject(project.link)}
-                                className="px-6 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-xs font-black uppercase tracking-widest"
+                                className="px-5 py-1.5 bg-white text-black rounded-full text-[11px] font-black uppercase tracking-widest active:bg-zinc-200 transition-colors"
                             >
                                 Get
                             </button>

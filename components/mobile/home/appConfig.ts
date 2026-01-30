@@ -16,10 +16,10 @@ export const APP_ICONS: Record<AppType, string> = {
   Photos: "/icons/gallery.jpg",
 
   Settings: "/icons/settings.png",
-  Safari: "/icons/about.jpg",
-  Mail: "/icons/about.jpg",
-  Music: "/icons/about.jpg",
-  Notes: "/icons/about.jpg",
-  Maps: "/icons/about.jpg",
-  AppStore: "/icons/about.jpg",
+  Safari: "/icons/safari.png",
+  Mail: "/icons/mail.png",
+  Music: "/icons/music.png",
+  Notes: "/icons/notes.png",
+  Maps: "/icons/maps.png",
+  AppStore: "/icons/appstore.jpg",
 };

@@ -61,14 +61,14 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
       {/* Cinematic Grain Overlay */}
       <div className="hidden md:block absolute inset-0 pointer-events-none opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] brightness-100 contrast-150" />
 
-      {/* Ambient Glow */}
+      {/* Ambient Glow - Now enabled for mobile too */}
       <motion.div 
         animate={{ 
             scale: [1, 1.2, 1],
             opacity: [0.3, 0.5, 0.3]
         }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        className="hidden md:block absolute w-[50vw] h-[50vw] bg-white/5 rounded-full blur-[120px] pointer-events-none"
+        className="absolute w-[80vw] h-[80vw] md:w-[50vw] md:h-[50vw] bg-white/5 rounded-full blur-[80px] md:blur-[120px] pointer-events-none"
       />
 
       {/* Visual background layers */}
@@ -103,37 +103,60 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
             ))}
         </div>
 
-        {/* Mobile Logo Branding (iPhone 15 Vibe) */}
-        <div className="flex flex-col items-center md:hidden mb-16">
+        {/* Mobile Logo Branding (Cinematic Redesign) */}
+        <div className="flex flex-col items-center md:hidden mb-20">
+            <div className="flex flex-row overflow-hidden mb-2">
+                {words.map((word, i) => (
+                    <motion.span
+                        key={i}
+                        initial={{ y: "100%", opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ 
+                            duration: 1, 
+                            ease: [0.22, 1, 0.36, 1],
+                            delay: i * 0.1 
+                        }}
+                        className="text-[14vw] font-black uppercase tracking-tighter text-white/90 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]"
+                    >
+                        {word}
+                    </motion.span>
+                ))}
+            </div>
             <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 1.5, ease: "easeInOut" }}
-                className="flex flex-col items-center"
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: "100%" }}
+                transition={{ duration: 1, delay: 0.8 }}
+                className="h-[1px] bg-linear-to-r from-transparent via-white/40 to-transparent w-full"
+            />
+            <motion.p
+                 initial={{ opacity: 0, y: 10 }}
+                 animate={{ opacity: 0.4, y: 0 }}
+                 transition={{ duration: 1, delay: 1.2 }}
+                 className="text-[10px] uppercase font-black tracking-[0.6em] mt-4 text-white"
             >
-                <span className="text-3xl font-black uppercase tracking-[0.5em] text-white/90">ARSHAD</span>
-            </motion.div>
+                Digital Portfolio
+            </motion.p>
         </div>
 
         {/* Progress Section */}
-        <div className="relative w-full max-w-[120px] md:max-w-lg flex flex-col items-center">
+        <div className="relative w-full max-w-[140px] md:max-w-lg flex flex-col items-center">
             <div className="w-full h-[2.5px] bg-zinc-900/50 relative overflow-hidden rounded-full">
                 {/* iOS Style White Bar */}
                 <motion.div 
-                    className="absolute top-0 left-0 h-full bg-white"
+                    className="absolute top-0 left-0 h-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]"
                     animate={{ width: `${percent}%` }}
                     transition={{ duration: 0.3, ease: "linear" }}
                 />
             </div>
             
-            {/* Desktop Only Percentage */}
-            <div className="hidden md:flex mt-8 items-baseline gap-4">
-                <span className="text-6xl md:text-9xl font-black tabular-nums tracking-tighter">
+            {/* Desktop & Mobile Percentage Reveal */}
+            <div className="flex mt-8 items-baseline gap-4">
+                <span className="text-5xl md:text-9xl font-black tabular-nums tracking-tighter text-white mb-[-0.1em]">
                     {percent.toString().padStart(2, '0')}
                 </span>
                 <div className="flex flex-col">
-                    <span className="text-zinc-600 text-xl font-bold italic tracking-tighter leading-none">/ 100</span>
-                    <span className="text-[10px] text-zinc-800 font-mono uppercase tracking-widest mt-1">STATUS: OK</span>
+                    <span className="text-zinc-600 text-sm md:text-xl font-bold italic tracking-tighter leading-none">/ 100</span>
+                    <span className="hidden md:inline text-[10px] text-zinc-800 font-mono uppercase tracking-widest mt-1">STATUS: OK</span>
                 </div>
             </div>
         </div>

@@ -43,7 +43,19 @@ export default function HomeClient() {
     <main className="relative h-full w-full bg-black overflow-hidden font-sans">
       <AnimatePresence mode="wait">
         {loading ? (
-          <div key="preloader-container" className="fixed inset-0 z-[10000] bg-black">
+          <motion.div 
+            key="preloader-container" 
+            exit={{ 
+              y: "-100%",
+              opacity: 0.9,
+              transition: { 
+                duration: 1.2, 
+                ease: [0.76, 0, 0.24, 1],
+                opacity: { duration: 0.7 } 
+              }
+            }}
+            className="fixed inset-0 z-[10000] bg-black"
+          >
              {isMobile ? (
                <IPhoneShell>
                   <Preloader key="mobile-preloader" onComplete={() => setLoading(false)} />
@@ -51,7 +63,7 @@ export default function HomeClient() {
              ) : (
                <Preloader key="desktop-preloader" onComplete={() => setLoading(false)} />
              )}
-          </div>
+          </motion.div>
         ) : (
           <motion.div 
             key="content"
