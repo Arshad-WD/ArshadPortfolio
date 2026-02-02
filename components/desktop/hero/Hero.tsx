@@ -114,15 +114,14 @@ const Hero: React.FC<HeroProps> = ({
 
             {/* Hero */}
             <div className="text-center z-40">
-              <h1 className="text-[12rem] font-extrabold bg-linear-to-r from-gray-400 via-gray-500 to-gray-600 bg-clip-text text-transparent uppercase -tracking-[0.0099em] -mt-20">
+              <h1 className="text-[10rem] font-extrabold bg-linear-to-r from-gray-400 via-gray-500 to-gray-600 bg-clip-text text-transparent uppercase -tracking-[0.0099em] -mt-20">
                 HI, I'M ARSHAD
               </h1>
 
               <div className="flex justify-between w-full px-20">
-                <div className="w-sm p-8 text-2xl text-zinc-600">
+                <div className="w-sm p-4 text-2xl text-zinc-600">
                   <p style={{fontFamily: "LastTrunk"}} className="uppercase text-justify ">
-                    Frontend Developer with a passion for UI/UX and Cybersecurity,
-                    crafting bold and immersive experiences.
+                    Full-stack developer with a backend-first mindset, focused on building reliable systems, scalable APIs, and production-ready applications.
                   </p>
                 </div>
 
@@ -219,7 +218,7 @@ const Hero: React.FC<HeroProps> = ({
         )}
 
         {/* Thumb-Optimized Bottom Nav Bar */}
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[85vw] h-16 bg-white/5 border border-white/10 backdrop-blur-2xl rounded-full flex items-center justify-around px-4 z-[70] shadow-2xl">
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[85vw] h-16 bg-white/5 border border-white/10 backdrop-blur-2xl rounded-full flex items-center justify-around px-4 z-70 shadow-2xl">
             <button onClick={scrollToAbout} className="text-[10px] font-mono uppercase tracking-[0.2em] text-[#FF9933] font-bold">About</button>
             <div className="w-[1px] h-4 bg-zinc-800" />
             <button onClick={scrollToProject} className="text-[10px] font-mono uppercase tracking-[0.2em] text-white font-bold">Projects</button>
