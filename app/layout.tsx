@@ -1,5 +1,6 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://arshad-portfolio.vercel.app"),
@@ -35,7 +36,26 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="relative text-white antialiased">{children}</body>
+      <head>
+        {/* Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-2Q7CVVC5MJ"
+          strategy="afterInteractive"
+        />
+
+        <Script id="ga4" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-2Q7CVVC5MJ');
+          `}
+        </Script>
+      </head>
+
+      <body className="relative text-white antialiased">
+        {children}
+      </body>
     </html>
   );
 }
