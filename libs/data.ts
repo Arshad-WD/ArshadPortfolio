@@ -28,7 +28,7 @@ export const PROJECTS = [
         id: 3,
         title: "03 EXPENSE TRACKER",
         project: "Visit Site",
-        img: "/images/expense_tracker.jpg",
+        img: "/images/expense_tracker.png",
         link: "https://expense-tracker-ircf.vercel.app/",
     },
     {
