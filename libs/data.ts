@@ -12,30 +12,30 @@ export const TECH_STACK = [
 export const PROJECTS = [
     {
         id: 1,
-        title: "01 MOVIE RATING",
+        title: "01 URL MEMORY",
+        project: "Visit Site",
+        img: "/images/url_memory.png",
+        link: "https://memory.jenixweblancer.in/",
+    },
+    {
+        id: 2,
+        title: "02 MOVIE RATING",
         project: "Visit Site",
         img: "/images/movie_rating.jpg",
         link: "https://entertainment-gold.vercel.app/",
     },
     {
-        id: 2,
-        title: "02 EXPENSE TRACKER",
+        id: 3,
+        title: "03 EXPENSE TRACKER",
         project: "Visit Site",
         img: "/images/expense_tracker.jpg",
         link: "https://expense-tracker-ircf.vercel.app/",
     },
     {
-        id: 3,
-        title: "03 AI CONVERSATION (DESIGN ONLY)",
+        id: 4,
+        title: "04 AI CONVERSATION (DESIGN ONLY)",
         project: "Visit Site",
         img: "/images/ai_convo.jpg",
-        link: "",
-    },
-    {
-        id: 4,
-        title: "04 GSAP FANTA (DESIGN)",
-        project: "Visit Site",
-        img: "/images/fanta.jpg",
         link: "",
     },
 ];
