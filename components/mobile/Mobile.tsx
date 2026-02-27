@@ -46,7 +46,7 @@ export default function Mobile() {
       app,
       title,
       message,
-      icon: APP_ICONS[app] || "/icons/about.jpg",
+      icon: APP_ICONS[app] || "/icons/about.webp",
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
     setNotiQueue(prev => [...prev, newNoti]);

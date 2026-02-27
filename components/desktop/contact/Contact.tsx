@@ -101,7 +101,7 @@ const Contact = () => {
         {[1, 4, 6].map((num, i) => (
           <Image
             key={num}
-            src={`/images/${num}.png`}
+            src={`/images/${num}.webp`}
             alt=""
             width={300}
             height={300}

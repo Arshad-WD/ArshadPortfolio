@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { PROJECTS } from "@/libs/data";
 import StackingCards from "./ProjectCard";
 import type { ProjectsProps } from "./types";
 
@@ -13,7 +14,7 @@ export default function Projects(_: ProjectsProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (!headingRef.current || !containerRef.current) return;
+    if (!containerRef.current || !headingRef.current) return;
 
     const ctx = gsap.context(() => {
       // Heading reveal
@@ -39,13 +40,13 @@ export default function Projects(_: ProjectsProps) {
         }
       );
 
-      // Section pin logic (if needed, currently cards have sticky behavior)
+      // Section Pinning
       ScrollTrigger.create({
         trigger: containerRef.current,
         start: "top top",
-        end: "+=300%",
-        pin: false, // Using sticky inside cards instead
-        scrub: true,
+        end: `+=${PROJECTS.length * 75}%`, // High-Contrast Velocity: Ultra Snap
+        pin: true,
+        scrub: 1,
       });
     }, containerRef);
 
@@ -55,27 +56,24 @@ export default function Projects(_: ProjectsProps) {
   return (
     <section 
       ref={containerRef}
-      className="w-screen bg-white rounded-t-[5rem] md:rounded-t-[10rem] pt-40 pb-60 z-20 relative -mt-40 shadow-[0_-50px_100px_rgba(0,0,0,0.05)]"
+      className="w-screen h-screen bg-white rounded-t-[5rem] md:rounded-t-[10rem] z-20 relative -mt-40 shadow-[0_-50px_100px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col"
     >
-      <div className="container mx-auto px-6 mb-40">
+      <div className="h-[30vh] flex flex-col justify-end pb-12">
         <div className="flex flex-col items-center text-center">
-            <span className="text-zinc-400 font-mono text-xs tracking-[0.5em] uppercase mb-8">
+            <span className="text-zinc-400 font-mono text-xs tracking-[0.5em] uppercase mb-4">
                 Selected Work
             </span>
             <h2
                 ref={headingRef}
-                className="text-8xl md:text-[12rem] lg:text-[18rem] font-black uppercase tracking-tighter text-zinc-900 leading-[0.75] mb-12"
+                className="text-7xl md:text-[7rem] lg:text-[8rem] font-black uppercase tracking-tighter text-zinc-900 leading-[0.75]"
             >
                 Featured<br />
                 <span className="text-zinc-100">Projects</span>
             </h2>
-            <p className="text-zinc-400 text-xl md:text-2xl font-medium tracking-tight max-w-xl leading-tight">
-                A collection of digital tools and experiences built with care, performance, and user-centric design.
-            </p>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto">
+      <div className="h-[70vh] flex items-center overflow-hidden">
         <StackingCards />
       </div>
     </section>

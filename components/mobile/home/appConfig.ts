@@ -1,25 +1,25 @@
 import { AppType } from "../types";
 
 export const APP_ICONS: Record<AppType, string> = {
-  About: "/icons/about.jpg",
-  Projects: "/icons/project.jpg",
-  Resume: "/icons/notepad.jpg",
+  About: "/icons/about.webp",
+  Projects: "/icons/project.webp",
+  Resume: "/icons/notepad.webp",
 
-  Instagram: "/icons/instagram.jpg",
-  Youtube: "/icons/youtube.jpg",
-  Linkedin: "/icons/linkedin.jpg",
-  X: "/icons/x.jpg",
+  Instagram: "/icons/instagram.webp",
+  Youtube: "/icons/youtube.webp",
+  Linkedin: "/icons/linkedin.webp",
+  X: "/icons/x.webp",
 
-  Contact: "/icons/contact.jpg",
-  Google: "/icons/google.jpg",
-  Camera: "/icons/camera.jpg",
-  Photos: "/icons/gallery.jpg",
+  Contact: "/icons/contact.webp",
+  Google: "/icons/google.webp",
+  Camera: "/icons/camera.webp",
+  Photos: "/icons/gallery.webp",
 
-  Settings: "/icons/settings.png",
-  Safari: "/icons/safari.png",
-  Mail: "/icons/mail.png",
-  Music: "/icons/music.png",
-  Notes: "/icons/notes.png",
-  Maps: "/icons/maps.png",
-  AppStore: "/icons/appstore.jpg",
+  Settings: "/icons/settings.webp",
+  Safari: "/icons/safari.webp",
+  Mail: "/icons/mail.webp",
+  Music: "/icons/music.webp",
+  Notes: "/icons/notes.webp",
+  Maps: "/icons/maps.webp",
+  AppStore: "/icons/appstore.webp",
 };

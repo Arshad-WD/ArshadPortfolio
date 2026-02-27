@@ -12,7 +12,7 @@ const Wallpaper = memo(function Wallpaper() {
       {/* Original Wallpaper image with better blending */}
       <div
         className="absolute inset-0 bg-cover bg-center mix-blend-overlay opacity-60"
-        style={{ backgroundImage: "url('/images/wallpaper.jpg')" }}
+        style={{ backgroundImage: "url('/images/wallpaper.webp')" }}
       />
       
       {/* Noise / Film Grain for Texture */}

@@ -98,28 +98,28 @@ const Techstack: React.FC = () => {
 
       <div className={styles["tech-stack-grid"]}>
         <div className={styles.card} id="card-1">
-          <img src="/images/reactjs.jpg" className={styles["tech-stack-image"]} />
+          <img src="/images/reactjs.webp" className={styles["tech-stack-image"]} />
         </div>
         <div className={styles.card} id="card-2">
-          <img src="/images/Nextjs.jpg" className={styles["tech-stack-image"]} />
+          <img src="/images/Nextjs.webp" className={styles["tech-stack-image"]} />
         </div>
         <div className={styles.card} id="card-3">
-          <img src="/images/node.jpg" className={styles["tech-stack-image"]} />
+          <img src="/images/node.webp" className={styles["tech-stack-image"]} />
         </div>
         <div className={styles.card} id="card-4">
-          <img src="/images/mongo.jpg" className={styles["tech-stack-image"]} />
+          <img src="/images/mongo.webp" className={styles["tech-stack-image"]} />
         </div>
         <div className={styles.card} id="card-5">
-          <img src="/images/tailwindcss.jpg" className={styles["tech-stack-image"]} />
+          <img src="/images/tailwindcss.webp" className={styles["tech-stack-image"]} />
         </div>
         <div className={styles.card} id="card-6">
-          <img src="/images/js.jpg" className={styles["tech-stack-image"]} />
+          <img src="/images/js.webp" className={styles["tech-stack-image"]} />
         </div>
         <div className={styles.card} id="card-7">
-          <img src="/images/flutter.jpg" className={styles["tech-stack-image"]} />
+          <img src="/images/flutter.webp" className={styles["tech-stack-image"]} />
         </div>
         <div className={styles.card} id="card-8">
-          <img src="/images/gsap.jpg" className={styles["tech-stack-image"]} />
+          <img src="/images/gsap.webp" className={styles["tech-stack-image"]} />
         </div>
       </div>
     </section>
@@ -129,5 +129,3 @@ const Techstack: React.FC = () => {
 };
 
 export default Techstack;
-
-
