@@ -23,7 +23,7 @@ export default function Dock({
   return (
     <div
       className={`
-        absolute bottom-12 left-1/2 -translate-x-1/2
+        absolute bottom-12 sm:bottom-12 left-1/2 -translate-x-1/2
         w-[92%] h-[88px]
         rounded-[32px]
         bg-white/10 backdrop-blur-[25px]
@@ -35,6 +35,7 @@ export default function Dock({
         transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1)
         ${hidden ? "opacity-0 pointer-events-none translate-y-32 scale-90" : "opacity-100 translate-y-0 scale-100"}
       `}
+      style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       {DOCK_APPS.map((app) => {
         const ref = useRef<HTMLButtonElement>(null);

@@ -47,7 +47,9 @@ export default function Footer(_: FooterProps) {
                 </h2>
                 <div className="mt-16 flex items-center gap-8">
                     <motion.a 
-                        href="mailto:jenixweblancer@gmail.com"
+                        href="https://wa.me/918591180070?text=Hi%20Arshad%2C%20I%20visited%20your%20portfolio%20and%20would%20love%20to%20connect!"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         className="px-12 py-6 bg-white text-black rounded-full font-black uppercase tracking-widest text-sm shadow-2xl hover:bg-zinc-200 transition-all"

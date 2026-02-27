@@ -3,16 +3,19 @@
 import { useEffect, useState } from "react";
 
 export default function IPhoneShell({ children }: { children: React.ReactNode }) {
+  const [isMobile, setIsMobile] = useState(false);
   const [scale, setScale] = useState(1);
 
   useEffect(() => {
     const handleResize = () => {
-      const vh = window.innerHeight;
-      const targetHeight = 852; // Exact shell height
-      if (vh < targetHeight) {
-        setScale(vh / targetHeight);
-      } else {
-        setScale(1);
+      const mobile = window.innerWidth < 640;
+      setIsMobile(mobile);
+      
+      if (!mobile) {
+        // Desktop: scale the decorative shell to fit viewport
+        const vh = window.innerHeight;
+        const targetHeight = 852;
+        setScale(vh < targetHeight ? vh / targetHeight : 1);
       }
     };
     handleResize();
@@ -20,6 +23,18 @@ export default function IPhoneShell({ children }: { children: React.ReactNode })
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // On real mobile: go full screen, no shell chrome
+  if (isMobile) {
+    return (
+      <div className="fixed inset-0 w-full h-full bg-black overflow-hidden">
+        <div className="relative w-full h-full">
+          {children}
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop: show the decorative iPhone frame
   return (
     <div className="flex justify-center items-center h-screen bg-black overflow-hidden py-4">
       <div

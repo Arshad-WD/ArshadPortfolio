@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useState, memo } from "react";
+import { useRef, useEffect, useState, memo, useCallback } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useGLTF, useAnimations, PerformanceMonitor, AdaptiveDpr, Preload } from "@react-three/drei";
 import type { WhaleRef } from "./types";
@@ -32,11 +32,12 @@ function WebGLGuard({children}: {children: React.ReactNode}){
 // Separate Scene for optimization
 const Scene = memo(() => {
   const whaleRef = useRef<WhaleRef | null>(null);
-  const { scene, animations } = useGLTF("/texture/scene.gltf");
+  const { scene, animations } = useGLTF("/texture/whale.glb");
   const { actions } = useAnimations(animations, whaleRef);
   
-  const [targetX, setTargetX] = useState(0);
-  const [targetY, setTargetY] = useState(0);
+  // Use refs instead of state to avoid React re-renders on mouse move
+  const targetX = useRef(0);
+  const targetY = useRef(0);
 
   useEffect(() => {
     if (animations.length && actions) {
@@ -50,19 +51,24 @@ const Scene = memo(() => {
 
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
-      setTargetX((e.clientX / window.innerWidth - 0.5) * 0.9);
-      setTargetY((e.clientY / window.innerHeight - 0.5) * 0.3);
+      targetX.current = (e.clientX / window.innerWidth - 0.5) * 0.9;
+      targetY.current = (e.clientY / window.innerHeight - 0.5) * 0.3;
     };
-    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mousemove", onMove, { passive: true });
     return () => window.removeEventListener("mousemove", onMove);
   }, []);
 
-  useFrame((state) => {
+  // Throttle rotation updates to ~30fps to save CPU while keeping animation smooth
+  const lastUpdate = useRef(0);
+  useFrame((_, delta) => {
     if (!whaleRef.current) return;
+    lastUpdate.current += delta;
+    if (lastUpdate.current < 1 / 30) return; // Skip frames beyond 30fps for rotation
+    lastUpdate.current = 0;
     
     // Smooth lerping for performance
-    whaleRef.current.rotation.y += (targetX - whaleRef.current.rotation.y) * 0.05;
-    whaleRef.current.rotation.x += (targetY - whaleRef.current.rotation.x) * 0.05;
+    whaleRef.current.rotation.y += (targetX.current - whaleRef.current.rotation.y) * 0.05;
+    whaleRef.current.rotation.x += (targetY.current - whaleRef.current.rotation.x) * 0.05;
   });
 
   useEffect(() => {
@@ -71,7 +77,9 @@ const Scene = memo(() => {
         child.material.colorSpace = THREE.SRGBColorSpace;
         child.castShadow = false;
         child.receiveShadow = false;
-        // Memory optimization: clear unnecessary materials if needed
+        // Freeze material to prevent unnecessary shader recompilation
+        child.material.needsUpdate = false;
+        child.frustumCulled = true;
       }
     });
     
@@ -95,6 +103,9 @@ Scene.displayName = "WhaleScene";
 export default function WhaleModel() {
   const [dpr, setDpr] = useState(1);
 
+  const handleDecline = useCallback(() => setDpr(0.8), []);
+  const handleIncline = useCallback(() => setDpr(1.2), []);
+
   return (
    <WebGLGuard>
     <Canvas
@@ -107,10 +118,9 @@ export default function WhaleModel() {
         depth: true,
         alpha: true,
       }}
-      // Optimization: Only render when needed
-      frameloop="always" 
+      frameloop="always"
     >
-      <PerformanceMonitor onDecline={() => setDpr(1)} onIncline={() => setDpr(1.5)} />
+      <PerformanceMonitor onDecline={handleDecline} onIncline={handleIncline} />
       <AdaptiveDpr pixelated />
       
       <ambientLight intensity={0.8} />
@@ -125,3 +135,5 @@ export default function WhaleModel() {
   );
 }
 
+// Preload the model so it starts downloading immediately
+useGLTF.preload("/texture/whale.glb");

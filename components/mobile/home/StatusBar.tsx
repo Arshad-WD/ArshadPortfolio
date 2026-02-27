@@ -24,7 +24,7 @@ export default function StatusBar() {
   }, []);
 
   return (
-    <div className="absolute top-0 left-0 w-full h-[35px] flex justify-between items-center px-8 z-50 pointer-events-none mt-2">
+    <div className="absolute top-0 left-0 w-full h-[35px] flex justify-between items-center px-8 z-50 pointer-events-none mt-2" style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}>
       {/* Time (Left of Dynamic Island) */}
       <div className="flex-1 flex justify-start">
         <span className="text-[15px] font-bold text-white tracking-tight leading-none h-4 flex items-center">{time}</span>

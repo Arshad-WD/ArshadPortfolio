@@ -4,11 +4,7 @@ import { motion } from "framer-motion";
 import { useRef } from "react";
 import {
   gridToXY,
-  GRID_WIDTH,
-  GRID_HEIGHT,
-  START_X,
-  START_Y,
-  CELL,
+  getResponsiveValues,
 } from "../../utils/grid";
 
 interface Props {
@@ -38,12 +34,17 @@ export default function AppIcon({
       role="button"
       tabIndex={0}
       drag
-      dragConstraints={{
-        left: START_X,
-        right: START_X + GRID_WIDTH - CELL,
-        top: START_Y,
-        bottom: START_Y + GRID_HEIGHT - CELL,
-      }}
+      dragConstraints={(() => {
+        const { startX, startY, cell, gap } = getResponsiveValues();
+        const cols = 4;
+        const rows = 6;
+        return {
+          left: startX,
+          right: startX + (cols * cell + (cols - 1) * gap) - cell,
+          top: startY,
+          bottom: startY + rows * (cell + gap) - cell,
+        };
+      })()}
       dragMomentum={false}
       animate={gridToXY(index)}
       transition={{ type: "spring", stiffness: 500, damping: 30 }}

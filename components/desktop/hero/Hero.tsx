@@ -125,7 +125,7 @@ const Hero: React.FC<HeroProps> = ({
                   </p>
                 </div>
 
-                {/* Whale Scene */}
+                {/* Whale Scene - Single instance shared across desktop/mobile */}
                 <div
                   className="w-full h-[80vh] bg-transparent absolute top-0 left-0 z-20 flex justify-center"
                   style={{ position: "absolute", top: "20vh" }}
@@ -179,7 +179,7 @@ const Hero: React.FC<HeroProps> = ({
            <div className="w-10 h-[1px] bg-zinc-800" />
         </div>
 
-        {/* 3D Whale Portal */}
+        {/* 3D Whale Portal - Reuses same model instance via CSS visibility */}
         <div className="relative flex-1 flex flex-col items-center justify-center -mt-10 z-20">
             <div className="relative w-[75vw] h-[75vw] rounded-full overflow-hidden border border-white/5 bg-white/5 backdrop-blur-3xl shadow-2xl">
                 <div className="absolute inset-0 scale-[1.5] -translate-y-10">
