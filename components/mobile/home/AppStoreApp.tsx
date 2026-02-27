@@ -1,67 +1,98 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useState } from "react";
 
-const FEATURED = [
-  { title: "Master Performance", subtitle: "Optimize your workflow with Next.js", color: "from-blue-600 to-indigo-800", emoji: "⚡" },
-  { title: "Design Systems", subtitle: "Build scalable UI architectures", color: "from-orange-500 to-red-600", emoji: "📐" },
+const APPS = [
+  { id: "1", name: "Lumina", category: "Design Tool", rating: "4.9", reviews: "2.1K", img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=400" },
+  { id: "2", name: "Vortex", category: "Social Networking", rating: "4.8", reviews: "12K", img: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&q=80&w=400" },
+  { id: "3", name: "Aeon", category: "Productivity", rating: "5.0", reviews: "800", img: "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format&fit=crop&q=80&w=400" },
 ];
 
 export default function AppStoreApp() {
   return (
-    <div className="w-full h-full bg-[#f2f2f7] dark:bg-black text-black dark:text-white flex flex-col">
-       <div className="pt-16 pb-4 px-6">
-         <div className="text-[13px] font-bold text-zinc-500 uppercase tracking-tight mb-0.5">Friday, January 30</div>
-         <div className="flex justify-between items-center">
-            <h1 className="text-3xl font-extrabold tracking-tight">Today</h1>
-            <div className="w-10 h-10 rounded-full bg-zinc-300 dark:bg-zinc-800 flex items-center justify-center font-bold text-white shadow-sm border dark:border-zinc-700">
-               A
-            </div>
-         </div>
-       </div>
+    <div className="w-full h-full bg-black text-white overflow-y-auto pt-24 pb-32 px-6">
+      <header className="flex justify-between items-end mb-10">
+        <div>
+           <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em]">Discovery</span>
+           <h1 className="text-5xl font-black tracking-tighter uppercase italic leading-none mt-1">Today</h1>
+        </div>
+        <div className="w-10 h-10 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center font-black text-white/50 text-[10px]">A</div>
+      </header>
 
-       <div className="flex-1 overflow-y-auto px-6 pb-24 space-y-6">
-          {FEATURED.map((item, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-              className={`relative overflow-hidden rounded-3xl bg-linear-to-br ${item.color} p-6 h-96 shadow-xl shadow-black/10 active:scale-[0.98] transition-transform cursor-pointer group`}
-            >
-               <div className="relative z-10 flex flex-col h-full justify-between">
-                  <div>
-                    <h2 className="text-xs font-bold text-white/60 uppercase tracking-widest mb-1">{item.subtitle}</h2>
-                    <h3 className="text-4xl font-black text-white leading-[1.1]">{item.title}</h3>
-                  </div>
-                  <div className="flex items-center gap-4">
-                     <div className="w-12 h-12 bg-white/20 backdrop-blur-xl rounded-xl flex items-center justify-center text-2xl shadow-sm border border-white/10">
-                        {item.emoji}
-                     </div>
-                     <div className="flex-1">
-                        <div className="text-sm font-bold text-white">Full-Stack Pro</div>
-                        <div className="text-[10px] font-medium text-white/60">Development Utilities</div>
-                     </div>
-                     <button className="bg-white/20 backdrop-blur-xl px-4 py-1.5 rounded-full text-xs font-black text-white uppercase tracking-wider border border-white/10 group-active:bg-white/40 transition-colors">
-                        Get
-                     </button>
-                  </div>
-               </div>
-               {/* GLARE/SHINE EFFECT */}
-               <div className="absolute top-0 -left-1/2 w-full h-[200%] bg-linear-to-r from-transparent via-white/5 to-transparent rotate-[35deg] translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-1000" />
-            </motion.div>
-          ))}
-       </div>
-
-       {/* BOTTOM NAVIGATION */}
-       <div className="h-20 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border-t dark:border-zinc-800 flex items-center justify-around px-4 pb-4">
-          {["🏠 Today", "🎮 Games", "📱 Apps", "🚀 Arcade", "🔍 Search"].map((tab, i) => (
-            <div key={i} className={`flex flex-col items-center gap-1 ${i === 0 ? "text-blue-500" : "text-zinc-400 opacity-60"}`}>
-               <span className="text-lg">{tab.split(" ")[0]}</span>
-               <span className="text-[9px] font-bold uppercase">{tab.split(" ")[1]}</span>
-            </div>
-          ))}
-       </div>
+      <div className="space-y-12">
+        {APPS.map((app) => (
+             <AppCard key={app.id} app={app} />
+        ))}
+      </div>
     </div>
   );
+}
+
+function AppCard({ app }: { app: any }) {
+    const [status, setStatus] = useState<"IDLE" | "DOWNLOADING" | "OPEN">("IDLE");
+    const [progress, setProgress] = useState(0);
+
+    const handleDownload = () => {
+        setStatus("DOWNLOADING");
+        let p = 0;
+        const interval = setInterval(() => {
+            p += 5;
+            setProgress(p);
+            if (p >= 100) {
+                clearInterval(interval);
+                setStatus("OPEN");
+            }
+        }, 100);
+    }
+
+    return (
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            className="relative group flex flex-col gap-4"
+        >
+            <div className="relative aspect-[4/5] rounded-[40px] overflow-hidden border border-white/5 shadow-2xl">
+                <img src={app.img} alt={app.name} className="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" />
+                <div className="absolute inset-0 bg-linear-to-t from-black via-transparent to-transparent" />
+                
+                <div className="absolute bottom-8 left-8 right-8 flex justify-between items-end">
+                    <div className="space-y-1">
+                        <h2 className="text-3xl font-black tracking-tighter uppercase italic leading-none">{app.name}</h2>
+                        <div className="flex items-center gap-2">
+                            <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">{app.category}</span>
+                            <div className="w-1 h-1 bg-white/20 rounded-full" />
+                            <span className="text-[9px] font-black text-[#FF9933] uppercase leading-none">★ {app.rating}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="flex justify-between items-center px-4">
+                 <div className="flex flex-col">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-white/30">Release</span>
+                    <span className="text-[11px] font-black text-white italic">v2.4.0 Live</span>
+                 </div>
+                 <button 
+                   onClick={status === "IDLE" ? handleDownload : undefined}
+                   className={`
+                     relative h-10 min-w-20 px-6 rounded-full flex items-center justify-center transition-all duration-500 overflow-hidden
+                     ${status === "OPEN" ? "bg-white text-black" : "bg-zinc-800 text-white"}
+                   `}
+                 >
+                    {status === "DOWNLOADING" && (
+                        <div className="absolute inset-0 bg-white/10 flex items-center justify-center">
+                            <svg className="w-6 h-6 -rotate-90">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2.5" fill="transparent" className="opacity-20" />
+                                <circle cx="12" cy="12" r="10" stroke="#FF9933" strokeWidth="2.5" fill="transparent" strokeDasharray={62.8} strokeDashoffset={62.8 - (62.8 * progress) / 100} />
+                            </svg>
+                        </div>
+                    )}
+                    <span className={`text-[10px] font-black uppercase tracking-widest ${status === "DOWNLOADING" ? "opacity-0" : "opacity-100"}`}>
+                        {status === "IDLE" ? "Get" : (status === "DOWNLOADING" ? "" : "Open")}
+                    </span>
+                 </button>
+            </div>
+        </motion.div>
+    )
 }

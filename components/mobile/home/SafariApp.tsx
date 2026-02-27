@@ -1,54 +1,120 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
+
+const SHORTCUTS = [
+  { name: "Work", url: "arshad.dev/work", icon: "💼" },
+  { name: "About", url: "arshad.dev/about", icon: "👤" },
+  { name: "Github", url: "github.com/arshad", icon: "🐙" },
+  { name: "Email", url: "mailto:arshad", icon: "✉️" },
+];
 
 export default function SafariApp() {
+  const [url, setUrl] = useState("arshad.dev/home");
+  const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  const loadUrl = (newUrl: string) => {
+    setLoading(true);
+    setProgress(0);
+    setUrl(newUrl);
+    
+    let p = 0;
+    const interval = setInterval(() => {
+        p += 10;
+        setProgress(p);
+        if (p >= 100) {
+            clearInterval(interval);
+            setTimeout(() => setLoading(false), 300);
+        }
+    }, 150);
+  }
+
   return (
-    <div className="w-full h-full bg-white dark:bg-black flex flex-col pt-16">
-      {/* ADDRESS BAR */}
-      <div className="px-4 py-3 bg-zinc-100/80 dark:bg-zinc-900/80 backdrop-blur-md sticky top-0 z-20 border-b dark:border-zinc-800 flex items-center gap-3">
-        <div className="flex-1 bg-white/50 dark:bg-black/50 rounded-xl py-2 px-4 shadow-inner flex items-center gap-2 border dark:border-zinc-800">
-           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-zinc-500">
-             <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-             <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-           </svg>
-           <span className="text-[15px] font-medium text-black dark:text-white truncate">arshad.dev</span>
+    <div className="w-full h-full bg-white dark:bg-black text-black dark:text-white flex flex-col pt-16 relative">
+      <header className="px-6 pb-6">
+        <div className="flex justify-between items-end mb-6">
+           <h1 className="text-4xl font-black tracking-tighter uppercase italic">Safari</h1>
+           <span className="text-2xl">🌍</span>
         </div>
-        <button className="w-8 h-8 rounded-full bg-linear-to-b from-zinc-200 to-zinc-300 dark:from-zinc-700 dark:to-zinc-800 flex items-center justify-center shadow-sm">
-           <span className="text-sm">🔄</span>
-        </button>
+
+        {/* ADDRESS BAR */}
+        <div className="relative group">
+            <div className={`absolute top-0 left-0 h-full bg-[#FF9933]/10 transition-all duration-300 pointer-events-none rounded-2xl ${loading ? "opacity-100" : "opacity-0"}`} style={{ width: `${progress}%` }} />
+            <div className="bg-zinc-100 dark:bg-zinc-900 rounded-2xl flex items-center px-4 py-3 gap-3 border border-black/5 active:scale-[0.98] transition-all">
+                <span className="text-xs opacity-40">🔒</span>
+                <input 
+                  type="text" 
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && loadUrl(url)}
+                  className="flex-1 bg-transparent text-sm font-black uppercase tracking-widest focus:outline-none"
+                />
+                {loading && <div className="w-4 h-4 border-2 border-[#FF9933] border-t-transparent rounded-full animate-spin" />}
+            </div>
+        </div>
+      </header>
+
+      {/* WEB VIEW */}
+      <div className="flex-1 overflow-y-auto px-6 pb-32">
+        <AnimatePresence mode="wait">
+            {!loading ? (
+                <motion.div 
+                    key={url}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="space-y-12 py-8"
+                >
+                    <div className="grid grid-cols-4 gap-6">
+                        {SHORTCUTS.map((s) => (
+                            <button 
+                                key={s.name} 
+                                onClick={() => loadUrl(s.url)}
+                                className="flex flex-col items-center gap-2 group"
+                            >
+                                <div className="w-14 h-14 bg-zinc-100 dark:bg-zinc-900 rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-black/5 group-active:scale-90 transition-transform">
+                                    {s.icon}
+                                </div>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">{s.name}</span>
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="p-10 bg-linear-to-br from-[#FF9933] to-[#FFCC66] rounded-[48px] shadow-2xl shadow-[#FF9933]/20">
+                        <span className="text-[10px] font-black text-black/40 uppercase tracking-[0.4em]">Pinned</span>
+                        <h2 className="text-4xl font-black uppercase italic tracking-tighter text-black mt-2 leading-[0.9]">Explore the Portfolio</h2>
+                        <button onClick={() => loadUrl('arshad.dev/work')} className="mt-8 px-8 py-3 bg-black text-white text-[10px] font-black uppercase tracking-widest rounded-full">Explore Now</button>
+                    </div>
+
+                    <div className="space-y-6">
+                        <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-zinc-400">Reading List</h3>
+                        {[1, 2].map(i => (
+                            <div key={i} className="flex gap-4 items-center">
+                                <div className="w-16 h-16 bg-zinc-800 rounded-2xl shrink-0" />
+                                <div>
+                                    <div className="text-[14px] font-black uppercase italic tracking-tighter">Award Winning Tech Design {i}</div>
+                                    <div className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mt-1">Medium • 4 min read</div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </motion.div>
+            ) : (
+                <div className="h-full flex items-center justify-center opacity-20">
+                    <span className="text-6xl animate-pulse">📶</span>
+                </div>
+            )}
+        </AnimatePresence>
       </div>
 
-      {/* CONTENT FALLBACK */}
-      <div className="flex-1 overflow-y-auto bg-white dark:bg-black flex flex-col items-center justify-center p-12 text-center">
-        <motion.div
-           initial={{ scale: 0.8, opacity: 0 }}
-           animate={{ scale: 1, opacity: 1 }}
-           className="w-24 h-24 bg-linear-to-br from-blue-500 to-blue-600 rounded-[28px] flex items-center justify-center mb-8 shadow-2xl shadow-blue-500/20"
-        >
-          <span className="text-5xl">🧭</span>
-        </motion.div>
-        <h2 className="text-2xl font-black mb-3">Safari</h2>
-        <p className="text-[15px] text-zinc-500 leading-relaxed max-w-[240px]">
-          Experience the web with absolute speed and privacy. Designed for the bold.
-        </p>
-        
-        <div className="mt-12 flex flex-wrap justify-center gap-3">
-           {["Privacy", "Speed", "iCloud"].map((p) => (
-             <span key={p} className="px-3 py-1 bg-zinc-100 dark:bg-zinc-900 rounded-full text-[11px] font-bold text-zinc-400 uppercase tracking-widest border dark:border-zinc-800">
-               {p}
-             </span>
-           ))}
-        </div>
-      </div>
-
-      {/* BOTTOM NAV */}
-      <div className="h-24 bg-zinc-50/90 dark:bg-zinc-950/90 backdrop-blur-2xl border-t dark:border-zinc-900 flex items-center justify-around px-8 pb-6">
-        <span className="text-blue-500 opacity-40">⏮️</span>
-        <span className="text-blue-500 opacity-40">⏭️</span>
-        <span className="text-blue-500">📤</span>
-        <span className="text-blue-500">📖</span>
-        <span className="text-blue-500">🗂️</span>
+      {/* TOOLBAR */}
+      <div className="h-24 bg-white/80 dark:bg-black/80 backdrop-blur-3xl border-t dark:border-zinc-800 flex justify-between items-center px-10 pb-8 absolute bottom-0 left-0 right-0">
+         <button className="text-2xl opacity-40">⬅️</button>
+         <button className="text-2xl opacity-40">➡️</button>
+         <button className="text-2xl opacity-40">📤</button>
+         <button className="text-2xl opacity-40">📖</button>
+         <button className="text-2xl opacity-40">📑</button>
       </div>
     </div>
   );

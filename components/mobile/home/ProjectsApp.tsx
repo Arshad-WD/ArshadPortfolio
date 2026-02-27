@@ -1,81 +1,129 @@
-"use client";
-
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 import { PROJECTS } from "../../../libs/data";
 
 export default function ProjectsApp() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollY } = useScroll({
+    container: containerRef
+  });
+
+  const headerY = useTransform(scrollY, [0, 200], [0, -100]);
+  const headerOpacity = useTransform(scrollY, [0, 150], [1, 0]);
+  const titleScale = useTransform(scrollY, [0, 150], [1, 0.8]);
+
   function openProject(url: string) {
     window.open(url, "_blank", "noopener,noreferrer");
   }
 
   return (
-    <div className="w-full h-full bg-black text-white overflow-y-auto pt-20 pb-20 px-4">
-      <div className="max-w-md mx-auto space-y-8">
+    <div 
+        ref={containerRef}
+        className="w-full h-full bg-black text-white overflow-y-auto overflow-x-hidden pt-24 pb-32"
+    >
+      <div className="max-w-md mx-auto px-6 space-y-12">
         
-        {/* LARGE TITLE */}
-        <div className="flex justify-between items-end px-2">
-          <h1 className="text-4xl font-bold tracking-tight">Projects</h1>
-          <button 
-            onClick={() => window.open("https://github.com/Arshad-WD", "_blank")}
-            className="text-blue-500 text-sm font-medium"
-          >
-            See All
-          </button>
-        </div>
+        {/* PARALLAX HEADER */}
+        <motion.div 
+            style={{ y: headerY, opacity: headerOpacity, scale: titleScale }}
+            className="flex flex-col gap-1"
+        >
+          <span className="text-[10px] font-black uppercase tracking-[0.5em] text-white/30">Gallery</span>
+          <h1 className="text-5xl font-black tracking-tighter uppercase italic leading-none">
+            Selected<br/><span className="text-[#FF9933]">Works</span>
+          </h1>
+        </motion.div>
 
-        {/* FEATURED PROJECT CARD (App Store Style) */}
-        <section className="space-y-4">
-            <h3 className="px-2 text-[11px] font-semibold text-zinc-500 uppercase tracking-widest">Featured</h3>
+        {/* PROJECTS GRID */}
+        <div className="space-y-16">
             {PROJECTS.map((project, idx) => (
-                <div key={idx} className="bg-zinc-900/40 rounded-3xl overflow-hidden border border-white/5 backdrop-blur-xl shadow-2xl transition-transform active:scale-[0.98]">
-                    <div className="relative aspect-video bg-zinc-800">
-                        <img 
-                            src={project.img} 
-                            alt={project.title} 
-                            loading="lazy"
-                            className="w-full h-full object-cover transition-opacity duration-500"
-                            onLoad={(e) => (e.currentTarget.style.opacity = "1")}
-                            style={{ opacity: 0 }}
-                        />
-                        <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent" />
-                        <div className="absolute bottom-4 left-5 right-5 flex justify-between items-center">
-                            <div className="flex-1 mr-4">
-                                <h2 className="text-lg font-black tracking-tight leading-tight">{project.title}</h2>
-                                <p className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest">{project.project}</p>
-                            </div>
-                            <button 
-                                onClick={() => openProject(project.link)}
-                                className="px-5 py-1.5 bg-white text-black rounded-full text-[11px] font-black uppercase tracking-widest active:bg-zinc-200 transition-colors"
-                            >
-                                Get
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <ProjectSection 
+                    key={project.id} 
+                    project={project} 
+                    index={idx} 
+                    openProject={openProject} 
+                />
             ))}
-        </section>
-
-        {/* REPOS SECTION */}
-        <div className="space-y-2">
-            <h3 className="px-2 text-[11px] font-semibold text-zinc-500 uppercase tracking-widest">Repositories</h3>
-            <section className="bg-zinc-900/50 rounded-2xl overflow-hidden border border-white/5 divide-y divide-white/5 text-sm">
-                <div className="p-4 flex items-center gap-4 active:bg-white/5" onClick={() => window.open("https://github.com/Arshad-WD", "_blank")}>
-                    <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                            <path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2.1c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.2-1.7-1.2-1.7-1-.7.1-.7.1-.7 1.1.1 1.7 1.2 1.7 1.2 1 .1.6-.3 1.5-.7.2-.8.4-1.3.7-1.6-2.5-.3-5.1-1.2-5.1-5.5 0-1.2.4-2.2 1.1-3-.1-.3-.5-1.5.1-3.1 0 0 .9-.3 3 .1a10.5 10.5 0 0 1 5.4 0c2.1-.4 3-.1 3-.1.6 1.6.2 2.8.1 3.1.7.8 1.1 1.8 1.1 3 0 4.3-2.6 5.2-5.1 5.5.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A11.5 11.5 0 0 0 23.5 12C23.5 5.7 18.3.5 12 .5z" />
-                        </svg>
-                    </div>
-                    <div className="flex-1">
-                        <p className="font-bold">Portfolio Source</p>
-                        <p className="text-zinc-500 text-xs text-justify">Custom systems, cyber-aesthetic engine.</p>
-                    </div>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-zinc-700">
-                        <path d="M9 18l6-6-6-6" />
-                    </svg>
-                </div>
-            </section>
         </div>
 
+        {/* FOOTER METADATA */}
+        <div className="pt-20 pb-10 border-t border-white/5 flex flex-col items-center gap-4">
+            <div className="w-8 h-[1px] bg-[#FF9933]" />
+            <span className="text-[9px] font-mono tracking-widest text-white/20 uppercase text-center">
+                Arshad Chaudhary // Portfolio v4.0<br/>
+                All Rights Reserved 2024
+            </span>
+        </div>
       </div>
     </div>
   );
+}
+
+function ProjectSection({ project, index, openProject }: { project: any, index: number, openProject: (url: string) => void }) {
+    const sectionRef = useRef(null);
+    const { scrollYProgress } = useScroll({
+        target: sectionRef,
+        offset: ["start end", "end start"]
+    });
+
+    const y = useTransform(scrollYProgress, [0, 1], [50, -50]);
+    const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.9, 1, 0.9]);
+
+    return (
+        <motion.section 
+            ref={sectionRef}
+            style={{ scale }}
+            className="relative"
+        >
+            <div className="relative group overflow-hidden rounded-[40px] bg-zinc-900 border border-white/5">
+                {/* Image Engine */}
+                <div className="relative aspect-[4/5] overflow-hidden">
+                    <motion.img 
+                        style={{ y }}
+                        src={project.img.replace('.png', '.webp').replace('.jpg', '.webp')} 
+                        alt={project.title}
+                        className="w-full h-[120%] object-cover grayscale opacity-40 group-active:grayscale-0 group-active:opacity-100 transition-all duration-1000"
+                    />
+                    <div className="absolute inset-0 bg-linear-to-t from-black via-black/40 to-transparent" />
+                    
+                    {/* High-End Glint */}
+                    <motion.div 
+                        initial={{ x: "-100%" }}
+                        whileInView={{ x: "100%" }}
+                        transition={{ duration: 1.5, ease: "easeInOut", delay: 0.2 }}
+                        className="absolute inset-0 bg-linear-to-r from-transparent via-white/5 to-transparent skew-x-12"
+                    />
+                </div>
+
+                {/* Content Deck */}
+                <div className="absolute bottom-0 left-0 right-0 p-10 space-y-6">
+                    <div className="flex justify-between items-end">
+                        <div className="space-y-2">
+                            <span className="text-[#FF9933] text-[10px] font-black uppercase tracking-[0.3em]">Project 0{index + 1}</span>
+                            <h2 className="text-4xl font-black tracking-tighter uppercase italic leading-none">{project.title}</h2>
+                        </div>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-6 border-t border-white/5">
+                         <div className="flex gap-4">
+                            {["Next.js", "GSAP", "3D"].slice(0, 2).map(t => (
+                                <span key={t} className="text-[9px] font-black tracking-wider text-white/30 uppercase italic">{t}</span>
+                            ))}
+                         </div>
+                         <button 
+                            onClick={() => openProject(project.link)}
+                            className="h-12 px-8 bg-[#FF9933] text-black text-[11px] font-black uppercase tracking-widest rounded-full shadow-[0_10px_30px_rgba(255,153,51,0.3)] active:scale-90 active:bg-white transition-all duration-300"
+                         >
+                            Open
+                         </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Kinetic Ghost background text */}
+            <div className="absolute -top-10 -right-4 pointer-events-none select-none opacity-[0.03]">
+                <span className="text-9xl font-black italic tracking-tighter">0{index + 1}</span>
+            </div>
+        </motion.section>
+    );
 }

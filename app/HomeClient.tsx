@@ -22,11 +22,22 @@ export default function HomeClient() {
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
   useEffect(() => {
+    // Check if preloader has already been shown in this session
+    const hasLoaded = sessionStorage.getItem("arshad_portfolio_loaded");
+    if (hasLoaded) {
+      setLoading(false);
+    }
+
     const checkMobile = () => setIsMobile(window.innerWidth < 640);
     checkMobile();
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  const handleLoadingComplete = () => {
+    setLoading(false);
+    sessionStorage.setItem("arshad_portfolio_loaded", "true");
+  };
 
   useEffect(() => {
     if (!loading) {
@@ -58,10 +69,10 @@ export default function HomeClient() {
           >
              {isMobile ? (
                <IPhoneShell>
-                  <Preloader key="mobile-preloader" onComplete={() => setLoading(false)} />
+                  <Preloader key="mobile-preloader" onComplete={handleLoadingComplete} />
                </IPhoneShell>
              ) : (
-               <Preloader key="desktop-preloader" onComplete={() => setLoading(false)} />
+               <Preloader key="desktop-preloader" onComplete={handleLoadingComplete} />
              )}
           </motion.div>
         ) : (

@@ -12,14 +12,25 @@ import StatusBar from "./home/StatusBar";
 import DynamicIsland from "./home/DynamicIsland";
 import NotificationBanner, { MobileNotification } from "./home/NotificationBanner";
 import NotificationCenter from "./home/NotificationCenter";
+import ControlCenter from "./home/ControlCenter";
 import { APP_ICONS } from "./home/appConfig";
+import { MusicProvider } from "./utils/MusicState";
 
 export default function Mobile() {
+  return (
+    <MusicProvider>
+      <MobileContent />
+    </MusicProvider>
+  );
+}
+
+function MobileContent() {
   const [active, setActive] = useState<AppLaunchPayload | null>(null);
   const [notiQueue, setNotiQueue] = useState<MobileNotification[]>([]);
   const [currentNoti, setCurrentNoti] = useState<MobileNotification | null>(null);
   const [notiHistory, setNotiHistory] = useState<MobileNotification[]>([]);
   const [showNotiCenter, setShowNotiCenter] = useState(false);
+  const [showControlCenter, setShowControlCenter] = useState(false);
 
   const [pages, setPages] = useState<AppType[][]>([
     ["About", "Projects", "Resume", "Safari", "Mail", "Music", "Settings", "Notes", "Instagram"],
@@ -131,12 +142,24 @@ function openApp(app: AppType, rect?: DOMRect) {
         onClick={() => setShowNotiCenter(true)}
       />
 
+      {/* CONTROL CENTER PULL TRIGGER (Right Ear) */}
+      <div 
+        className="absolute top-0 right-0 w-[140px] h-[55px] z-[160] cursor-pointer"
+        onClick={() => setShowControlCenter(true)}
+      />
+
       {/* NOTIFICATION CENTER PANEL */}
       <NotificationCenter
         notifications={notiHistory}
         isOpen={showNotiCenter}
         onClose={() => setShowNotiCenter(false)}
         onClear={() => setNotiHistory([])}
+      />
+
+      {/* CONTROL CENTER PANEL */}
+      <ControlCenter
+        isOpen={showControlCenter}
+        onClose={() => setShowControlCenter(false)}
       />
 
       {/* NOTIFICATION LAYER (BANNER) */}
@@ -168,7 +191,7 @@ function openApp(app: AppType, rect?: DOMRect) {
 
       {/* HOME (always mounted) */}
       <HomeScreen
-        hidden={!!active || !!launchRect}
+        hidden={!!active || !!launchRect || showNotiCenter || showControlCenter}
         pages={pages}
         pageIndex={pageIndex}
         setPageIndex={setPageIndex}
@@ -181,7 +204,7 @@ function openApp(app: AppType, rect?: DOMRect) {
       />
 
       {/* page dots */}
-      <div className="absolute bottom-[168px] w-full flex justify-center gap-2 z-40">
+      <div className={`absolute bottom-[168px] w-full flex justify-center gap-2 z-40 transition-opacity duration-300 ${active || launchRect || showNotiCenter || showControlCenter ? "opacity-0" : "opacity-100"}`}>
         {pages.map((_, i) => (
           <div
             key={i}
@@ -193,7 +216,7 @@ function openApp(app: AppType, rect?: DOMRect) {
       </div>
 
       {/* SEARCH PILL */}
-      {!active && !launchRect && (
+      {!active && !launchRect && !showNotiCenter && !showControlCenter && (
         <div className="absolute bottom-[145px] left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full border border-white/5 shadow-sm active:scale-95 transition-transform z-40">
            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4">
              <circle cx="11" cy="11" r="8" />
@@ -205,7 +228,7 @@ function openApp(app: AppType, rect?: DOMRect) {
 
       {/* DOCK (always mounted) */}
       <Dock
-        hidden={!!active || !!launchRect}
+        hidden={!!active || !!launchRect || showNotiCenter || showControlCenter}
         notifications={notifications}
         openApp={(app: AppType, rect?: DOMRect) => {
           clearNotification(app);

@@ -3,19 +3,20 @@
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 
+import { useMusic } from "../utils/MusicState";
+
 export default function MusicApp() {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(45);
+  const { isPlaying, setIsPlaying, progress, setProgress } = useMusic();
 
   useEffect(() => {
     let interval: any;
     if (isPlaying) {
       interval = setInterval(() => {
-        setProgress(p => (p < 100 ? p + 0.1 : 0));
+        setProgress(progress < 100 ? progress + 0.1 : 0);
       }, 100);
     }
     return () => clearInterval(interval);
-  }, [isPlaying]);
+  }, [isPlaying, progress, setProgress]);
 
   return (
     <div className="w-full h-full bg-linear-to-b from-zinc-800 to-black text-white p-8 flex flex-col justify-between pt-24 overflow-hidden">
