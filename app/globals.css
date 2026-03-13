@@ -41,6 +41,16 @@ body {
   background: #555;
 }
 
+/* Hide scrollbar utilities */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
 /* Neon Border Animation */
 @keyframes neon-border-animation {
   0% {

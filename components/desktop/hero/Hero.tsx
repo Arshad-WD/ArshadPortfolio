@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import WhaleModel from "../canvas/Model";
+import SplitMaskReveal from "@/components/shared/SplitMaskReveal";
 
 import type { HeroProps, Quote } from "./types";
 
@@ -79,7 +79,7 @@ const Hero: React.FC<HeroProps> = ({
           ref={heroRef}
           className="relative z-10 h-dvh w-screen overflow-x-hidden bg-blue-100"
         >
-          <div className="bg-black h-screen w-full text-white">
+          <div className="bg-black h-screen w-full text-white overflow-hidden relative">
             {/* Navbar */}
             <div className="Navbar px-20 pt-12 items-center w-full">
               <ul className="flex justify-between items-center z-40">
@@ -125,12 +125,11 @@ const Hero: React.FC<HeroProps> = ({
                   </p>
                 </div>
 
-                {/* Whale Scene - Single instance shared across desktop/mobile */}
+                {/* Split Mask Reveal - Lifted off the bottom to clear the clip-path skew */}
                 <div
-                  className="w-full h-[80vh] bg-transparent absolute top-0 left-0 z-20 flex justify-center"
-                  style={{ position: "absolute", top: "20vh" }}
+                  className="w-full h-[70vh] bg-transparent absolute bottom-[10vh] left-1/2 -translate-x-1/2 z-20 flex justify-center"
                 >
-                  <WhaleModel />
+                  <SplitMaskReveal />
                 </div>
 
                 <div className="w-2/5 z-40">
@@ -179,13 +178,13 @@ const Hero: React.FC<HeroProps> = ({
            <div className="w-10 h-[1px] bg-zinc-800" />
         </div>
 
-        {/* 3D Whale Portal - Reuses same model instance via CSS visibility */}
+        {/* Split Mask Portal */}
         <div className="relative flex-1 flex flex-col items-center justify-center -mt-10 z-20">
-            <div className="relative w-[75vw] h-[75vw] rounded-full overflow-hidden border border-white/5 bg-white/5 backdrop-blur-3xl shadow-2xl">
-                <div className="absolute inset-0 scale-[1.5] -translate-y-10">
-                    <WhaleModel />
+            <div className="relative w-full h-[65vw] flex items-center justify-center">
+                <div className="absolute w-full h-[90vw] flex items-center justify-center">
+                    <SplitMaskReveal />
                 </div>
-                <div className="absolute inset-0 bg-linear-to-b from-white/10 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-linear-to-b from-none to-transparent pointer-events-none z-30" />
             </div>
 
             {/* Title Detail */}
