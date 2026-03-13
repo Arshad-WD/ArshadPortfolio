@@ -12,6 +12,10 @@ export const metadata: Metadata = {
   },
   description:
     "Portfolio of Arshad — Premium Full Stack Developer specializing in React, Next.js, Framer Motion, and Industrial-grade UI/UX Design.",
+  icons: {
+    icon: "/icon.png",
+    apple: "/icon.png",
+  },
   keywords: ["Arshad", "Full Stack Developer", "Next.js Portfolio", "React Developer", "GSAP Animation", "UI/UX Design", "Framer Motion", "Premium Website"],
   authors: [{ name: "Arshad" }],
   creator: "Arshad",
