@@ -16,6 +16,7 @@ export const PROJECTS = [
         project: "Visit Site",
         img: "/images/url_memory.webp",
         link: "https://memory.jenixweblancer.in/",
+        tags: ["Next.js", "React", "State"],
     },
     {
         id: 2,
@@ -23,6 +24,7 @@ export const PROJECTS = [
         project: "Visit Site",
         img: "/images/movie_rating.webp",
         link: "https://entertainment-gold.vercel.app/",
+        tags: ["API", "React", "Filtering"],
     },
     {
         id: 3,
@@ -30,6 +32,7 @@ export const PROJECTS = [
         project: "Visit Site",
         img: "/images/expense_tracker.webp",
         link: "https://expense-tracker-ircf.vercel.app/",
+        tags: ["Charts", "Finance", "Logic"],
     },
     {
         id: 4,
@@ -37,6 +40,7 @@ export const PROJECTS = [
         project: "Visit Site",
         img: "/images/ai_convo.webp",
         link: "",
+        tags: ["Design", "AI", "Concept"],
     },
 ];
 

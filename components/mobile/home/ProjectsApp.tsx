@@ -148,7 +148,7 @@ function ProjectSection({ project, index, openProject }: { project: any, index: 
                             </p>
                             
                             <div className="flex flex-wrap gap-2">
-                                {["React", "Next.js", "GSAP"].map(t => (
+                                {project.tags?.map((t: string) => (
                                     <span key={t} className="px-2 py-0.5 border border-zinc-100 text-[7px] font-bold text-zinc-400 tracking-widest uppercase">
                                         {t}
                                     </span>
