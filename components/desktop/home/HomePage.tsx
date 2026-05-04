@@ -17,19 +17,21 @@ export default function HomePage() {
 
   return (
     <main className="relative min-h-screen w-screen overflow-x-hidden">
-      <Hero
-        scrollToAbout={() =>
-          aboutRef.current?.scrollIntoView({ behavior: "smooth" })
-        }
-        scrollToProject={() =>
-          projectRef.current?.scrollIntoView({ behavior: "smooth" })
-        }
-        scrollToContact={() =>
-          contactRef.current?.scrollIntoView({ behavior: "smooth" })
-        }
-      />
+      <div data-section="home">
+        <Hero
+          scrollToAbout={() =>
+            aboutRef.current?.scrollIntoView({ behavior: "smooth" })
+          }
+          scrollToProject={() =>
+            projectRef.current?.scrollIntoView({ behavior: "smooth" })
+          }
+          scrollToContact={() =>
+            contactRef.current?.scrollIntoView({ behavior: "smooth" })
+          }
+        />
+      </div>
 
-      <section className="relative min-h-screen bg-black">
+      <section data-section="skills" className="relative min-h-screen bg-black">
         <Techstack />
       </section>
 
@@ -37,12 +39,13 @@ export default function HomePage() {
         <About />
       </section>
 
-      <section ref={projectRef} className="relative min-h-screen bg-black">
+      <section ref={projectRef} data-section="projects" className="relative min-h-screen bg-black">
         <Projects />
       </section>
 
       <section
         ref={contactRef}
+        data-section="contact"
         className="relative min-h-screen bg-white overflow-hidden"
       >
         <Contact />

@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
+import BotLoader from "@/components/BotLoader";
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 
@@ -93,6 +94,7 @@ export default function RootLayout({
 
       <body className="relative text-white antialiased">
         {children}
+        <BotLoader />
       </body>
     </html>
   );
