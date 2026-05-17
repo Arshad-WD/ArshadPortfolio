@@ -58,15 +58,10 @@ const Scene = memo(() => {
     return () => window.removeEventListener("mousemove", onMove);
   }, []);
 
-  // Throttle rotation updates to ~30fps to save CPU while keeping animation smooth
-  const lastUpdate = useRef(0);
-  useFrame((_, delta) => {
+  // Smooth lerping for performance at native monitor refresh rate (60/120/144fps)
+  useFrame(() => {
     if (!whaleRef.current) return;
-    lastUpdate.current += delta;
-    if (lastUpdate.current < 1 / 30) return; // Skip frames beyond 30fps for rotation
-    lastUpdate.current = 0;
     
-    // Smooth lerping for performance
     whaleRef.current.rotation.y += (targetX.current - whaleRef.current.rotation.y) * 0.05;
     whaleRef.current.rotation.x += (targetY.current - whaleRef.current.rotation.x) * 0.05;
   });
@@ -101,37 +96,33 @@ const Scene = memo(() => {
 Scene.displayName = "WhaleScene";
 
 export default function WhaleModel() {
-  const [dpr, setDpr] = useState(1);
-
-  const handleDecline = useCallback(() => setDpr(0.8), []);
-  const handleIncline = useCallback(() => setDpr(1.2), []);
-
   return (
    <WebGLGuard>
     <Canvas
-      dpr={dpr}
+      dpr={[1, 2]} // Support crystal-clear high-definition on Retina and high-DPI screens
       camera={{ position: [0, 2, 5], fov: 45 }}
       gl={{
         powerPreference: "high-performance",
-        antialias: false,
+        antialias: true, // Enable hardware MSAA antialiasing for silky-smooth mesh edges
         stencil: false,
         depth: true,
         alpha: true,
+        toneMapping: THREE.ACESFilmicToneMapping, // High-end cinematic color and lighting mapping
       }}
       frameloop="always"
     >
-      <PerformanceMonitor onDecline={handleDecline} onIncline={handleIncline} />
-      <AdaptiveDpr pixelated />
+      <ambientLight intensity={0.6} />
+      <directionalLight position={[5, 5, 5]} intensity={1.8} />
       
-      <ambientLight intensity={0.8} />
-      <directionalLight position={[5, 5, 5]} intensity={1.5} />
+      {/* Soft Cyan/Purple studio rim light to add deep 3D volume and beautiful edge highlights */}
+      <pointLight position={[-5, -3, -5]} intensity={1.2} color="#06b6d4" />
       
       <Suspense fallback={null}>
         <Scene />
         <Preload all />
       </Suspense>
     </Canvas>
-</WebGLGuard> 
+   </WebGLGuard> 
   );
 }
 

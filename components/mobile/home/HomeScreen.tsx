@@ -16,10 +16,10 @@ export default function HomeScreen({
   openApp,
   hidden,
 }: {
-  pages: AppType[][];
+  pages: (AppType | null)[][];
   pageIndex: number;
   setPageIndex: React.Dispatch<React.SetStateAction<number>>;
-  setPages: React.Dispatch<React.SetStateAction<AppType[][]>>;
+  setPages: React.Dispatch<React.SetStateAction<(AppType | null)[][]>>;
   notifications: Partial<Record<AppType, number>>;
   openApp: (app: AppType, rect?: DOMRect) => void; 
   hidden?: boolean;
@@ -49,8 +49,10 @@ export default function HomeScreen({
       const next = [...prev];
       const pageApps = [...next[page]];
 
-      pageApps.splice(fromIndex, 1);
-      pageApps.splice(targetIndex, 0, app);
+      // Swap the dragged app with whatever is at the target index (app or null)
+      const targetApp = pageApps[targetIndex];
+      pageApps[targetIndex] = app;
+      pageApps[fromIndex] = targetApp;
 
       next[page] = pageApps;
       return next;
@@ -84,15 +86,17 @@ export default function HomeScreen({
       {pages.map((pageApps, page) => (
         <div key={page} className="relative w-full h-full shrink-0">
           {pageApps.map((app, index) => (
-            <AppIcon
-              key={app}
-              label={app}
-              icon={APP_ICONS[app]}
-              index={index}
-              badge={notifications[app]}
-              onLaunch={(app, rect) => openApp(app as AppType, rect)} 
-              onMove={(x, y) => move(app, x, y, page)}
-            />
+            app ? (
+              <AppIcon
+                key={app}
+                label={app}
+                icon={APP_ICONS[app]}
+                index={index}
+                badge={notifications[app]}
+                onLaunch={(app, rect) => openApp(app as AppType, rect)} 
+                onMove={(x, y) => move(app, x, y, page)}
+              />
+            ) : null
           ))}
         </div>
       ))}

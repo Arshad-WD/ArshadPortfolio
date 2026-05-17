@@ -1,4 +1,10 @@
 User-agent: *
 Allow: /
 
+# Block internal API routes from crawlers
+Disallow: /api/
+
+# Block Next.js internals
+Disallow: /_next/
+
 Sitemap: https://arshad-portfolio.vercel.app/sitemap.xml

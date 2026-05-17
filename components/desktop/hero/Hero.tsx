@@ -24,7 +24,7 @@ const Hero: React.FC<HeroProps> = ({
 
   const handleResumeClick = (): void => {
     setButtonText("Viewing Resume...");
-    window.open("/resume/ARSHADCHAUDHARY-2025.pdf", "_blank");
+    window.open("/resume/ARSHADCHAUDHARY-2026.pdf", "_blank");
 
     setTimeout(() => {
       setButtonText("CHECK RESUME");

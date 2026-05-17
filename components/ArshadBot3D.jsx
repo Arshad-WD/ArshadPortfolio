@@ -67,10 +67,25 @@ function BotModel({ mouseNear, mouseDir }) {
     const clone = scene.clone(true);
     const mats = [];
     clone.traverse((child) => {
-      if (child.isMesh && child.material) {
-        child.material = child.material.clone();
-        if (child.material.emissive) {
-          mats.push(child.material);
+      if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+        
+        if (child.material) {
+          child.material = child.material.clone();
+          child.material.roughness = 0.25; // Premium brushed chrome roughness
+          child.material.metalness = 0.90; // Gorgeous metallic reflection capability
+          
+          // Force high-definition texture filtering and maximum anisotropy
+          if (child.material.map) {
+            child.material.map.anisotropy = 16;
+            child.material.map.minFilter = THREE.LinearMipmapLinearFilter;
+            child.material.map.magFilter = THREE.LinearFilter;
+          }
+          
+          if (child.material.emissive) {
+            mats.push(child.material);
+          }
         }
       }
     });
@@ -340,17 +355,23 @@ function BotCanvas({ botRef, mouseNear, mouseDir }) {
       <Canvas
         style={{ background: "transparent" }}
         camera={{ position: [0, 0.2, 2.2], fov: 35 }}
-        gl={{ alpha: true, antialias: true }}
+        gl={{ 
+          alpha: true, 
+          antialias: true,
+          powerPreference: "high-performance",
+          toneMapping: THREE.ACESFilmicToneMapping, // High-end photographic tone mapping
+          toneMappingExposure: 1.15
+        }}
         dpr={[1, 2]}
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0);
         }}
       >
-        <ambientLight intensity={1.5} />
-        <hemisphereLight intensity={0.5} groundColor="#000" />
-        <directionalLight position={[5, 10, 5]} intensity={2.5} color="#fff" />
-        <pointLight position={[-4, 2, 6]} intensity={2} color={ACCENT} />
-        <spotLight position={[0, 5, 2]} angle={0.5} penumbra={1} intensity={2.5} />
+        <ambientLight intensity={0.4} />
+        <hemisphereLight intensity={0.2} groundColor="#000" />
+        <directionalLight position={[5, 10, 5]} intensity={1.2} color="#fff" />
+        <pointLight position={[-4, 2, 6]} intensity={1.0} color={ACCENT} />
+        <spotLight position={[0, 5, 2]} angle={0.5} penumbra={1} intensity={1.0} />
         
         <Suspense fallback={null}>
           <Center>
@@ -358,13 +379,7 @@ function BotCanvas({ botRef, mouseNear, mouseDir }) {
               <BotModel mouseNear={mouseNear} mouseDir={mouseDir} />
             </Float>
           </Center>
-          <ContactShadows
-            position={[0, -0.6, 0]}
-            opacity={0.5}
-            scale={6}
-            blur={2.5}
-            far={1.5}
-          />
+          <Environment preset="city" intensity={0.5} /> {/* High-end HDR environment map reflections */}
         </Suspense>
       </Canvas>
     </div>

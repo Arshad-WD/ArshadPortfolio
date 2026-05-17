@@ -35,16 +35,17 @@ export default function HomePage() {
         <Techstack />
       </section>
 
-      <section ref={aboutRef} className="relative min-h-screen bg-black">
+      <section ref={aboutRef} id="about" className="relative min-h-screen bg-black">
         <About />
       </section>
 
-      <section ref={projectRef} data-section="projects" className="relative min-h-screen bg-black">
+      <section ref={projectRef} id="projects" data-section="projects" className="relative min-h-screen bg-black">
         <Projects />
       </section>
 
       <section
         ref={contactRef}
+        id="contact"
         data-section="contact"
         className="relative min-h-screen bg-white overflow-hidden"
       >

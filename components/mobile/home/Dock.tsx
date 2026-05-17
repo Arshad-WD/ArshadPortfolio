@@ -22,8 +22,8 @@ export default function Dock({
 }) {
   return (
     <div className={`
-      absolute bottom-12 left-1/2 -translate-x-1/2
-      w-[94%] h-[92px]
+      absolute bottom-10 left-1/2 -translate-x-1/2
+      w-[92%] h-[84px]
       flex flex-col items-center
       z-[200]
       transition-all duration-700 cubic-bezier(0.2, 0.8, 0.2, 1)
@@ -36,25 +36,25 @@ export default function Dock({
         className={`
           relative
           w-full h-full
-          rounded-[36px]
-          bg-white/10 backdrop-blur-[40px]
-          border-[0.5px] border-white/20
+          rounded-[32px]
+          bg-white/20 dark:bg-white/10 backdrop-blur-3xl
+          border-[0.5px] border-white/30 dark:border-white/20
           flex justify-evenly items-center
-          px-3
-          shadow-[0_20px_50px_rgba(0,0,0,0.3)]
+          px-2
+          shadow-lg
         `}
         style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
       >
         {/* GLOSS OVERLAY */}
-        <div className="absolute inset-0 bg-linear-to-b from-white/10 to-transparent rounded-[36px] pointer-events-none" />
+        <div className="absolute inset-0 bg-linear-to-b from-white/20 to-transparent rounded-[32px] pointer-events-none" />
 
         {DOCK_APPS.map((app) => {
           const ref = useRef<HTMLButtonElement>(null);
 
           return (
-            <div key={app} className="relative group">
+            <div key={app} className="relative group h-[75%] aspect-square">
                 {/* ICON REFLECTION */}
-                <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-[40px] h-[40px] opacity-10 blur-sm pointer-events-none scale-y-[-0.8]">
+                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-[80%] h-[80%] opacity-10 blur-md pointer-events-none scale-y-[-0.8]">
                     <img src={APP_ICONS[app]} alt="" className="w-full h-full rounded-full" />
                 </div>
 
@@ -66,7 +66,7 @@ export default function Dock({
                 }}
                 className="
                     relative
-                    w-[64px] h-[64px]
+                    w-full h-full
                     rounded-[16px]
                     active:scale-90
                     active:brightness-75
@@ -75,7 +75,7 @@ export default function Dock({
                 "
                 >
                 {notifications[app] && notifications[app]! > 0 && (
-                    <div className="absolute -top-1.5 -right-1.5 min-w-5 h-5 px-1 rounded-full bg-red-500 text-[10px] text-white flex items-center justify-center font-black z-10 shadow-lg border-2 border-[#1a1a1a]">
+                    <div className="absolute -top-1.5 -right-1.5 min-w-5 h-5 px-1 rounded-full bg-red-500 text-[10px] text-white flex items-center justify-center font-bold z-10 shadow-sm border-[1.5px] border-white dark:border-[#1a1a1a]">
                         {notifications[app]}
                     </div>
                 )}
@@ -84,7 +84,7 @@ export default function Dock({
                     src={APP_ICONS[app]}
                     alt={app}
                     draggable={false}
-                    className="w-full h-full rounded-[18px] object-cover shadow-2xl"
+                    className="w-full h-full rounded-[16px] object-cover shadow-md"
                 />
                 </button>
             </div>

@@ -13,7 +13,6 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function Projects(_: ProjectsProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const scrollProgress = useMotionValue(0);
 
   useGSAP(() => {
     if (!containerRef.current) return;
@@ -22,27 +21,58 @@ export default function Projects(_: ProjectsProps) {
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top top",
-        end: `+=${(PROJECTS.length + 1) * 100}%`,
+        end: `+=${(PROJECTS.length) * 110}%`,
         pin: true,
         scrub: 1,
         anticipatePin: 1,
-        onUpdate: (self) => {
-           scrollProgress.set(self.progress);
-        }
       }
     });
 
     // 1. Heading scrolls out with a slight compression
     tl.to("#projects-header", {
-      y: -200,
+      y: -250,
       opacity: 0,
-      scale: 0.9,
-      duration: 1.5,
-      ease: "power2.inOut"
+      scale: 0.92,
+      duration: 1,
+      ease: "power1.out"
     });
 
-    // 2. Pause/Duration for the stack interaction
-    tl.to({}, { duration: PROJECTS.length * 2.5 });
+    // 2. Animate cards one by one using pure, ultra-smooth GPU composition paths
+    PROJECTS.forEach((card, index) => {
+      // Card entrance: fly up from 500px, fade in, scale to 1
+      tl.fromTo(`.project-card-${index}`, 
+        { y: 500, opacity: 0, scale: 0.86 },
+        { 
+          y: 0, 
+          opacity: 1, 
+          scale: 1, 
+          duration: 1.2, 
+          ease: "power1.out" 
+        },
+        `+=0.1` // Gentle pacing pause between card arrivals
+      );
+
+      // Subsequent card pushes: when a card is in the center and the NEXT card enters, 
+      // all previous cards stack up simultaneously!
+      if (index > 0) {
+        for (let j = 0; j < index; j++) {
+          const stackLevel = index - j;
+          tl.to(`.project-card-${j}`, {
+            y: -stackLevel * 45,
+            scale: Math.pow(0.95, stackLevel),
+            duration: 1.2,
+            ease: "power1.out"
+          }, "<"); // Sync execution perfectly with the current card entrance!
+
+          // Light dimming of stacked cards using high-performance GPU opacity overlay
+          tl.to(`.project-card-dim-${j}`, {
+            opacity: stackLevel * 0.08,
+            duration: 1.2,
+            ease: "power1.out"
+          }, "<");
+        }
+      }
+    });
     
   }, { scope: containerRef });
 
@@ -113,7 +143,7 @@ export default function Projects(_: ProjectsProps) {
         {/* CARDS SECTION - Synced via scrollProgress */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="w-full h-full pointer-events-auto">
-             <StackingCards progress={scrollProgress} />
+             <StackingCards />
           </div>
         </div>
       </div>

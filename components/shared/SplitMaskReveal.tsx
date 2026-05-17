@@ -70,11 +70,11 @@ export default function SplitMaskReveal() {
               seed={glitchSeed} 
               result="noise" 
             />
-            {/* Massive scale (250) for sharp, blocky horizontal displacement */}
+            {/* Refined scale (90) for crisp, premium horizontal tech displacement */}
             <feDisplacementMap 
               in="SourceGraphic" 
               in2="noise" 
-              scale="250" 
+              scale="90" 
               xChannelSelector="R" 
               yChannelSelector="G" 
               result="displaced" 
@@ -130,14 +130,14 @@ export default function SplitMaskReveal() {
         className="relative w-[95%] sm:w-full max-w-[700px] aspect-[4/5] rounded-2xl md:rounded-[3rem] overflow-hidden sm:pointer-events-auto"
         onPointerEnter={handlePointerEnter}
       >
-        {/* Layer 1: Base Portrait */}
+        {/* Layer 1: Base Portrait - Restored Image alignment with unoptimized={true} to fix broken image */}
         <Image 
           src="/images/Layer1.png"
           alt="Base Character Portrait"
           fill
+          unoptimized={true}
           className="object-cover object-bottom pointer-events-none origin-bottom scale-[0.80]"
           priority
-          quality={100}
           sizes="(max-width: 768px) 100vw, 700px"
         />
         
@@ -153,15 +153,21 @@ export default function SplitMaskReveal() {
             src="/images/Layer2.png"
             alt="Cyber Character Overlay"
             fill
+            unoptimized={true}
             className="object-cover object-bottom pointer-events-none origin-bottom scale-[0.88]"
+            style={{
+              imageRendering: "auto",
+              filter: "contrast(1.04) saturate(1.08) drop-shadow(0px 0px 15px rgba(139, 92, 246, 0.2))", // Volumetric glow
+              WebkitBackfaceVisibility: "hidden",
+              backfaceVisibility: "hidden" // GPU subpixel anti-aliasing
+            }}
             priority
-            quality={100}
             sizes="(max-width: 768px) 100vw, 700px"
           />
         </div>
 
-        {/* Optional: Digital scanline overlay specifically for the glitch area */}
-        <div className="absolute inset-0 z-20 pointer-events-none mix-blend-overlay opacity-20 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,3px_100%]" />
+        {/* Optional: Micro-subtle digital overlay (Opacity optimized to 4% for ultra-crisp faces) */}
+        <div className="absolute inset-0 z-20 pointer-events-none mix-blend-overlay opacity-[0.04] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,3px_100%]" />
       </div>
     </div>
   );

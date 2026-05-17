@@ -1,19 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { PROJECTS } from "@/libs/data";
-import { motion, useTransform, MotionValue } from "framer-motion";
-import { useGSAP } from "@gsap/react";
+import { motion } from "framer-motion";
 
-export default function StackingCards({ progress }: { progress: MotionValue<number> }) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
-
+export default function StackingCards() {
   return (
     <div className="relative w-full h-screen flex items-center justify-center overflow-hidden">
         <div className="relative w-full h-[92vh] max-w-7xl pt-20 pb-12">
@@ -22,8 +13,6 @@ export default function StackingCards({ progress }: { progress: MotionValue<numb
               key={card.id} 
               card={card} 
               index={index} 
-              total={PROJECTS.length}
-              progress={progress} 
             />
           ))}
         </div>
@@ -33,78 +22,38 @@ export default function StackingCards({ progress }: { progress: MotionValue<numb
 
 function Card({ 
   card, 
-  index, 
-  total, 
-  progress 
+  index 
 }: { 
   card: any; 
   index: number; 
-  total: number;
-  progress: MotionValue<number> 
 }) {
     const [isHovered, setIsHovered] = useState(false);
-    
-    // DEFINE INTERVALS for this card
-    const arrivalStart = 0.15 + (index * 0.2);
-    const arrivalEnd = arrivalStart + 0.1;
-    
-    // Subsequent shifts
-    const nextArrives = PROJECTS.slice(index + 1).map((_, i) => ({
-        start: 0.15 + ((index + 1 + i) * 0.2),
-        end: 0.15 + ((index + 1 + i) * 0.2) + 0.1
-    }));
-
-    // CONSTRUCT MAPPING ARRAYS
-    const inputPoints: number[] = [0, arrivalStart - 0.1, arrivalStart];
-    const yPoints: number[] = [1200, 1200, 0];
-    const scalePoints: number[] = [0.8, 0.8, 1];
-    const opacityPoints: number[] = [0, 0, 1];
-    const brightnessPoints: number[] = [1, 1, 1];
-    const blurPoints: string[] = ["0px", "0px", "0px"];
-
-    nextArrives.forEach((interval, i) => {
-        const stackLevel = i + 1;
-        inputPoints.push(interval.start, interval.end);
-        yPoints.push(-(stackLevel - 1) * 45, -stackLevel * 45);
-        scalePoints.push(Math.pow(0.95, stackLevel - 1), Math.pow(0.95, stackLevel));
-        opacityPoints.push(1, 1);
-        brightnessPoints.push(1 - ((stackLevel - 1) * 0.08), 1 - (stackLevel * 0.08));
-        blurPoints.push(`${(stackLevel - 1) * 0.5}px`, `${stackLevel * 0.5}px`);
-    });
-
-    inputPoints.push(1);
-    yPoints.push(yPoints[yPoints.length - 1]);
-    scalePoints.push(scalePoints[scalePoints.length - 1]);
-    opacityPoints.push(1);
-    brightnessPoints.push(brightnessPoints[brightnessPoints.length - 1]);
-    blurPoints.push(blurPoints[blurPoints.length - 1]);
-
-    const y = useTransform(progress, inputPoints, yPoints);
-    const scale = useTransform(progress, inputPoints, scalePoints);
-    const opacity = useTransform(progress, inputPoints, opacityPoints);
-    const filter = useTransform(progress, inputPoints, blurPoints.map((b, i) => `blur(${b}) brightness(${brightnessPoints[i]})`));
 
     return (
-        <motion.div
-            style={{ 
-              y,
-              scale,
-              opacity,
-              filter,
+        <div
+            className={`project-card-${index} absolute inset-0 m-auto w-full h-[85%] max-h-[720px] flex items-center justify-center pointer-events-none opacity-0`}
+            style={{
               zIndex: index,
+              transform: "translate3d(0, 500px, 0) scale(0.86)",
+              transformOrigin: "bottom"
             }}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            className="absolute inset-0 m-auto w-full h-[85%] max-h-[720px] flex items-center justify-center pointer-events-none"
         >
-            <div className="relative w-full max-w-6xl h-full rounded-[2.5rem] md:rounded-[3.5rem] border border-zinc-200 bg-white shadow-[0_60px_120px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col md:flex-row pointer-events-auto transition-all duration-700 ease-[0.23,1,0.32,1] hover:shadow-[0_80px_160px_rgba(0,0,0,0.15)]">
+            <div 
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+              className="relative w-full max-w-6xl h-full rounded-[2.5rem] md:rounded-[3.5rem] border border-zinc-200 bg-white shadow-[0_60px_120px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col md:flex-row pointer-events-auto transition-[box-shadow,transform] duration-700 ease-[0.23,1,0.32,1] hover:shadow-[0_80px_160px_rgba(0,0,0,0.15)]"
+            >
+                {/* Direct GPU-accelerated Dimming Overlay instead of heavy CSS filter brightness */}
+                <div 
+                  className={`project-card-dim-${index} absolute inset-0 bg-zinc-950 pointer-events-none z-30 opacity-0`} 
+                />
                 
                 {/* Visual Anchor - Left Column (60%) */}
                 <div className="w-full md:w-[60%] h-[40%] md:h-full relative overflow-hidden bg-zinc-50 border-r border-zinc-100 group/img">
-                    <motion.img
+                    <img
                         src={card.img.replace('.png', '.webp').replace('.jpg', '.webp')}
                         alt={card.title}
-                        className={`w-full h-full object-cover transition-all duration-1000 ease-[0.16,1,0.3,1] ${isHovered ? 'scale-110 grayscale-0' : 'scale-100 grayscale opacity-90'}`}
+                        className={`w-full h-full object-cover transition-[transform,filter,opacity] duration-1000 ease-[0.16,1,0.3,1] ${isHovered ? 'scale-110 grayscale-0' : 'scale-100 grayscale opacity-90'}`}
                     />
                     
                     <div className="absolute inset-0 bg-gradient-to-tr from-cyan-950/20 to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-700" />
@@ -164,7 +113,7 @@ function Card({
                                <span 
                                  className="text-transparent transition-all duration-700"
                                  style={{ WebkitTextStroke: '1px #09090b', opacity: 0.15 }}
-                               >
+                                >
                                  {card.title.split(' ').slice(1).join(' ')}
                                </span>
                             </h3>
@@ -236,12 +185,6 @@ function Card({
                     <div className="absolute bottom-8 left-8 w-8 h-[1px] bg-zinc-950" /><div className="absolute bottom-8 left-8 w-[1px] h-8 bg-zinc-950" />
                 </div>
             </div>
-        </motion.div>
+        </div>
     );
 }
-
-
-
-
-
-

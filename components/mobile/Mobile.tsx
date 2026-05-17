@@ -10,93 +10,78 @@ import { EXTERNAL_APPS } from "./window/externalApps";
 import Wallpaper from "./home/Wallpaper";
 import StatusBar from "./home/StatusBar";
 import DynamicIsland from "./home/DynamicIsland";
-import NotificationBanner, { MobileNotification } from "./home/NotificationBanner";
+import NotificationBanner from "./home/NotificationBanner";
 import NotificationCenter from "./home/NotificationCenter";
 import ControlCenter from "./home/ControlCenter";
-import { APP_ICONS } from "./home/appConfig";
 import { MusicProvider } from "./utils/MusicState";
+import { NotificationProvider, useNotification } from "./utils/NotificationState";
 
 export default function Mobile() {
   return (
     <MusicProvider>
-      <MobileContent />
+      <NotificationProvider>
+        <MobileContent />
+      </NotificationProvider>
     </MusicProvider>
   );
 }
 
 function MobileContent() {
   const [active, setActive] = useState<AppLaunchPayload | null>(null);
-  const [notiQueue, setNotiQueue] = useState<MobileNotification[]>([]);
-  const [currentNoti, setCurrentNoti] = useState<MobileNotification | null>(null);
-  const [notiHistory, setNotiHistory] = useState<MobileNotification[]>([]);
   const [showNotiCenter, setShowNotiCenter] = useState(false);
   const [showControlCenter, setShowControlCenter] = useState(false);
+  const { notiHistory, currentNoti, setCurrentNoti, clearHistory, appBadges, clearBadge, triggerNotification } = useNotification();
 
-  const [pages, setPages] = useState<AppType[][]>([
-    ["About", "Projects", "Resume", "Safari", "Mail", "Music", "Settings", "Notes", "Instagram"],
-    ["Youtube", "Linkedin", "X", "Maps", "AppStore", "Camera", "Contact", "Photos", "Google"],
+  const [pages, setPages] = useState<(AppType | null)[][]>([
+    [
+      "About", "Projects", "Resume", "Safari",
+      "Mail", "Music", "Settings", "Notes",
+      "Instagram", null, null, null,
+      null, null, null, null,
+      null, null, null, null,
+      null, null, null, null,
+    ],
+    [
+      "Youtube", "Linkedin", "X", "Maps",
+      "AppStore", "Camera", "Contact", "Photos",
+      "Google", null, null, null,
+      null, null, null, null,
+      null, null, null, null,
+      null, null, null, null,
+    ],
   ]);
 
   const [pageIndex, setPageIndex] = useState(0);
 
   const [launchRect, setLaunchRect] = useState<DOMRect | null>(null);
 
-  const [notifications, setNotifications] = useState<
-    Partial<Record<AppType, number>>
-  >({
-    Youtube: 5,
-    Instagram: 2,
-    Linkedin: 1,
-  });
-
-  /* ---------------- notification system ---------------- */
-
-  const triggerNotification = (app: AppType, title: string, message: string) => {
-    const newNoti: MobileNotification = {
-      id: Math.random().toString(36).substr(2, 9),
-      app,
-      title,
-      message,
-      icon: APP_ICONS[app] || "/icons/about.webp",
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
-    setNotiQueue(prev => [...prev, newNoti]);
-    setNotiHistory(prev => [...prev, newNoti]);
-  };
-
+  /* ---------------- mock notifications ---------------- */
   useEffect(() => {
-    if (!currentNoti && notiQueue.length > 0) {
-      const next = notiQueue[0];
-      setCurrentNoti(next);
-      setNotiQueue(prev => prev.slice(1));
-    }
-  }, [currentNoti, notiQueue]);
+    let timers: NodeJS.Timeout[] = [];
+    
+    // Initial simulated notifications
+    timers.push(setTimeout(() => {
+      triggerNotification("Contact", "Recruiter", "Hi Arshad, we reviewed your portfolio and were really impressed!");
+    }, 4000));
+    
+    timers.push(setTimeout(() => {
+      triggerNotification("Mail", "Vercel", "Deployment arshad-portfolio-improved.vercel.app completed.");
+    }, 12000));
 
-  /* ---------------- badges ---------------- */
+    timers.push(setTimeout(() => {
+      triggerNotification("Linkedin", "Profile Views", "You appeared in 18 searches this week. See who's looking.");
+    }, 25000));
 
-  function clearNotification(app: AppType) {
-    setNotifications((prev) => {
-      if (!prev[app]) return prev;
-      const next = { ...prev };
-      delete next[app];
-      return next;
-    });
-  }
-
-  function addNotification(app: AppType, count = 1) {
-    setNotifications((prev) => ({
-      ...prev,
-      [app]: (prev[app] ?? 0) + count,
-    }));
-  }
-
-  useEffect(() => {
+    // Recurring Instagram Notification
     const id = setInterval(() => {
-      triggerNotification("Instagram", "New Message", "Arshad: The mobile OS looks incredible! 🔥");
-      addNotification("Instagram", 1);
+      triggerNotification("Instagram", "New Message", "Design Team: The new animations are fire! 🔥");
     }, 60000);
+    timers.push(id as any);
 
-    return () => clearInterval(id);
+    return () => {
+      timers.forEach(t => clearTimeout(t));
+      clearInterval(id);
+    };
   }, []);
 
   /* ---------------- app opening logic ---------------- */
@@ -153,7 +138,7 @@ function openApp(app: AppType, rect?: DOMRect) {
         notifications={notiHistory}
         isOpen={showNotiCenter}
         onClose={() => setShowNotiCenter(false)}
-        onClear={() => setNotiHistory([])}
+        onClear={clearHistory}
       />
 
       {/* CONTROL CENTER PANEL */}
@@ -196,9 +181,9 @@ function openApp(app: AppType, rect?: DOMRect) {
         pageIndex={pageIndex}
         setPageIndex={setPageIndex}
         setPages={setPages}
-        notifications={notifications}
+        notifications={appBadges}
         openApp={(app: AppType, rect?: DOMRect) => {
-          clearNotification(app);
+          clearBadge(app);
           openApp(app, rect);
         }}
       />
@@ -229,9 +214,9 @@ function openApp(app: AppType, rect?: DOMRect) {
       {/* DOCK (always mounted) */}
       <Dock
         hidden={!!active || !!launchRect || showNotiCenter || showControlCenter}
-        notifications={notifications}
+        notifications={appBadges}
         openApp={(app: AppType, rect?: DOMRect) => {
-          clearNotification(app);
+          clearBadge(app);
           openApp(app, rect);
         }}
       />
