@@ -1,41 +1,26 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useProgress } from "@react-three/drei";
 
 export default function Preloader({ onComplete }: { onComplete: () => void }) {
   const [percent, setPercent] = useState(0);
-  const { progress: actualProgress } = useProgress();
-  const progressRef = useRef(actualProgress);
 
   useEffect(() => {
-    progressRef.current = actualProgress;
-  }, [actualProgress]);
-
-  useEffect(() => {
-    let artificialProgress = 0;
-    const duration = 2800; // Slower for elegance
+    let currentPercent = 0;
+    const duration = 2500; // Smooth 2.5s transition
     const intervalTime = 16;
     const steps = duration / intervalTime;
     const increment = 100 / steps;
 
     const timer = setInterval(() => {
-      const currentActual = progressRef.current;
-
-      if (artificialProgress < 100) {
-        artificialProgress += increment;
-        const effectiveProgress = Math.min(
-            artificialProgress, 
-            currentActual > 0 ? currentActual : 100
-        );
-        setPercent(Math.floor(effectiveProgress));
-      }
-
-      if (artificialProgress >= 100 && (currentActual >= 100 || currentActual === 0)) {
+      currentPercent += increment;
+      if (currentPercent >= 100) {
         setPercent(100);
         clearInterval(timer);
-        setTimeout(onComplete, 1500); // Cinematic transition delay
+        setTimeout(onComplete, 1200); // Cinematic transition delay
+      } else {
+        setPercent(Math.floor(currentPercent));
       }
     }, intervalTime);
 

@@ -8,6 +8,10 @@ import emailjs from "@emailjs/browser";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Image from "next/image";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { SlideButton } from "@/components/ui/slide-button";
+import { Check, Loader2, X } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -19,11 +23,18 @@ const Contact = () => {
   const [imagesReady, setImagesReady] = useState(0);
 
   const imageRefs = useRef<(HTMLImageElement | null)[]>([]);
+  const [buttonStatus, setButtonStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
-  const sendEmail = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
+  const handleFormSubmit = () => {
     if (!formRef.current) return;
+
+    if (!formRef.current.checkValidity()) {
+      formRef.current.reportValidity();
+      setButtonStatus("idle");
+      return;
+    }
+
+    setButtonStatus("loading");
 
     const promise = emailjs.sendForm(
       "service_1b7ojvg",
@@ -33,15 +44,32 @@ const Contact = () => {
     );
 
     toast.promise(promise, {
-      pending: "Initiating transmission...",
-      success: "Message received. 🚀",
-      error: "Transmission interrupted. ❌",
+      pending: {
+        render: "Initiating transmission...",
+        icon: <Loader2 className="animate-spin text-purple-400 size-5" />,
+      },
+      success: {
+        render: "Message received. 🚀",
+        icon: <Check className="text-green-400 size-5" />,
+      },
+      error: {
+        render: "Transmission interrupted. ❌",
+        icon: <X className="text-red-400 size-5" />,
+      },
     });
 
     promise.then(() => {
+      setButtonStatus("success");
       formRef.current?.reset();
+      setTimeout(() => {
+        setButtonStatus("idle");
+      }, 4000);
     }).catch((error) => {
-      console.log("Error sending message", error.text);
+      setButtonStatus("error");
+      console.log("Error sending message", error);
+      setTimeout(() => {
+        setButtonStatus("idle");
+      }, 4000);
     });
   };
 
@@ -94,7 +122,20 @@ const Contact = () => {
       ref={containerRef}
       className="min-h-screen w-screen bg-zinc-950 rounded-t-[5rem] md:rounded-t-[10rem] py-20 px-6 md:px-16 flex flex-col lg:flex-row items-center justify-between relative overflow-hidden"
     >
-      <ToastContainer theme="dark" />
+      <ToastContainer
+        position="bottom-right"
+        autoClose={4000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        toastClassName="!relative !flex !p-4 !min-h-16 !rounded-xl !justify-between !overflow-hidden !cursor-pointer !bg-zinc-900/80 !backdrop-blur-xl !border !border-zinc-800 !text-white !font-sans !text-sm !font-semibold !shadow-2xl"
+        progressClassName="!bg-gradient-to-r !from-purple-500 !via-pink-500 !to-orange-500"
+      />
 
       {/* Background Decor */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden opacity-30">
@@ -144,49 +185,42 @@ const Contact = () => {
       <div className="w-full lg:w-1/2 lg:pl-20 mt-20 lg:mt-0 z-10">
         <form
           ref={formRef}
-          onSubmit={sendEmail}
+          onSubmit={(e) => e.preventDefault()}
           className="w-full max-w-xl mx-auto rounded-[3rem] p-8 md:p-12 bg-white/5 backdrop-blur-3xl border border-white/10 shadow-2xl space-y-10"
         >
           <div className="space-y-8">
             <div className="relative group">
-              <input
+              <Input
                 type="text"
                 name="user_name"
                 required
                 placeholder="Name"
-                className="w-full bg-transparent border-b border-zinc-700 py-4 text-white text-xl focus:outline-none focus:border-white transition-colors placeholder:text-zinc-700"
+                className="w-full bg-transparent border-t-0 border-x-0 border-b border-zinc-700 rounded-none py-6 px-0 text-white text-xl focus-visible:ring-0 focus-visible:border-white transition-colors placeholder:text-zinc-750"
               />
             </div>
 
             <div className="relative group">
-              <input
+              <Input
                 type="email"
                 name="user_email"
                 required
                 placeholder="Email"
-                className="w-full bg-transparent border-b border-zinc-700 py-4 text-white text-xl focus:outline-none focus:border-white transition-colors placeholder:text-zinc-700"
+                className="w-full bg-transparent border-t-0 border-x-0 border-b border-zinc-700 rounded-none py-6 px-0 text-white text-xl focus-visible:ring-0 focus-visible:border-white transition-colors placeholder:text-zinc-750"
               />
             </div>
 
             <div className="relative group">
-              <textarea
+              <Textarea
                 name="message"
                 required
                 placeholder="Your Project Details"
                 rows={4}
-                className="w-full bg-transparent border-b border-zinc-700 py-4 text-white text-xl focus:outline-none focus:border-white transition-colors placeholder:text-zinc-700 resize-none"
+                className="w-full bg-transparent border-t-0 border-x-0 border-b border-zinc-700 rounded-none py-4 px-0 text-white text-xl focus-visible:ring-0 focus-visible:border-white transition-colors placeholder:text-zinc-750 resize-none min-h-[100px]"
               />
             </div>
           </div>
 
-          <motion.button
-            type="submit"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="w-full py-6 rounded-2xl bg-white text-black text-xl font-black uppercase tracking-widest hover:bg-zinc-200 transition-colors shadow-xl"
-          >
-            Send Message
-          </motion.button>
+          <SlideButton status={buttonStatus} onDragComplete={handleFormSubmit} />
         </form>
       </div>
     </div>

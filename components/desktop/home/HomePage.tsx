@@ -7,8 +7,7 @@ import Techstack from "@/components/desktop/tech-stack/TechStack";
 import About from "@/components/desktop/about/About";
 import Projects from "@/components/desktop/projects/Projects";
 import Contact from "@/components/desktop/contact/Contact";
-import Footer from "@/components/desktop/footer/Footer";
-
+import { CinematicFooter } from "@/components/ui/motion-footer";
 
 export default function HomePage() {
   const aboutRef = useRef<HTMLElement | null>(null);
@@ -16,45 +15,47 @@ export default function HomePage() {
   const contactRef = useRef<HTMLElement | null>(null);
 
   return (
-    <main className="relative min-h-screen w-screen overflow-x-hidden">
-      <div data-section="home">
-        <Hero
-          scrollToAbout={() =>
-            aboutRef.current?.scrollIntoView({ behavior: "smooth" })
-          }
-          scrollToProject={() =>
-            projectRef.current?.scrollIntoView({ behavior: "smooth" })
-          }
-          scrollToContact={() =>
-            contactRef.current?.scrollIntoView({ behavior: "smooth" })
-          }
-        />
-      </div>
+    <div className="relative w-full bg-black min-h-screen overflow-x-hidden">
+      {/* Main Content Area: Stays above the footer */}
+      <main className="relative z-10 w-full bg-black rounded-b-[2.5rem] md:rounded-b-[5rem] shadow-2xl border-b border-white/5">
+        <div data-section="home">
+          <Hero
+            scrollToAbout={() =>
+              aboutRef.current?.scrollIntoView({ behavior: "smooth" })
+            }
+            scrollToProject={() =>
+              projectRef.current?.scrollIntoView({ behavior: "smooth" })
+            }
+            scrollToContact={() =>
+              contactRef.current?.scrollIntoView({ behavior: "smooth" })
+            }
+          />
+        </div>
 
-      <section data-section="skills" className="relative min-h-screen bg-black">
-        <Techstack />
-      </section>
+        <section data-section="skills" className="relative min-h-screen bg-black">
+          <Techstack />
+        </section>
 
-      <section ref={aboutRef} id="about" className="relative min-h-screen bg-black">
-        <About />
-      </section>
+        <section ref={aboutRef} id="about" className="relative min-h-screen bg-black">
+          <About />
+        </section>
 
-      <section ref={projectRef} id="projects" data-section="projects" className="relative min-h-screen bg-black">
-        <Projects />
-      </section>
+        <section ref={projectRef} id="projects" data-section="projects" className="relative min-h-screen bg-black">
+          <Projects />
+        </section>
 
-      <section
-        ref={contactRef}
-        id="contact"
-        data-section="contact"
-        className="relative min-h-screen bg-white overflow-hidden"
-      >
-        <Contact />
-      </section>
+        <section
+          ref={contactRef}
+          id="contact"
+          data-section="contact"
+          className="relative min-h-screen bg-white overflow-hidden"
+        >
+          <Contact />
+        </section>
+      </main>
 
-      <section className="relative bg-gray-900 text-white min-h-[50vh] flex items-center justify-center">
-        <Footer />
-      </section>
-    </main>
+      {/* Fixed reveal footer behind main content */}
+      <CinematicFooter />
+    </div>
   );
 }

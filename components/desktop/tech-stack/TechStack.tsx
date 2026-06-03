@@ -33,34 +33,28 @@ const Techstack: React.FC = () => {
         { id: "#card-8", endTranslatex: -1500, rotate: -30 },
       ];
 
-      ScrollTrigger.create({
-        trigger: `.${styles["wrapper-stack"]}`,
-        start: "top top",
-        end: "+=900vh",
-        scrub: 1,
-        pin: true,
-        onUpdate: (self) => {
-          gsap.to(`.${styles["wrapper-stack"]}`, {
-            x: `${-480 * self.progress}vw`,
-            duration: 0.5,
-            ease: "power3.out",
-          });
+      gsap.to(`.${styles["wrapper-stack"]}`, {
+        x: "-480vw",
+        ease: "none",
+        scrollTrigger: {
+          trigger: `.${styles["wrapper-stack"]}`,
+          start: "top top",
+          end: "+=900vh",
+          scrub: 1,
+          pin: true,
         },
       });
 
       cards.forEach((card) => {
-        ScrollTrigger.create({
-          trigger: card.id,
-          start: "top top",
-          end: "+=1000vh",
-          scrub: 1,
-          onUpdate: (self) => {
-            gsap.to(card.id, {
-              x: `${card.endTranslatex * self.progress}px`,
-              rotate: card.rotate * self.progress * 2,
-              duration: 0.5,
-              ease: "power3.out",
-            });
+        gsap.to(card.id, {
+          x: `${card.endTranslatex}px`,
+          rotate: card.rotate * 2,
+          ease: "none",
+          scrollTrigger: {
+            trigger: card.id,
+            start: "top top",
+            end: "+=1000vh",
+            scrub: 1,
           },
         });
       });

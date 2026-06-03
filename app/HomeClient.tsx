@@ -19,9 +19,20 @@ const Mobile = dynamic(
 
 export default function HomeClient() {
   const [loading, setLoading] = useState(true);
-  const [isMobile, setIsMobile] = useState<boolean | null>(null);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
 
   useEffect(() => {
+    // Eagerly prefetch the dynamic modules in the background during preloader
+    import("@/components/desktop/home/HomePage").catch(() => {});
+    import("@/components/mobile/Mobile").catch(() => {});
+
+    // Preload critical hero images in the browser cache
+    const images = ["/images/Layer1.png", "/images/Layer2.png"];
+    images.forEach((src) => {
+      const img = new window.Image();
+      img.src = src;
+    });
+
     // Check if preloader has already been shown in this session
     const hasLoaded = sessionStorage.getItem("arshad_portfolio_loaded");
     if (hasLoaded) {
@@ -48,12 +59,23 @@ export default function HomeClient() {
     }
   }, [loading]);
 
-  if (isMobile === null) return <div className="fixed inset-0 bg-black" />;
-
   return (
     <main className="relative h-full w-full bg-black overflow-hidden font-sans">
-      <AnimatePresence mode="wait">
-        {loading ? (
+      {/* Mount content immediately in the background so all hero assets/images load in parallel */}
+      <div className="h-full w-full">
+        {isMobile ? (
+          <div className="fixed inset-0 z-[9999] bg-black">
+            <IPhoneShell>
+              <Mobile />
+            </IPhoneShell>
+          </div>
+        ) : (
+          <DesktopHome />
+        )}
+      </div>
+
+      <AnimatePresence>
+        {loading && (
           <motion.div 
             key="preloader-container" 
             exit={{ 
@@ -74,24 +96,6 @@ export default function HomeClient() {
              ) : (
                <Preloader key="desktop-preloader" onComplete={handleLoadingComplete} />
              )}
-          </motion.div>
-        ) : (
-          <motion.div 
-            key="content"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1 }}
-            className="h-full w-full"
-          >
-            {isMobile ? (
-              <div className="fixed inset-0 z-[9999] bg-black">
-                <IPhoneShell>
-                  <Mobile />
-                </IPhoneShell>
-              </div>
-            ) : (
-              <DesktopHome />
-            )}
           </motion.div>
         )}
       </AnimatePresence>

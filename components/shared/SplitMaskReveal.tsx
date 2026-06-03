@@ -44,7 +44,7 @@ export default function SplitMaskReveal() {
   useEffect(() => {
     const interval = setInterval(() => {
       setGlitchSeed(Math.random());
-    }, 60); // Fast digital flicker
+    }, 150); // Optimized digital flicker rate
     return () => clearInterval(interval);
   }, []);
 
@@ -66,7 +66,7 @@ export default function SplitMaskReveal() {
             <feTurbulence 
               type="fractalNoise" 
               baseFrequency="0.01 0.4" 
-              numOctaves="2" 
+              numOctaves="1" 
               seed={glitchSeed} 
               result="noise" 
             />
