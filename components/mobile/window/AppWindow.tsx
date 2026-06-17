@@ -44,9 +44,9 @@ export default function AppWindow({
       <div className="absolute top-[50px] left-0 w-full h-14 z-50 flex items-center px-6">
         <button
           onClick={close}
-          className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-md"
+          className="w-12 h-12 rounded-full bg-black/10 dark:bg-white/10 flex items-center justify-center backdrop-blur-md active:scale-95 transition-transform"
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-black dark:text-white">
             <path d="M15 18l-6-6 6-6" />
           </svg>
         </button>

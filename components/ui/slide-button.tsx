@@ -93,12 +93,15 @@ const SlideButton = forwardRef<HTMLButtonElement, SlideButtonProps>(
     }, [completed]);
 
     useEffect(() => {
-      if (status === "idle") {
-        setCompleted(false);
-        dragX.set(0);
-      } else if (status === "loading" || status === "success" || status === "error") {
-        setCompleted(true);
-      }
+      const timer = setTimeout(() => {
+        if (status === "idle") {
+          setCompleted(false);
+          dragX.set(0);
+        } else if (status === "loading" || status === "success" || status === "error") {
+          setCompleted(true);
+        }
+      }, 0);
+      return () => clearTimeout(timer);
     }, [status, dragX]);
 
     const handleDragStart = useCallback(() => {

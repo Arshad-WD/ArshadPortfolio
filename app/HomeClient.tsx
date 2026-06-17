@@ -17,14 +17,20 @@ const Mobile = dynamic(
   { ssr: false }
 );
 
+const BotLoader = dynamic(
+  () => import("@/components/BotLoader"),
+  { ssr: false }
+);
+
 export default function HomeClient() {
   const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState<boolean>(false);
 
   useEffect(() => {
-    // Eagerly prefetch the dynamic modules in the background during preloader
+    // Eagerly prefetch active layout modules in the background during preloader
     import("@/components/desktop/home/HomePage").catch(() => {});
     import("@/components/mobile/Mobile").catch(() => {});
+    import("@/components/BotLoader").catch(() => {});
 
     // Preload critical hero images in the browser cache
     const images = ["/images/Layer1.png", "/images/Layer2.png"];
@@ -70,7 +76,10 @@ export default function HomeClient() {
             </IPhoneShell>
           </div>
         ) : (
-          <DesktopHome />
+          <>
+            <DesktopHome />
+            <BotLoader />
+          </>
         )}
       </div>
 
@@ -102,4 +111,5 @@ export default function HomeClient() {
     </main>
   );
 }
+
 

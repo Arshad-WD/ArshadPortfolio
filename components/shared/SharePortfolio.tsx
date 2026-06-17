@@ -30,7 +30,11 @@ export default function SharePortfolio() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setShareUrl(window.location.origin);
+      const origin = window.location.origin;
+      const timer = setTimeout(() => {
+        setShareUrl(origin);
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, []);
 

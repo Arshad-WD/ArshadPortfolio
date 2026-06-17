@@ -124,7 +124,7 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
       </div>
 
       {/* Grain & Depth Filter */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] brightness-150 contrast-125 invert" />
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[url('/noise.svg')] brightness-150 contrast-125 invert" />
       <div className="absolute inset-0 pointer-events-none bg-linear-to-b from-black via-transparent to-black opacity-60" />
     </motion.div>
   );

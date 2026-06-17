@@ -1,7 +1,13 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import BotLoader from "@/components/BotLoader";
+import { Outfit } from "next/font/google";
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  variable: "--font-outfit",
+});
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 
@@ -76,6 +82,27 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Preload critical assets eagerly */}
+        <link
+          rel="preload"
+          href="/fonts/THELASTTRUNKS-Personal-Use-Only.ttf"
+          as="font"
+          type="font/ttf"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/images/Layer1.png"
+          as="image"
+          fetchPriority="high"
+        />
+        <link
+          rel="preload"
+          href="/images/Layer2.png"
+          as="image"
+          fetchPriority="high"
+        />
+
         {/* Google Analytics */}
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
@@ -92,9 +119,8 @@ export default function RootLayout({
       </Script>
       </head>
 
-      <body className="relative text-white antialiased">
+      <body className={`${outfit.variable} relative text-white antialiased`}>
         {children}
-        <BotLoader />
       </body>
     </html>
   );

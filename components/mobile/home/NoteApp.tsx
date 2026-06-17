@@ -74,7 +74,7 @@ export default function NoteApp() {
   return (
     <div className="w-full h-full bg-[#f2f2f7] dark:bg-black text-black dark:text-white flex flex-col relative overflow-hidden">
       {/* Subtle Paper Texture Background for Edit Mode */}
-      <div className={`absolute inset-0 pointer-events-none transition-opacity duration-300 ${active ? 'opacity-100' : 'opacity-0'} bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-overlay dark:opacity-10`} />
+      <div className={`absolute inset-0 pointer-events-none transition-opacity duration-300 ${active ? 'opacity-100' : 'opacity-0'} bg-[url('/noise.svg')] mix-blend-overlay dark:opacity-10`} />
 
       <AnimatePresence mode="wait">
         {!active ? (

@@ -92,28 +92,28 @@ const Techstack: React.FC = () => {
 
       <div className={styles["tech-stack-grid"]}>
         <div className={styles.card} id="card-1">
-          <img src="/images/reactjs.webp" className={styles["tech-stack-image"]} />
+          <img src="/images/reactjs.webp" width={250} height={250} alt="React" className={styles["tech-stack-image"]} />
         </div>
         <div className={styles.card} id="card-2">
-          <img src="/images/Nextjs.webp" className={styles["tech-stack-image"]} />
+          <img src="/images/Nextjs.webp" width={250} height={250} alt="Next.js" className={styles["tech-stack-image"]} />
         </div>
         <div className={styles.card} id="card-3">
-          <img src="/images/node.webp" className={styles["tech-stack-image"]} />
+          <img src="/images/node.webp" width={250} height={250} alt="Node.js" className={styles["tech-stack-image"]} />
         </div>
         <div className={styles.card} id="card-4">
-          <img src="/images/mongo.webp" className={styles["tech-stack-image"]} />
+          <img src="/images/mongo.webp" width={250} height={250} alt="MongoDB" className={styles["tech-stack-image"]} />
         </div>
         <div className={styles.card} id="card-5">
-          <img src="/images/tailwindcss.webp" className={styles["tech-stack-image"]} />
+          <img src="/images/tailwindcss.webp" width={250} height={250} alt="Tailwind CSS" className={styles["tech-stack-image"]} />
         </div>
         <div className={styles.card} id="card-6">
-          <img src="/images/js.webp" className={styles["tech-stack-image"]} />
+          <img src="/images/js.webp" width={250} height={250} alt="JavaScript" className={styles["tech-stack-image"]} />
         </div>
         <div className={styles.card} id="card-7">
-          <img src="/images/flutter.webp" className={styles["tech-stack-image"]} />
+          <img src="/images/flutter.webp" width={250} height={250} alt="Flutter" className={styles["tech-stack-image"]} />
         </div>
         <div className={styles.card} id="card-8">
-          <img src="/images/gsap.webp" className={styles["tech-stack-image"]} />
+          <img src="/images/gsap.webp" width={250} height={250} alt="GSAP" className={styles["tech-stack-image"]} />
         </div>
       </div>
     </section>

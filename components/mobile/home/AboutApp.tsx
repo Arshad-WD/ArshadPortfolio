@@ -41,7 +41,7 @@ export default function AboutApp() {
         >
           {/* Animated Gradient Background */}
           <div className="absolute inset-0 bg-linear-to-br from-blue-600 via-purple-600 to-orange-500 animate-gradient-xy opacity-90" />
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-30 mix-blend-overlay" />
+          <div className="absolute inset-0 bg-[url('/noise.svg')] opacity-30 mix-blend-overlay" />
           
           <div className="absolute inset-0 p-8 flex flex-col justify-end bg-linear-to-t from-black/80 via-black/20 to-transparent">
             <motion.div 

@@ -4,6 +4,11 @@ import React, { useRef, useState, useEffect } from "react";
 import { motion, useSpring } from "framer-motion";
 import Image from "next/image";
 
+const getPseudoRand = (index: number, offset: number) => {
+  const val = Math.sin(index * 12.9898 + offset * 78.233) * 43758.5453123;
+  return val - Math.floor(val);
+};
+
 export default function SplitMaskReveal() {
   const containerRef = useRef<HTMLDivElement>(null);
   
@@ -57,7 +62,7 @@ export default function SplitMaskReveal() {
   };
 
   return (
-    <div className="relative w-screen h-dvh flex items-center justify-center touch-pan-y">
+    <div className="relative w-full h-full flex items-center justify-center touch-pan-y">
       
       <svg className="absolute w-0 h-0" style={{ position: 'absolute', width: 0, height: 0 }}>
         <defs>
@@ -90,7 +95,7 @@ export default function SplitMaskReveal() {
               result="glitch" 
             />
           </filter>
-
+ 
           {/* Mask that combines the main reveal + secondary "glitch shards" */}
           <mask id="cyber-mask">
             <rect width="100%" height="100%" fill="black" />
@@ -103,20 +108,20 @@ export default function SplitMaskReveal() {
               fill="white" 
               filter="url(#cyber-glitch)" 
             />
-
+ 
             {/* Floating digital artifacts (glitch shards) cluster around the cursor */}
             {[...Array(6)].map((_, i) => (
               <motion.rect
                 key={i}
-                width={Math.random() * 80 + 30}
-                height={Math.random() * 4 + 1}
+                width={getPseudoRand(i, 1) * 80 + 30}
+                height={getPseudoRand(i, 2) * 4 + 1}
                 fill="white"
-                opacity={Math.random() > 0.3 ? 0.8 : 0.2}
+                opacity={getPseudoRand(i, 3) > 0.3 ? 0.8 : 0.2}
                 x={pointerX}
                 y={pointerY}
                 style={{
-                  translateX: (i - 3) * 40 + (Math.random() - 0.5) * 100,
-                  translateY: (i - 3) * 10 + (Math.random() - 0.5) * 80,
+                  translateX: (i - 3) * 40 + (getPseudoRand(i, 4) - 0.5) * 100,
+                  translateY: (i - 3) * 10 + (getPseudoRand(i, 5) - 0.5) * 80,
                   scaleX: revealSize // Pass motion value directly for reactivity
                 }}
               />
@@ -124,10 +129,10 @@ export default function SplitMaskReveal() {
           </mask>
         </defs>
       </svg>
-
+ 
       <div 
         ref={containerRef}
-        className="relative w-[95%] sm:w-full max-w-[700px] aspect-[4/5] rounded-2xl md:rounded-[3rem] overflow-hidden sm:pointer-events-auto"
+        className="relative w-full h-full overflow-hidden sm:pointer-events-auto"
         onPointerEnter={handlePointerEnter}
       >
         {/* Layer 1: Base Portrait - Restored Image alignment with unoptimized={true} to fix broken image */}
@@ -136,7 +141,7 @@ export default function SplitMaskReveal() {
           alt="Base Character Portrait"
           fill
           unoptimized={true}
-          className="object-cover object-bottom pointer-events-none origin-bottom scale-[0.80]"
+          className="object-contain object-bottom pointer-events-none origin-bottom scale-[1.38]"
           priority
           sizes="(max-width: 768px) 100vw, 700px"
         />
@@ -154,7 +159,7 @@ export default function SplitMaskReveal() {
             alt="Cyber Character Overlay"
             fill
             unoptimized={true}
-            className="object-cover object-bottom pointer-events-none origin-bottom scale-[0.88]"
+            className="object-contain object-bottom pointer-events-none origin-bottom scale-[1.38]"
             style={{
               imageRendering: "auto",
               filter: "contrast(1.04) saturate(1.08) drop-shadow(0px 0px 15px rgba(139, 92, 246, 0.2))", // Volumetric glow

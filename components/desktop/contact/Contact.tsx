@@ -75,7 +75,6 @@ const Contact = () => {
 
   useEffect(() => {
     if (!headingRef.current || !paragraphRef.current || !containerRef.current) return;
-    if (imagesReady < 3) return;
 
     const ctx = gsap.context(() => {
       // Heading reveal
@@ -112,7 +111,7 @@ const Contact = () => {
           }
         });
       });
-    }, containerRef);
+    }, containerRef.current);
 
     return () => ctx.revert();
   }, [imagesReady]);
@@ -146,48 +145,56 @@ const Contact = () => {
             alt=""
             width={300}
             height={300}
+            style={{ width: "auto", height: "auto" }}
             className={`absolute rounded-full blur-2xl ${
               i === 0 ? "top-10 left-10" : i === 1 ? "bottom-10 right-10" : "top-1/2 left-1/2"
             }`}
             onLoad={() => setImagesReady(prev => prev + 1)}
             ref={(el) => {
-              if (el) imageRefs.current[i] = el as any;
+              if (el) imageRefs.current[i] = el as unknown as HTMLImageElement;
             }}
           />
         ))}
       </div>
 
       {/* Left Section */}
-      <div className="w-full lg:w-1/2 z-10 space-y-12 text-center lg:text-left">
-        <h1
-          ref={headingRef}
-          className="text-white text-6xl md:text-8xl lg:text-[10rem] uppercase font-black leading-[0.8] tracking-tighter"
-        >
-          <span className="block">Let's</span>
-          <span className="block text-zinc-700">Connect</span>
-        </h1>
+      <div className="w-full lg:w-[45%] z-10 space-y-12 text-center lg:text-left pr-0 lg:pr-8">
+        <div className="space-y-4">
+          <h1
+            ref={headingRef}
+            className="text-white text-6xl md:text-8xl lg:text-[7.5rem] uppercase font-black leading-[0.8] tracking-tighter"
+          >
+            <span className="block">Let&apos;s</span>
+            <span className="block text-zinc-700">Connect</span>
+          </h1>
 
-        <p
-          ref={paragraphRef}
-          className="text-zinc-500 text-xl md:text-2xl font-medium max-w-md mx-auto lg:mx-0 leading-tight"
-          style={{ fontFamily: "LastTrunk" }}
-        >
-          Got a project in mind? Reach out and let's build something exceptional together.
-        </p>
-
-        <div className="flex flex-col gap-4 text-zinc-400 font-mono text-sm">
-          <p>Available for freelance & full-time roles</p>
-          <p>Response time: &lt; 24 hours</p>
+          <p
+            ref={paragraphRef}
+            className="text-zinc-350 text-lg md:text-xl font-medium max-w-md mx-auto lg:mx-0 leading-tight"
+            style={{ fontFamily: "LastTrunk" }}
+          >
+            Got a project in mind? Reach out and let&apos;s build something exceptional together.
+          </p>
         </div>
       </div>
 
       {/* Right Section - Form */}
-      <div className="w-full lg:w-1/2 lg:pl-20 mt-20 lg:mt-0 z-10">
+      <div className="w-full lg:w-[55%] lg:pl-20 mt-20 lg:mt-0 z-10">
         <form
           ref={formRef}
           onSubmit={(e) => e.preventDefault()}
-          className="w-full max-w-xl mx-auto rounded-[3rem] p-8 md:p-12 bg-white/5 backdrop-blur-3xl border border-white/10 shadow-2xl space-y-10"
+          className="w-full max-w-xl mx-auto rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-12 bg-zinc-900/20 backdrop-blur-3xl border border-white/5 shadow-2xl relative group/form hover:border-white/10 transition-all duration-500"
         >
+          {/* Cyber Terminal Header */}
+          <div className="flex items-center justify-between border-b border-white/5 pb-6 mb-10">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
+              <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
+              <span className="w-2.5 h-2.5 rounded-full bg-green-500/70" />
+            </div>
+            <span className="text-[8px] font-mono text-zinc-400 uppercase tracking-[0.3em] font-bold">Secure_Comms_Terminal</span>
+          </div>
+
           <div className="space-y-8">
             <div className="relative group">
               <Input
@@ -195,8 +202,9 @@ const Contact = () => {
                 name="user_name"
                 required
                 placeholder="Name"
-                className="w-full bg-transparent border-t-0 border-x-0 border-b border-zinc-700 rounded-none py-6 px-0 text-white text-xl focus-visible:ring-0 focus-visible:border-white transition-colors placeholder:text-zinc-750"
+                className="w-full bg-transparent border-t-0 border-x-0 border-b border-zinc-800 rounded-none py-4 px-0 text-white text-lg focus-visible:ring-0 focus-visible:border-cyan-500 transition-colors placeholder:text-zinc-500 font-sans"
               />
+              <div className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-cyan-500 group-focus-within:w-full transition-all duration-500" />
             </div>
 
             <div className="relative group">
@@ -205,8 +213,9 @@ const Contact = () => {
                 name="user_email"
                 required
                 placeholder="Email"
-                className="w-full bg-transparent border-t-0 border-x-0 border-b border-zinc-700 rounded-none py-6 px-0 text-white text-xl focus-visible:ring-0 focus-visible:border-white transition-colors placeholder:text-zinc-750"
+                className="w-full bg-transparent border-t-0 border-x-0 border-b border-zinc-800 rounded-none py-4 px-0 text-white text-lg focus-visible:ring-0 focus-visible:border-violet-500 transition-colors placeholder:text-zinc-500 font-sans"
               />
+              <div className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-violet-500 group-focus-within:w-full transition-all duration-500" />
             </div>
 
             <div className="relative group">
@@ -215,12 +224,15 @@ const Contact = () => {
                 required
                 placeholder="Your Project Details"
                 rows={4}
-                className="w-full bg-transparent border-t-0 border-x-0 border-b border-zinc-700 rounded-none py-4 px-0 text-white text-xl focus-visible:ring-0 focus-visible:border-white transition-colors placeholder:text-zinc-750 resize-none min-h-[100px]"
+                className="w-full bg-transparent border-t-0 border-x-0 border-b border-zinc-800 rounded-none py-4 px-0 text-white text-lg focus-visible:ring-0 focus-visible:border-cyan-500 transition-colors placeholder:text-zinc-500 resize-none min-h-[100px] font-sans"
               />
+              <div className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-cyan-500 group-focus-within:w-full transition-all duration-500" />
             </div>
           </div>
 
-          <SlideButton status={buttonStatus} onDragComplete={handleFormSubmit} />
+          <div className="pt-4">
+            <SlideButton status={buttonStatus} onDragComplete={handleFormSubmit} />
+          </div>
         </form>
       </div>
     </div>

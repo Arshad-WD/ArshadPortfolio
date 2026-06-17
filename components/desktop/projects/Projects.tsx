@@ -21,9 +21,9 @@ export default function Projects(_: ProjectsProps) {
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top top",
-        end: `+=${(PROJECTS.length) * 110}%`,
+        end: `+=${(PROJECTS.length + 1) * 110}%`,
         pin: true,
-        scrub: 1,
+        scrub: 0.5,
         anticipatePin: 1,
       }
     });
@@ -73,6 +73,16 @@ export default function Projects(_: ProjectsProps) {
         }
       }
     });
+
+    // 3. Smooth exit transition: slide all cards up and fade them out together
+    tl.to(".project-card-0, .project-card-1, .project-card-2, .project-card-3", {
+      y: -1000,
+      opacity: 0,
+      scale: 0.85,
+      duration: 1.5,
+      stagger: 0.08,
+      ease: "power2.in"
+    }, "+=0.3"); // Gentle delay before exit
     
   }, { scope: containerRef });
 

@@ -13,6 +13,8 @@ const About = () => {
   const textRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!containerRef.current) return;
+
     const ctx = gsap.context(() => {
       if (!headingRef.current || !textRef.current) return;
 
@@ -57,7 +59,7 @@ const About = () => {
           },
         }
       );
-    }, containerRef);
+    }, containerRef.current);
 
     return () => ctx.revert();
   }, []);
@@ -65,7 +67,7 @@ const About = () => {
   return (
     <section 
       ref={containerRef}
-      className="relative min-h-screen w-screen bg-black flex flex-col items-center justify-center px-6 overflow-hidden pt-32 pb-80"
+      className="relative min-h-screen w-screen bg-black flex flex-col items-center justify-center px-6 md:px-16 overflow-hidden pt-32 pb-48"
     >
       {/* Background Ambient Glowing Orbs */}
       <div 
@@ -84,14 +86,15 @@ const About = () => {
       <div className="absolute inset-0 opacity-[0.02] pointer-events-none" 
            style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '100px 100px' }} />
 
-      <div className="z-10 max-w-5xl w-full text-center space-y-16">
-        <div className="space-y-6">
+      <div className="z-10 max-w-4xl w-full flex flex-col justify-between space-y-12">
+        {/* Philosophy & Connect */}
+        <div className="space-y-6 text-center">
             <span className="text-cyan-500/80 font-mono text-[10px] tracking-[0.6em] uppercase block">
                 The Philosophy
             </span>
             <h1
                 ref={headingRef}
-                className="text-6xl md:text-[9vw] font-black uppercase tracking-tighter leading-[0.85] text-white italic select-none group/title"
+                className="text-5xl md:text-[7vw] lg:text-[6.5vw] font-black uppercase tracking-tighter leading-[0.85] text-white italic select-none group/title"
             >
                 <span className="block transition-all duration-700 hover:tracking-[0.02em] hover:text-cyan-400">
                   Simplicity
@@ -114,7 +117,7 @@ const About = () => {
 
         <div 
             ref={textRef}
-            className="relative max-w-3xl mx-auto p-8 md:p-12 rounded-[2rem] border border-zinc-900 bg-zinc-950/40 backdrop-blur-xl overflow-hidden group/card transition-all duration-700 hover:border-zinc-800 hover:shadow-[0_40px_80px_rgba(0,0,0,0.6)]"
+            className="relative p-8 md:p-10 rounded-[2rem] border border-zinc-900 bg-zinc-950/40 backdrop-blur-xl overflow-hidden group/card transition-all duration-700 hover:border-zinc-800 hover:shadow-[0_40px_80px_rgba(0,0,0,0.6)]"
         >
             {/* Tech Crosshair Corners */}
             <div className="absolute top-4 left-4 w-4 h-4 border-t border-l border-zinc-800 group-hover/card:border-cyan-500/40 transition-colors duration-500" />
@@ -125,8 +128,8 @@ const About = () => {
             {/* Glowing Accent line */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-[1px] bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent group-hover/card:w-48 transition-all duration-700" />
 
-            <p className="text-lg md:text-2xl font-medium tracking-tight text-zinc-400 leading-relaxed font-serif italic relative z-10 selection:bg-cyan-500/20">
-                "Engineering modern digital environments where performance meets seamless aesthetics. Currently refining my craft in my third year of engineering."
+            <p className="text-lg md:text-xl font-medium tracking-tight text-zinc-300 leading-relaxed font-serif italic relative z-10 selection:bg-cyan-500/20">
+                &quot;Engineering modern digital environments where performance meets seamless aesthetics. Currently refining my craft in my third year of engineering.&quot;
             </p>
             
             <div className="mt-6 flex items-center justify-center gap-6 opacity-30 group-hover/card:opacity-60 transition-opacity duration-500">
@@ -136,7 +139,7 @@ const About = () => {
             </div>
         </div>
 
-        <div className="pt-6 relative z-10">
+        <div className="pt-2 relative z-10 text-center">
           <motion.a
             href="#contact"
             whileHover={{ scale: 1.05, y: -2 }}
@@ -155,10 +158,6 @@ const About = () => {
                 </svg>
             </div>
           </motion.a>
-          
-          <div className="mt-4 flex items-center justify-center gap-2 opacity-20">
-             <span className="text-[7px] font-mono tracking-widest text-zinc-500 uppercase">Port_Sec_Encr_v2.6</span>
-          </div>
         </div>
       </div>
 

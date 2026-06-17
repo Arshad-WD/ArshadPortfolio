@@ -1,30 +1,31 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { PROJECTS } from "@/libs/data";
 import { motion } from "framer-motion";
+import type { ProjectCard as ProjectCardType } from "./types";
 
 export default function StackingCards() {
-  return (
-    <div className="relative w-full h-screen flex items-center justify-center overflow-hidden">
-        <div className="relative w-full h-[92vh] max-w-7xl pt-20 pb-12">
-          {PROJECTS.map((card, index) => (
-            <Card 
-              key={card.id} 
-              card={card} 
-              index={index} 
-            />
-          ))}
-        </div>
-    </div>
-  );
+    return (
+      <div className="relative w-full h-screen flex items-center justify-center overflow-hidden">
+          <div className="relative w-full h-[92vh] max-w-7xl pt-20 pb-12">
+            {PROJECTS.map((card, index) => (
+              <Card 
+                key={card.id} 
+                card={card} 
+                index={index} 
+              />
+            ))}
+          </div>
+      </div>
+    );
 }
 
 function Card({ 
   card, 
   index 
 }: { 
-  card: any; 
+  card: ProjectCardType & { tags?: string[] }; 
   index: number; 
 }) {
     const [isHovered, setIsHovered] = useState(false);
@@ -35,13 +36,14 @@ function Card({
             style={{
               zIndex: index,
               transform: "translate3d(0, 500px, 0) scale(0.86)",
-              transformOrigin: "bottom"
+              transformOrigin: "bottom",
+              willChange: "transform, opacity"
             }}
         >
             <div 
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
-              className="relative w-full max-w-6xl h-full rounded-[2.5rem] md:rounded-[3.5rem] border border-zinc-200 bg-white shadow-[0_60px_120px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col md:flex-row pointer-events-auto transition-[box-shadow,transform] duration-700 ease-[0.23,1,0.32,1] hover:shadow-[0_80px_160px_rgba(0,0,0,0.15)]"
+              className="relative w-full max-w-6xl h-full rounded-[2.5rem] md:rounded-[3.5rem] border border-zinc-200 bg-white shadow-[0_60px_120px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col lg:flex-row pointer-events-auto transition-[box-shadow] duration-700 ease-[0.23,1,0.32,1] hover:shadow-[0_80px_160px_rgba(0,0,0,0.15)]"
             >
                 {/* Direct GPU-accelerated Dimming Overlay instead of heavy CSS filter brightness */}
                 <div 
@@ -49,10 +51,12 @@ function Card({
                 />
                 
                 {/* Visual Anchor - Left Column (60%) */}
-                <div className="w-full md:w-[60%] h-[40%] md:h-full relative overflow-hidden bg-zinc-50 border-r border-zinc-100 group/img">
+                <div className="w-full lg:w-[60%] h-[40%] lg:h-full relative overflow-hidden bg-zinc-50 border-r border-zinc-100 group/img">
                     <img
                         src={card.img.replace('.png', '.webp').replace('.jpg', '.webp')}
                         alt={card.title}
+                        width={800}
+                        height={600}
                         className={`w-full h-full object-cover transition-[transform,filter,opacity] duration-1000 ease-[0.16,1,0.3,1] ${isHovered ? 'scale-110 grayscale-0' : 'scale-100 grayscale opacity-90'}`}
                     />
                     
@@ -97,7 +101,7 @@ function Card({
                 </div>
 
                 {/* Content Deck - Right Column (40%) */}
-                <div className="flex-1 flex flex-col p-10 md:p-14 lg:p-16 relative bg-white min-h-0 h-full">
+                <div className="flex-1 flex flex-col p-6 md:p-10 lg:p-16 relative bg-white min-h-0 h-full">
                     
                     <div className="flex justify-between items-center mb-10">
                         <span className="text-cyan-600 text-[9px] font-black uppercase tracking-[0.5em] font-mono">Series_04 // Project</span>
@@ -122,7 +126,7 @@ function Card({
 
                         <div className="space-y-8">
                             <p className="text-zinc-500 text-sm md:text-base font-medium leading-relaxed max-w-sm font-serif italic selection:bg-cyan-100">
-                                 // Architectural manifestation of high-fidelity {card.title} logic. Scaled for industrial-grade visual precision and narrative depth.
+                                 {`// Architectural manifestation of high-fidelity ${card.title} logic. Scaled for industrial-grade visual precision and narrative depth.`}
                             </p>
 
                             <div className="flex flex-wrap gap-2">

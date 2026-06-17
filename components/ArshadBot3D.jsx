@@ -17,13 +17,33 @@ const ACCENT = "#4A90E2";
 const API_URL = "/api/chat";
 
 const SECTION_MESSAGES = {
-  home: "Welcome! Ask me anything 👋",
-  projects: "Want to know about my projects? 🚀",
-  skills: "Curious about my tech stack? ⚡",
-  contact: "Want to get in touch? 📬",
+  home: "Hey — I'm Arshad's AI assistant. Ask me anything.",
+  projects: "Explore Arshad's projects. What would you like to know?",
+  skills: "Full-stack by craft. Ask about his tech stack.",
+  contact: "Looking to collaborate? I can help with that.",
 };
 
-const REACTION_EMOJIS = ["👀", "!", "hi~", "..."];
+const REACTION_EMOJIS = [
+  // Professional
+  "Scanning...",
+  "Hello.",
+  "Ready.",
+  "Online.",
+  "Initializing...",
+  "Standing by.",
+  "System nominal.",
+  // Funny / personality
+  "Oh hey 👀",
+  "You noticed me!",
+  "Don't mind me...",
+  "I'm just floating here.",
+  "Need help? I got you.",
+  "Yes, I'm real. Kinda.",
+  "404: awkwardness not found.",
+  "Arshad made me, blame him.",
+  "I don't bite. Promise.",
+  "Less bugs than Arshad's code. Maybe.",
+];
 
 /* ─────────────────────── helpers ─────────────────────── */
 function randBetween(a, b) {
@@ -315,21 +335,39 @@ function ReactionBubble({ text, pos }) {
       style={{
         position: "fixed",
         left: `${pos.x}px`,
-        top: `${pos.y - 55}px`,
+        top: `${pos.y - 62}px`,
         transform: "translateX(-50%)",
-        background: "rgba(74,144,226,0.2)",
-        backdropFilter: "blur(8px)",
-        border: "1px solid rgba(74,144,226,0.4)",
-        borderRadius: 12,
-        padding: "4px 12px",
-        fontSize: 14,
-        color: "#fff",
+        display: "flex",
+        alignItems: "center",
+        gap: "7px",
+        background: "rgba(10, 10, 18, 0.82)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        border: "1px solid rgba(139, 92, 246, 0.25)",
+        borderRadius: "100px",
+        padding: "6px 14px 6px 10px",
+        fontSize: 11,
+        fontFamily: "'SF Mono', 'Fira Code', monospace",
+        fontWeight: 500,
+        letterSpacing: "0.04em",
+        color: "rgba(255,255,255,0.75)",
         zIndex: 100003,
         pointerEvents: "none",
-        animation: "arshadBotBubbleIn 0.3s ease-out",
+        animation: "arshadBotBubbleIn 0.25s cubic-bezier(0.34,1.56,0.64,1)",
         whiteSpace: "nowrap",
+        boxShadow: "0 4px 24px rgba(139,92,246,0.15), 0 1px 0 rgba(255,255,255,0.04) inset",
       }}
     >
+      {/* Pulsing status dot */}
+      <span style={{
+        width: 5,
+        height: 5,
+        borderRadius: "50%",
+        background: "#a78bfa",
+        boxShadow: "0 0 6px #a78bfa",
+        animation: "arshadDotPulse 1.8s ease-in-out infinite",
+        flexShrink: 0,
+      }} />
       {text}
     </div>
   );
@@ -359,8 +397,9 @@ function BotCanvas({ botRef, mouseNear, mouseDir }) {
           alpha: true, 
           antialias: true,
           powerPreference: "high-performance",
-          toneMapping: THREE.ACESFilmicToneMapping, // High-end photographic tone mapping
-          toneMappingExposure: 1.15
+          toneMapping: THREE.NoToneMapping,
+          toneMappingExposure: 1.0,
+          logarithmicDepthBuffer: false,
         }}
         dpr={[1, 2]}
         onCreated={({ gl }) => {
@@ -379,7 +418,6 @@ function BotCanvas({ botRef, mouseNear, mouseDir }) {
               <BotModel mouseNear={mouseNear} mouseDir={mouseDir} />
             </Float>
           </Center>
-          <Environment preset="city" intensity={0.5} /> {/* High-end HDR environment map reflections */}
         </Suspense>
       </Canvas>
     </div>
@@ -518,15 +556,15 @@ export default function ArshadBot3D() {
       const near = dist < PROXIMITY;
 
       if (near && !prevNearRef.current) {
+        // Mouse just entered — pick a random reaction and show it
+        if (reactionTimeoutRef.current) clearTimeout(reactionTimeoutRef.current);
         setReaction(
           REACTION_EMOJIS[Math.floor(Math.random() * REACTION_EMOJIS.length)]
         );
-        if (reactionTimeoutRef.current)
-          clearTimeout(reactionTimeoutRef.current);
-        reactionTimeoutRef.current = setTimeout(
-          () => setReaction(null),
-          1500
-        );
+      } else if (!near && prevNearRef.current) {
+        // Mouse just left — hide the reaction after a short delay
+        if (reactionTimeoutRef.current) clearTimeout(reactionTimeoutRef.current);
+        reactionTimeoutRef.current = setTimeout(() => setReaction(null), 400);
       }
       prevNearRef.current = near;
 
