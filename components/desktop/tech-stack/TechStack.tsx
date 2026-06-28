@@ -14,7 +14,8 @@ const Techstack: React.FC = () => {
       document.querySelectorAll<HTMLImageElement>(`.${styles["tech-stack-image"]}`)
     );
 
-    const initAnimations = () => {
+    // Scope all GSAP animations to this component — ctx.revert() only kills our own triggers
+    const ctx = gsap.context(() => {
       const cards: {
         id: string;
         endTranslatex: number;
@@ -32,13 +33,14 @@ const Techstack: React.FC = () => {
 
       gsap.to(`.${styles["wrapper-stack"]}`, {
         x: "-480vw",
-        ease: "none",
+        ease: "power1.inOut",
         scrollTrigger: {
           trigger: `.${styles["wrapper-stack"]}`,
           start: "top top",
           end: "+=900vh",
-          scrub: 1,
+          scrub: 1.8,
           pin: true,
+          anticipatePin: 1,
         },
       });
 
@@ -46,19 +48,16 @@ const Techstack: React.FC = () => {
         gsap.to(card.id, {
           x: `${card.endTranslatex}px`,
           rotate: card.rotate * 2,
-          ease: "none",
+          ease: "power1.inOut",
           scrollTrigger: {
             trigger: card.id,
             start: "top top",
             end: "+=1000vh",
-            scrub: 1,
+            scrub: 2,
           },
         });
       });
-    };
-
-    // Initialize animations immediately so ScrollTrigger sets up pinning/scroll height
-    initAnimations();
+    });
 
     const handleLoad = () => {
       ScrollTrigger.refresh();
@@ -76,7 +75,8 @@ const Techstack: React.FC = () => {
       images.forEach((img) =>
         img.removeEventListener("load", handleLoad)
       );
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+      // Only reverts THIS component's triggers — not the Hero's or any other component's
+      ctx.revert();
     };
   }, []);
 

@@ -54,6 +54,9 @@ const Hero: React.FC<HeroProps> = ({
     const hero = heroRef.current;
     if (!hero) return;
 
+    // Enable GPU-composited rendering for smooth clip-path transition
+    hero.style.willChange = "clip-path";
+
     gsap.set(hero, {
       clipPath: "polygon(14% 0, 72% 0, 90% 90%, 0% 100%)",
       borderRadius: "0 0 40% 10%",
@@ -62,13 +65,13 @@ const Hero: React.FC<HeroProps> = ({
     gsap.from(hero, {
       clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
       borderRadius: "0 0 0 0",
-      ease: "power1.inOut",
+      ease: "power2.inOut",
       duration: 2,
       scrollTrigger: {
         trigger: hero,
         start: "center center",
         end: "bottom center",
-        scrub: true,
+        scrub: 1.5,
       },
     });
   }, []);
