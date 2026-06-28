@@ -2,20 +2,22 @@
 
 import { motion } from "framer-motion";
 import { AppLaunchPayload } from "../types";
-import AboutApp from "../home/AboutApp";
-import ResumeApp from "../home/ResumeApp";
-import CameraApp from "../home/CameraApp";
-import ProjectsApp from "../home/ProjectsApp";
-import SettingsApp from "../home/SettingsApp";
-import SafariApp from "../home/SafariApp";
-import ContactApp from "../home/ContactApp";
-import GalleryApp from "../home/GalleryApp";
-import MailApp from "../home/MailApp";
-import MapsApp from "../home/MapsApp";
-import MusicApp from "../home/MusicApp";
-import NoteApp from "../home/NoteApp";
-import AppStoreApp from "../home/AppStoreApp";
-import ChromeApp from "../home/ChromeApp";
+import dynamic from "next/dynamic";
+
+const AboutApp = dynamic(() => import("../home/AboutApp"), { ssr: false });
+const ResumeApp = dynamic(() => import("../home/ResumeApp"), { ssr: false });
+const CameraApp = dynamic(() => import("../home/CameraApp"), { ssr: false });
+const ProjectsApp = dynamic(() => import("../home/ProjectsApp"), { ssr: false });
+const SettingsApp = dynamic(() => import("../home/SettingsApp"), { ssr: false });
+const SafariApp = dynamic(() => import("../home/SafariApp"), { ssr: false });
+const ContactApp = dynamic(() => import("../home/ContactApp"), { ssr: false });
+const GalleryApp = dynamic(() => import("../home/GalleryApp"), { ssr: false });
+const MailApp = dynamic(() => import("../home/MailApp"), { ssr: false });
+const MapsApp = dynamic(() => import("../home/MapsApp"), { ssr: false });
+const MusicApp = dynamic(() => import("../home/MusicApp"), { ssr: false });
+const NoteApp = dynamic(() => import("../home/NoteApp"), { ssr: false });
+const AppStoreApp = dynamic(() => import("../home/AppStoreApp"), { ssr: false });
+const ChromeApp = dynamic(() => import("../home/ChromeApp"), { ssr: false });
 
 export default function AppWindow({
   payload,

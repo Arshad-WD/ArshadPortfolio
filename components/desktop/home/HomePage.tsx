@@ -1,13 +1,25 @@
 "use client";
 
 import { useRef } from "react";
+import dynamic from "next/dynamic";
 
 import Hero from "@/components/desktop/hero/Hero";
-import Techstack from "@/components/desktop/tech-stack/TechStack";
-import About from "@/components/desktop/about/About";
-import Projects from "@/components/desktop/projects/Projects";
-import Contact from "@/components/desktop/contact/Contact";
-import { CinematicFooter } from "@/components/ui/motion-footer";
+
+const Techstack = dynamic(() => import("@/components/desktop/tech-stack/TechStack"), {
+  ssr: false,
+});
+const About = dynamic(() => import("@/components/desktop/about/About"), {
+  ssr: false,
+});
+const Projects = dynamic(() => import("@/components/desktop/projects/Projects"), {
+  ssr: false,
+});
+const Contact = dynamic(() => import("@/components/desktop/contact/Contact"), {
+  ssr: false,
+});
+const CinematicFooter = dynamic(() => import("@/components/ui/motion-footer").then(mod => mod.CinematicFooter), {
+  ssr: false,
+});
 
 export default function HomePage() {
   const aboutRef = useRef<HTMLElement | null>(null);

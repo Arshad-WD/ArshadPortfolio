@@ -23,26 +23,17 @@ const SECTION_MESSAGES = {
   contact: "Looking to collaborate? I can help with that.",
 };
 
-const REACTION_EMOJIS = [
-  // Professional
-  "Scanning...",
-  "Hello.",
-  "Ready.",
-  "Online.",
-  "Initializing...",
-  "Standing by.",
-  "System nominal.",
-  // Funny / personality
-  "Oh hey 👀",
-  "You noticed me!",
-  "Don't mind me...",
-  "I'm just floating here.",
-  "Need help? I got you.",
-  "Yes, I'm real. Kinda.",
-  "404: awkwardness not found.",
-  "Arshad made me, blame him.",
-  "I don't bite. Promise.",
-  "Less bugs than Arshad's code. Maybe.",
+const REACTION_MESSAGES = [
+  "Available for new projects.",
+  "Full-stack, front to back.",
+  "Based in Pakistan.",
+  "Open to collaborations.",
+  "Next.js · React · Node.js",
+  "UI/UX · Three.js · GSAP",
+  "Ask me anything.",
+  "Let's build something.",
+  "Arshad's portfolio assistant.",
+  "Specialized in premium UIs.",
 ];
 
 /* ─────────────────────── helpers ─────────────────────── */
@@ -335,39 +326,28 @@ function ReactionBubble({ text, pos }) {
       style={{
         position: "fixed",
         left: `${pos.x}px`,
-        top: `${pos.y - 62}px`,
+        top: `${pos.y - 58}px`,
         transform: "translateX(-50%)",
-        display: "flex",
+        display: "inline-flex",
         alignItems: "center",
-        gap: "7px",
-        background: "rgba(10, 10, 18, 0.82)",
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
-        border: "1px solid rgba(139, 92, 246, 0.25)",
-        borderRadius: "100px",
-        padding: "6px 14px 6px 10px",
+        background: "rgba(8, 8, 10, 0.88)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+        border: "1px solid rgba(255, 255, 255, 0.09)",
+        borderRadius: "6px",
+        padding: "7px 13px",
         fontSize: 11,
-        fontFamily: "'SF Mono', 'Fira Code', monospace",
+        fontFamily: "'Outfit', 'Inter', sans-serif",
         fontWeight: 500,
-        letterSpacing: "0.04em",
-        color: "rgba(255,255,255,0.75)",
+        letterSpacing: "0.06em",
+        color: "rgba(255,255,255,0.55)",
         zIndex: 100003,
         pointerEvents: "none",
-        animation: "arshadBotBubbleIn 0.25s cubic-bezier(0.34,1.56,0.64,1)",
+        animation: "arshadBotBubbleIn 0.22s cubic-bezier(0.23, 1, 0.32, 1)",
         whiteSpace: "nowrap",
-        boxShadow: "0 4px 24px rgba(139,92,246,0.15), 0 1px 0 rgba(255,255,255,0.04) inset",
+        textTransform: "uppercase",
       }}
     >
-      {/* Pulsing status dot */}
-      <span style={{
-        width: 5,
-        height: 5,
-        borderRadius: "50%",
-        background: "#a78bfa",
-        boxShadow: "0 0 6px #a78bfa",
-        animation: "arshadDotPulse 1.8s ease-in-out infinite",
-        flexShrink: 0,
-      }} />
       {text}
     </div>
   );
@@ -559,7 +539,7 @@ export default function ArshadBot3D() {
         // Mouse just entered — pick a random reaction and show it
         if (reactionTimeoutRef.current) clearTimeout(reactionTimeoutRef.current);
         setReaction(
-          REACTION_EMOJIS[Math.floor(Math.random() * REACTION_EMOJIS.length)]
+          REACTION_MESSAGES[Math.floor(Math.random() * REACTION_MESSAGES.length)]
         );
       } else if (!near && prevNearRef.current) {
         // Mouse just left — hide the reaction after a short delay

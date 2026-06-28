@@ -57,6 +57,7 @@ function Card({
                         alt={card.title}
                         width={800}
                         height={600}
+                        loading="lazy"
                         className={`w-full h-full object-cover transition-[transform,filter,opacity] duration-1000 ease-[0.16,1,0.3,1] ${isHovered ? 'scale-110 grayscale-0' : 'scale-100 grayscale opacity-90'}`}
                     />
                     
