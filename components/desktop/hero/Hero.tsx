@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
@@ -54,24 +54,23 @@ const Hero: React.FC<HeroProps> = ({
     const hero = heroRef.current;
     if (!hero) return;
 
-    gsap.fromTo(
-      hero,
-      {
-        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-        borderRadius: "0 0 0 0",
+    gsap.set(hero, {
+      clipPath: "polygon(14% 0, 72% 0, 90% 90%, 0% 100%)",
+      borderRadius: "0 0 40% 10%",
+    });
+
+    gsap.from(hero, {
+      clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+      borderRadius: "0 0 0 0",
+      ease: "power1.inOut",
+      duration: 2,
+      scrollTrigger: {
+        trigger: hero,
+        start: "center center",
+        end: "bottom center",
+        scrub: true,
       },
-      {
-        clipPath: "polygon(14% 0, 72% 0, 90% 90%, 0% 100%)",
-        borderRadius: "0 0 40% 10%",
-        ease: "power1.inOut",
-        scrollTrigger: {
-          trigger: hero.parentElement || hero,
-          start: "top top",
-          end: "bottom top",
-          scrub: true,
-        },
-      }
-    );
+    });
   }, []);
 
   const handleKeyDown = (e: React.KeyboardEvent, action: () => void) => {
