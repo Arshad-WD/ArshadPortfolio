@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Outfit } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -121,6 +122,7 @@ export default function RootLayout({
 
       <body className={`${outfit.variable} relative text-white antialiased`}>
         {children}
+        <Analytics />
       </body>
     </html>
   );

@@ -148,8 +148,9 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
 
   return (
     <div
-      className="fixed inset-0 z-[9999] bg-[#080808] flex flex-col overflow-hidden select-none"
+      className="fixed inset-0 z-[9999] flex flex-col overflow-hidden select-none"
       style={{
+        backgroundColor: "#030303",
         clipPath: clipping ? "inset(0 0 100% 0)" : "inset(0 0 0% 0)",
         transition: clipping ? "clip-path 0.72s cubic-bezier(0.76,0,0.24,1)" : "none",
       }}

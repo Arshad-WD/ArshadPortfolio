@@ -11,13 +11,10 @@ gsap.registerPlugin(ScrollTrigger);
 const Techstack: React.FC = () => {
   useEffect(() => {
     const images = Array.from(
-      document.querySelectorAll<HTMLImageElement>(`.${styles["tech-stack-image"]}`));
+      document.querySelectorAll<HTMLImageElement>(`.${styles["tech-stack-image"]}`)
+    );
 
-    if (!images.length) return;
-
-    let loadedImages = 0;
-
-        const initAnimations = () => {
+    const initAnimations = () => {
       const cards: {
         id: string;
         endTranslatex: number;
@@ -60,11 +57,11 @@ const Techstack: React.FC = () => {
       });
     };
 
+    // Initialize animations immediately so ScrollTrigger sets up pinning/scroll height
+    initAnimations();
+
     const handleLoad = () => {
-      loadedImages++;
-      if (loadedImages === images.length) {
-        initAnimations();
-      }
+      ScrollTrigger.refresh();
     };
 
     images.forEach((img) => {
@@ -74,8 +71,6 @@ const Techstack: React.FC = () => {
         img.addEventListener("load", handleLoad);
       }
     });
-
-
 
     return () => {
       images.forEach((img) =>
