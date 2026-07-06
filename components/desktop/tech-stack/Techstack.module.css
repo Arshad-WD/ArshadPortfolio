@@ -21,7 +21,7 @@
   top: 50%;
   left: 45%;
   transform: translate(-50%, -50%);
-}
+  }
 
 .container {
   width: 100%;
@@ -52,14 +52,45 @@
 }
 
 
-:global(#card-1) { top: 50%; left: 12%; }
-:global(#card-2) { top: 20%; left: 38%; }
-:global(#card-3) { top: 55%; left: 53%; }
-:global(#card-4) { top: 5%; left: 27%; }
-:global(#card-5) { top: 40%; left: 70%; }
-:global(#card-6) { top: 60%; left: 80%; }
-:global(#card-7) { top: 5%; left: 60%; }
-:global(#card-8) { top: 10%; left: 95%; }
+:global(#card-1) {
+  top: 50%;
+  left: 12%;
+}
+
+:global(#card-2) {
+  top: 20%;
+  left: 38%;
+}
+
+:global(#card-3) {
+  top: 55%;
+  left: 53%;
+}
+
+:global(#card-4) {
+  top: 5%;
+  left: 27%;
+}
+
+:global(#card-5) {
+  top: 40%;
+  left: 70%;
+}
+
+:global(#card-6) {
+  top: 60%;
+  left: 80%;
+}
+
+:global(#card-7) {
+  top: 5%;
+  left: 60%;
+}
+
+:global(#card-8) {
+  top: 10%;
+  left: 95%;
+}
 
 @media (max-width: 900px) {
   .wrapper-stack {

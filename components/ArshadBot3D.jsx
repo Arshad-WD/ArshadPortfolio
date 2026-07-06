@@ -26,7 +26,7 @@ const SECTION_MESSAGES = {
 const REACTION_MESSAGES = [
   "Available for new projects.",
   "Full-stack, front to back.",
-  "Based in Pakistan.",
+  "Based in India.",
   "Open to collaborations.",
   "Next.js · React · Node.js",
   "UI/UX · Three.js · GSAP",
