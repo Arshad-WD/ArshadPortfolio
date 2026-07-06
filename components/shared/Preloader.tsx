@@ -95,7 +95,6 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
   const [phase, setPhase] = useState<Phase>("greetings");
   const [greetingIdx, setGreetingIdx] = useState(0);
   const [percent, setPercent] = useState(0);
-  const [clipping, setClipping] = useState(false);
   
   const percentAnim = useMotionValue(0);
   const clipPathVal = useTransform(percentAnim, (p) => `inset(0 ${100 - p}% 0 0)`);
@@ -128,12 +127,11 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
         // brief hold at 100 then exit
         setTimeout(() => {
           setPhase("exit");
-          setClipping(true);
           setTimeout(() => {
             sessionStorage.setItem(SESSION_KEY, "done");
             setPhase("done");
             onComplete();
-          }, 800);
+          }, 1400); // Wait for the staggered vertical pillars exit animation (delay + duration) to finish
         }, 420);
       }
     });
@@ -147,13 +145,41 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
 
   return (
     <div
-      className="fixed inset-0 z-[9999] flex flex-col overflow-hidden select-none"
+      className={`fixed inset-0 z-[9999] overflow-hidden select-none ${
+        phase === "exit" ? "pointer-events-none" : "pointer-events-auto"
+      }`}
       style={{
-        backgroundColor: "#030303",
-        clipPath: clipping ? "inset(0 0 100% 0)" : "inset(0 0 0% 0)",
-        transition: clipping ? "clip-path 0.72s cubic-bezier(0.76,0,0.24,1)" : "none",
+        backgroundColor: phase === "exit" ? "transparent" : "#030303",
       }}
     >
+      {/* Staggered Vertical Pillars (reveals content one-by-one by sliding/collapsing upwards) */}
+      <div className="absolute inset-0 flex pointer-events-none z-0">
+        {Array.from({ length: 10 }).map((_, i) => (
+          <motion.div
+            key={i}
+            initial={{ scaleY: 1 }}
+            animate={{ scaleY: phase === "exit" ? 0 : 1 }}
+            transition={{
+              duration: 0.85,
+              ease: [0.76, 0, 0.24, 1], // Premium ease-in-out curve
+              delay: i * 0.055, // Staggered delays from left to right
+            }}
+            style={{
+              flex: 1,
+              backgroundColor: "#030303",
+              transformOrigin: "top", // collapse/slide upwards
+              marginRight: "-1px", // prevent sub-pixel rendering gaps
+            }}
+          />
+        ))}
+      </div>
+
+      {/* UI Content Wrapper (Fades out when exiting) */}
+      <motion.div
+        className="relative z-10 flex flex-col h-full w-full pointer-events-none"
+        animate={{ opacity: phase === "exit" ? 0 : 1 }}
+        transition={{ duration: 0.35, ease: "easeOut" }}
+      >
       {/* ── TOP MARQUEE ── */}
       <div className="border-b border-white/[0.06] py-[11px]">
         <Marquee durationSecs={28} />
@@ -314,17 +340,18 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
         </span>
       </div>
 
-      {/* Film grain */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-[0.03] mix-blend-screen"
-        style={{
-          backgroundImage: "url('/noise.svg')",
-          backgroundSize: "180px 180px",
-        }}
-      />
+        {/* Film grain */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-[0.03] mix-blend-screen"
+          style={{
+            backgroundImage: "url('/noise.svg')",
+            backgroundSize: "180px 180px",
+          }}
+        />
 
-      {/* Vignette */}
-      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_80%_80%_at_50%_50%,transparent_30%,rgba(0,0,0,0.55)_100%)]" />
+        {/* Vignette */}
+        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_80%_80%_at_50%_50%,transparent_30%,rgba(0,0,0,0.55)_100%)]" />
+      </motion.div>
     </div>
   );
 }
