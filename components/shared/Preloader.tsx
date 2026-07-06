@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useTransform, animate } from "framer-motion";
 
 /* ──────────────────────────────────────────────
    Constants
@@ -96,7 +96,9 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
   const [greetingIdx, setGreetingIdx] = useState(0);
   const [percent, setPercent] = useState(0);
   const [clipping, setClipping] = useState(false);
-  const loadStart = useRef<number>(0);
+  
+  const percentAnim = useMotionValue(0);
+  const clipPathVal = useTransform(percentAnim, (p) => `inset(0 ${100 - p}% 0 0)`);
 
   /* ── Phase 1: cycle greetings ── */
   useEffect(() => {
@@ -115,17 +117,14 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
   /* ── Phase 2: run progress counter ── */
   useEffect(() => {
     if (phase !== "loading") return;
-    loadStart.current = Date.now();
 
-    const tick = setInterval(() => {
-      const elapsed = Date.now() - loadStart.current;
-      const t = Math.min(elapsed / LOADING_DURATION_MS, 1);
-      const val = Math.floor(easeOutExpo(t) * 100);
-      setPercent(val);
-
-      if (t >= 1) {
-        clearInterval(tick);
-        setPercent(100);
+    const controls = animate(percentAnim, 100, {
+      duration: LOADING_DURATION_MS / 1000,
+      ease: [0.16, 1, 0.3, 1], // easeOutExpo custom cubic bezier curve
+      onUpdate: (latest) => {
+        setPercent(Math.floor(latest));
+      },
+      onComplete: () => {
         // brief hold at 100 then exit
         setTimeout(() => {
           setPhase("exit");
@@ -137,10 +136,10 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
           }, 800);
         }, 420);
       }
-    }, 16);
+    });
 
-    return () => clearInterval(tick);
-  }, [phase, onComplete]);
+    return () => controls.stop();
+  }, [phase, onComplete, percentAnim]);
 
   if (phase === "done") return null;
 
@@ -232,11 +231,10 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
                 </div>
 
                 {/* Filled overlay — clips left→right with loading percent */}
-                <div
+                <motion.div
                   className="absolute inset-0 flex items-end pointer-events-none"
                   style={{
-                    clipPath: `inset(0 ${100 - percent}% 0 0)`,
-                    transition: "clip-path 0.06s linear",
+                    clipPath: clipPathVal,
                   }}
                 >
                   {NAME.split("").map((letter, i) => (
@@ -256,7 +254,7 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
                       {letter}
                     </span>
                   ))}
-                </div>
+                </motion.div>
               </div>
 
               {/* Status label */}
