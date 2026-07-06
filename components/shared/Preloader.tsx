@@ -205,10 +205,10 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
               <AnimatePresence mode="wait">
                 <motion.span
                   key={`g-${greetingIdx}`}
-                  initial={{ opacity: 0, y: 18, filter: "blur(6px)" }}
-                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  exit={{ opacity: 0, y: -18, filter: "blur(6px)" }}
-                  transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -15 }}
+                  transition={{ duration: 0.32, ease: [0.25, 1, 0.5, 1] }}
                   className="text-[13vw] sm:text-[10vw] md:text-[8vw] font-black tracking-tight text-white leading-none"
                   style={{ fontFamily: "var(--font-outfit), sans-serif" }}
                 >
