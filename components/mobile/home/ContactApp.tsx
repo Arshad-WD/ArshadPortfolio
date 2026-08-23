@@ -5,9 +5,9 @@ import { motion } from "framer-motion";
 const CONTACTS = [
   { 
     name: "Email", 
-    role: "arshadsayyad53@gmail.com", 
+    role: "hello@jenixweblancer.in", 
     color: "bg-blue-500", 
-    link: "mailto:arshadsayyad53@gmail.com",
+    link: "mailto:hello@jenixweblancer.in",
     icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
   },
   { 

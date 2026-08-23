@@ -28,7 +28,8 @@ export default function AppWindow({
 }) {
   return (
     <motion.div
-      className="absolute inset-0 z-[110] bg-black/95 backdrop-blur-3xl overflow-hidden"
+      className="absolute inset-0 z-[110] bg-black/95 backdrop-blur-lg overflow-hidden"
+      style={{ willChange: "transform" }}
       initial={{ scale: 0.8, opacity: 0, borderRadius: 40 }}
       animate={{ scale: 1, opacity: 1, borderRadius: 0 }}
       exit={{ scale: 0.8, opacity: 0, borderRadius: 40 }}

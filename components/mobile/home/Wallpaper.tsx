@@ -53,16 +53,17 @@ const Wallpaper = memo(function Wallpaper() {
         }}
       />
 
-      {/* ── Animated shimmer sweep — single horizontal pass ── */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.025) 50%, transparent 60%)",
-          animation: "shimmer 8s ease-in-out infinite",
-          backgroundSize: "200% 100%",
-        }}
-      />
+      {/* ── Animated shimmer sweep — GPU-composited via transform ── */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div
+          className="absolute inset-0 -translate-x-full"
+          style={{
+            background:
+              "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.025) 50%, transparent 60%)",
+            animation: "shimmer 8s ease-in-out infinite",
+          }}
+        />
+      </div>
 
       {/* ── Subtle 45° line texture ── */}
       <div
@@ -93,9 +94,9 @@ const Wallpaper = memo(function Wallpaper() {
 
       <style>{`
         @keyframes shimmer {
-          0%   { background-position: -100% 0; }
-          50%  { background-position: 100% 0; }
-          100% { background-position: -100% 0; }
+          0%   { transform: translateX(-100%); }
+          50%  { transform: translateX(200%); }
+          100% { transform: translateX(-100%); }
         }
       `}</style>
     </div>

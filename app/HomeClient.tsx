@@ -24,19 +24,14 @@ const BotLoader = dynamic(
 export default function HomeClient() {
   const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState<boolean>(false);
-  const [loadBot, setLoadBot] = useState(false);
 
   useEffect(() => {
-    // Determine screen size immediately
-    const mobile = window.innerWidth < 640;
-    setIsMobile(mobile);
+    // Mobile view paused — always show desktop
+    // const mobile = window.innerWidth < 640;
+    // setIsMobile(mobile);
 
-    // Eagerly prefetch ONLY the layout module needed for this viewport type during preloader
-    if (mobile) {
-      import("@/components/mobile/Mobile").catch(() => {});
-    } else {
-      import("@/components/desktop/home/HomePage").catch(() => {});
-    }
+    // Eagerly prefetch desktop layout
+    import("@/components/desktop/home/HomePage").catch(() => {});
 
     // Preload critical hero images in the browser cache
     const images = ["/images/Layer1.png", "/images/Layer2.png"];
@@ -51,10 +46,12 @@ export default function HomeClient() {
       setLoading(false);
     }
 
-    const checkMobile = () => setIsMobile(window.innerWidth < 640);
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    // const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    // window.addEventListener("resize", checkMobile);
+    // return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  const [loadBot, setLoadBot] = useState(false);
 
   const handleLoadingComplete = () => {
     setLoading(false);

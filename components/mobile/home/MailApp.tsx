@@ -16,7 +16,7 @@ export default function MailApp() {
   const [body, setBody] = useState("");
 
   const handleSend = () => {
-    const mailto = `mailto:arshadsayyad53@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const mailto = `mailto:hello@jenixweblancer.in?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.assign(mailto);
     setView("INBOX");
     setSubject("");
@@ -132,7 +132,7 @@ export default function MailApp() {
             <div className="flex-1 flex flex-col">
               <div className="px-5 py-3 flex items-center border-b border-zinc-200 dark:border-zinc-800 gap-2">
                  <span className="text-[15px] text-zinc-500">To:</span>
-                 <span className="text-[15px] font-medium text-blue-500 bg-blue-500/10 px-2 py-0.5 rounded-full">arshadsayyad53@gmail.com</span>
+                 <span className="text-[15px] font-medium text-blue-500 bg-blue-500/10 px-2 py-0.5 rounded-full">hello@jenixweblancer.in</span>
               </div>
               <div className="px-5 py-3 flex items-center border-b border-zinc-200 dark:border-zinc-800 gap-2">
                  <span className="text-[15px] text-zinc-500">Subject:</span>

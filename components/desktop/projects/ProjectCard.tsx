@@ -2,194 +2,368 @@
 
 import { useState } from "react";
 import { PROJECTS } from "@/libs/data";
-import { motion } from "framer-motion";
 import type { ProjectCard as ProjectCardType } from "./types";
 
 export default function StackingCards() {
-    return (
-      <div className="relative w-full h-screen flex items-center justify-center overflow-hidden">
-          <div className="relative w-full h-[92vh] max-w-7xl pt-20 pb-12">
-            {PROJECTS.map((card, index) => (
-              <Card 
-                key={card.id} 
-                card={card} 
-                index={index} 
-              />
-            ))}
-          </div>
+  return (
+    <div className="relative w-full h-screen flex items-center justify-center overflow-hidden">
+      <div className="relative w-full h-[92vh] max-w-7xl pt-20 pb-12">
+        {PROJECTS.map((card, index) => (
+          <Card key={card.id} card={card} index={index} />
+        ))}
       </div>
-    );
+    </div>
+  );
 }
 
-function Card({ 
-  card, 
-  index 
-}: { 
-  card: ProjectCardType & { tags?: string[] }; 
-  index: number; 
+function Card({
+  card,
+  index,
+}: {
+  card: ProjectCardType & { tags?: string[] };
+  index: number;
 }) {
-    const [isHovered, setIsHovered] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
-    return (
+  const [num, ...rest] = card.title.split(" ");
+  const name = rest.join(" ");
+
+  return (
+    <div
+      className={`project-card-${index} absolute inset-0 m-auto w-full h-[85%] max-h-[720px] flex items-center justify-center pointer-events-none opacity-0`}
+      style={{
+        zIndex: index,
+        transform: "translate3d(0, 500px, 0) scale(0.86)",
+        transformOrigin: "bottom",
+        willChange: "transform, opacity",
+      }}
+    >
+      {/* ─── CARD ─── */}
+      <div
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        className="relative w-full max-w-6xl h-full rounded-2xl overflow-hidden flex pointer-events-auto"
+        style={{
+          background: "#1c2430",
+          boxShadow: isHovered
+            ? "0 0 0 1px rgba(201,169,110,0.2), 0 40px 100px rgba(0,0,0,0.6), 0 0 60px rgba(201,169,110,0.06)"
+            : "0 0 0 1px rgba(255,255,255,0.05), 0 30px 70px rgba(0,0,0,0.5)",
+          transition: "box-shadow 0.6s ease",
+        }}
+      >
+        {/* GSAP dim layer */}
+        <div className={`project-card-dim-${index} absolute inset-0 bg-zinc-950 pointer-events-none z-[35] opacity-0`} />
+
+        {/* ── Film grain noise ── */}
         <div
-            className={`project-card-${index} absolute inset-0 m-auto w-full h-[85%] max-h-[720px] flex items-center justify-center pointer-events-none opacity-0`}
+          className="absolute inset-0 pointer-events-none z-[1] opacity-[0.035]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+            backgroundSize: "128px 128px",
+          }}
+        />
+
+        {/* ── UIverse animated border with glow ── */}
+        <div
+          className="absolute pointer-events-none z-[30] rounded-2xl"
+          style={{
+            inset: isHovered ? "14px" : "0px",
+            border: "1.5px solid #c9a96e",
+            opacity: isHovered ? 1 : 0,
+            transform: isHovered ? "rotate(0deg)" : "rotate(8deg)",
+            boxShadow: isHovered ? "inset 0 0 30px rgba(201,169,110,0.05), 0 0 20px rgba(201,169,110,0.08)" : "none",
+            transition: "all 0.55s cubic-bezier(0.23,1,0.32,1)",
+          }}
+        />
+
+        {/* ── Holographic shimmer (ticket-inspired) ── */}
+        <div
+          className="absolute inset-0 pointer-events-none z-[2]"
+          style={{
+            background:
+              "conic-gradient(at 60% 40%, transparent 0%, rgba(255,107,254,0.07) 15%, rgba(0,249,248,0.07) 30%, transparent 45%, rgba(0,129,253,0.07) 60%, rgba(238,240,188,0.05) 75%, transparent 90%)",
+            opacity: isHovered ? 1 : 0,
+            transition: "opacity 0.6s ease",
+            mixBlendMode: "screen",
+          }}
+        />
+
+        {/* ── LEFT: Image (58%) ── */}
+        <div className="relative w-[58%] h-full shrink-0 overflow-hidden">
+          <img
+            src={card.img}
+            alt={card.title}
+            className="w-full h-full object-cover"
             style={{
-              zIndex: index,
-              transform: "translate3d(0, 500px, 0) scale(0.86)",
-              transformOrigin: "bottom",
-              willChange: "transform, opacity"
+              transform: isHovered ? "scale(1.06)" : "scale(1)",
+              filter: isHovered
+                ? "brightness(0.7) saturate(1.15)"
+                : "brightness(0.5) saturate(0.85)",
+              transition: "transform 1.2s cubic-bezier(0.16,1,0.3,1), filter 0.8s ease",
             }}
-        >
-            <div 
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-              className="relative w-full max-w-6xl h-full rounded-[2.5rem] md:rounded-[3.5rem] border border-zinc-200 bg-white shadow-[0_60px_120px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col lg:flex-row pointer-events-auto transition-[box-shadow] duration-700 ease-[0.23,1,0.32,1] hover:shadow-[0_80px_160px_rgba(0,0,0,0.15)]"
+            loading="lazy"
+          />
+
+          {/* Gradient toward right seam + bottom */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(to right, transparent 55%, #1c2430 100%), linear-gradient(to top, #1c2430 0%, transparent 35%)",
+            }}
+          />
+
+          {/* Holographic reflection on image */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "linear-gradient(135deg, rgba(201,169,110,0.1) 0%, transparent 50%, rgba(0,249,248,0.07) 100%)",
+              opacity: isHovered ? 1 : 0,
+              transition: "opacity 0.7s ease",
+              mixBlendMode: "overlay",
+            }}
+          />
+
+          {/* Perforated divider on right edge (ticket-inspired) */}
+          <div
+            className="absolute top-0 right-0 h-full w-[2px] pointer-events-none"
+            style={{
+              background: `repeating-linear-gradient(
+                to bottom,
+                transparent 0px,
+                transparent 8px,
+                rgba(201,169,110,0.15) 8px,
+                rgba(201,169,110,0.15) 14px
+              )`,
+            }}
+          />
+
+          {/* Project badge – top left */}
+          <div
+            className="absolute top-6 left-6 flex items-center gap-2 px-3.5 py-1.5 rounded-full z-10"
+            style={{
+              background: "rgba(28,36,48,0.85)",
+              border: "1px solid rgba(201,169,110,0.3)",
+              backdropFilter: "blur(8px)",
+            }}
+          >
+            <div
+              className="w-1.5 h-1.5 rounded-full animate-pulse"
+              style={{ backgroundColor: "#c9a96e" }}
+            />
+            <span
+              className="text-[10px] font-black uppercase tracking-[0.3em]"
+              style={{ color: "#c9a96e" }}
             >
-                {/* Direct GPU-accelerated Dimming Overlay instead of heavy CSS filter brightness */}
-                <div 
-                  className={`project-card-dim-${index} absolute inset-0 bg-zinc-950 pointer-events-none z-30 opacity-0`} 
-                />
-                
-                {/* Visual Anchor - Left Column (60%) */}
-                <div className="w-full lg:w-[60%] h-[40%] lg:h-full relative overflow-hidden bg-zinc-50 border-r border-zinc-100 group/img">
-                    <img
-                        src={card.img.replace('.png', '.webp').replace('.jpg', '.webp')}
-                        alt={card.title}
-                        width={800}
-                        height={600}
-                        loading="lazy"
-                        className={`w-full h-full object-cover transition-[transform,filter,opacity] duration-1000 ease-[0.16,1,0.3,1] ${isHovered ? 'scale-110 grayscale-0' : 'scale-100 grayscale opacity-90'}`}
-                    />
-                    
-                    <div className="absolute inset-0 bg-gradient-to-tr from-cyan-950/20 to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-700" />
+              Project {num}
+            </span>
+          </div>
 
-                    <div className="absolute inset-0 p-8 flex flex-col justify-between pointer-events-none">
-                        <div className="flex justify-between items-start">
-                            <div className="flex flex-col gap-1">
-                                <div className="px-3 py-1 bg-zinc-950 text-white flex items-center gap-2">
-                                    <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse" />
-                                    <span className="text-[10px] font-black tracking-[0.3em] uppercase">Visual_Node: 0{index + 1}</span>
-                                </div>
-                                <span className="text-[8px] font-mono text-zinc-400 mt-1 uppercase tracking-widest px-1">Ref_ID: {card.id}</span>
-                            </div>
-                            
-                            <div className="flex flex-col items-end gap-1 opacity-40">
-                                <span className="text-[9px] font-mono text-zinc-950 tracking-tighter">LAT: 34.0522° N</span>
-                                <span className="text-[9px] font-mono text-zinc-950 tracking-tighter">LON: 118.2437° W</span>
-                            </div>
-                        </div>
+          {/* Vertical rotated label – left edge */}
+          <div
+            className="absolute top-1/2 left-0 pointer-events-none z-10"
+            style={{
+              transform: "translateY(-50%) rotate(-90deg)",
+              transformOrigin: "center center",
+              opacity: 0.2,
+            }}
+          >
+            <span
+              className="text-[7px] font-black uppercase tracking-[0.6em] whitespace-nowrap"
+              style={{ color: "#c9a96e" }}
+            >
+              ARSHAD · JENIXWEBLANCER
+            </span>
+          </div>
 
-                        <div className="flex justify-between items-end">
-                             <div className="flex items-center gap-8">
-                                <div className="flex flex-col gap-1">
-                                    <span className="text-[7px] font-mono text-zinc-400 uppercase tracking-widest">Aero_Dynamics</span>
-                                    <div className="w-24 h-[2px] bg-zinc-100 relative overflow-hidden">
-                                        <div className={`absolute inset-0 bg-cyan-500 transition-transform duration-1000 ${isHovered ? 'translate-x-0' : '-translate-x-full'}`} />
-                                    </div>
-                                </div>
-                                <div className="flex flex-col gap-1">
-                                    <span className="text-[7px] font-mono text-zinc-400 uppercase tracking-widest">Entropy_Scale</span>
-                                    <div className="w-16 h-[2px] bg-zinc-100 relative overflow-hidden">
-                                        <div className={`absolute inset-0 bg-zinc-950 transition-transform duration-700 delay-100 ${isHovered ? 'translate-x-0' : '-translate-x-full'}`} />
-                                    </div>
-                                </div>
-                             </div>
-                             <span className="text-[10px] font-black font-mono text-zinc-950/20 italic tracking-widest">© 2026 // ARSHAD_CH</span>
-                        </div>
-                    </div>
-
-                    <div className="absolute top-0 left-0 w-full h-[2px] bg-cyan-500/20 blur-[2px] animate-scan-slow z-20" />
-                </div>
-
-                {/* Content Deck - Right Column (40%) */}
-                <div className="flex-1 flex flex-col p-6 md:p-10 lg:p-16 relative bg-white min-h-0 h-full">
-                    
-                    <div className="flex justify-between items-center mb-10">
-                        <span className="text-cyan-600 text-[9px] font-black uppercase tracking-[0.5em] font-mono">Series_04 // Project</span>
-                        <div className="w-10 h-10 border border-zinc-100 flex items-center justify-center rotate-45 transition-transform duration-700 group-hover:rotate-0">
-                             <div className="w-2 h-2 bg-zinc-950 -rotate-45" />
-                        </div>
-                    </div>
-
-                    <div className="flex-1 overflow-y-auto no-scrollbar pr-4 flex flex-col gap-12">
-                        <div className="space-y-4">
-                            <h3 className="text-4xl md:text-6xl lg:text-7xl font-black uppercase tracking-[-0.08em] text-zinc-950 leading-[0.85] group-hover:tracking-[-0.1em] transition-all duration-700">
-                               {card.title.split(' ')[0]}<br/>
-                               <span 
-                                 className="text-transparent transition-all duration-700"
-                                 style={{ WebkitTextStroke: '1px #09090b', opacity: 0.15 }}
-                                >
-                                 {card.title.split(' ').slice(1).join(' ')}
-                               </span>
-                            </h3>
-                            <div className="w-16 h-2 bg-cyan-600" />
-                        </div>
-
-                        <div className="space-y-8">
-                            <p className="text-zinc-500 text-sm md:text-base font-medium leading-relaxed max-w-sm font-serif italic selection:bg-cyan-100">
-                                 {`// Architectural manifestation of high-fidelity ${card.title} logic. Scaled for industrial-grade visual precision and narrative depth.`}
-                            </p>
-
-                            <div className="flex flex-wrap gap-2">
-                                {card.tags?.map((t: string) => (
-                                    <span key={t} className="px-2.5 py-1 rounded-sm border border-zinc-100 text-[8px] md:text-[9px] font-bold text-zinc-400 uppercase tracking-widest bg-zinc-50/50">
-                                        {t}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="pt-8 mt-auto border-t border-zinc-100 relative z-20 bg-white">
-                        {card.link ? (
-                            <motion.a 
-                                href={card.link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                whileHover={{ x: 10 }}
-                                whileTap={{ scale: 0.98 }}
-                                className="group/btn relative w-full h-16 md:h-20 bg-zinc-950 flex items-center justify-between px-8 md:px-10 rounded-full overflow-hidden transition-all duration-500 hover:shadow-[0_30px_60px_rgba(0,0,0,0.3)]"
-                            >
-                                <motion.div className="absolute inset-0 bg-cyan-600 translate-x-[-101%] group-hover/btn:translate-x-0 transition-transform duration-700 ease-[0.16,1,0.3,1]" />
-                                <div className="relative z-10 flex flex-col items-start leading-none gap-1">
-                                    <span className="text-zinc-500 group-hover/btn:text-cyan-100 text-[8px] font-mono uppercase tracking-[0.4em]">Launch_Protocol</span>
-                                    <span className="text-white text-lg md:text-xl font-black uppercase tracking-tighter">Visit Live Site</span>
-                                </div>
-                                <div className="relative z-10 w-10 h-10 md:w-12 md:h-12 bg-white flex items-center justify-center rounded-full transition-all duration-500 group-hover/btn:rotate-45">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-zinc-950">
-                                        <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
-                                    </svg>
-                                </div>
-                            </motion.a>
-                        ) : (
-                            <div className="flex items-center justify-between px-10 py-6 border-2 border-dashed border-zinc-100 rounded-full bg-zinc-50/50">
-                                <div className="flex flex-col">
-                                    <span className="text-zinc-400 font-mono text-[8px] uppercase tracking-[0.5em] font-black">Archive_Protocol</span>
-                                    <span className="text-zinc-300 font-black uppercase tracking-tighter text-sm italic">Internal Case Only</span>
-                                </div>
-                            </div>
-                        )}
-                        <div className="mt-6 flex justify-between items-center px-4">
-                             <div className="flex items-center gap-3">
-                                 <div className="flex gap-1"><div className="w-1 h-3 bg-cyan-600 animate-pulse" /><div className="w-1 h-3 bg-zinc-100 animate-pulse delay-75" /></div>
-                                 <span className="text-[8px] font-mono text-zinc-950/40 font-black uppercase tracking-widest">Process_Active</span>
-                             </div>
-                             <span className="text-[8px] font-mono text-zinc-300 uppercase">SYS_REF_v4</span>
-                        </div>
-                    </div>
-
-                    <div className="absolute bottom-0 right-0 pointer-events-none select-none opacity-[0.03] p-10 translate-x-1/4 translate-y-1/4 overflow-hidden -z-10 bg-white">
-                        <span className="text-[25vw] font-black text-zinc-950 uppercase tracking-tighter leading-none block transform -rotate-12 translate-y-1/2">0{index + 1}</span>
-                    </div>
-                </div>
-
-                <div className="absolute top-0 right-0 w-24 h-24 pointer-events-none opacity-5">
-                    <div className="absolute top-8 right-8 w-8 h-[1px] bg-zinc-950" /><div className="absolute top-8 right-8 w-[1px] h-8 bg-zinc-950" />
-                </div>
-                <div className="absolute bottom-0 left-0 w-24 h-24 pointer-events-none opacity-5">
-                    <div className="absolute bottom-8 left-8 w-8 h-[1px] bg-zinc-950" /><div className="absolute bottom-8 left-8 w-[1px] h-8 bg-zinc-950" />
-                </div>
+          {/* Tags – bottom left */}
+          {card.tags && (
+            <div className="absolute bottom-5 left-5 z-10 flex flex-wrap gap-1.5">
+              {card.tags.map((t) => (
+                <span
+                  key={t}
+                  className="px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest rounded-sm text-white/70"
+                  style={{
+                    background: "rgba(0,0,0,0.5)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    backdropFilter: "blur(4px)",
+                  }}
+                >
+                  {t}
+                </span>
+              ))}
             </div>
+          )}
         </div>
-    );
+
+        {/* ── RIGHT: Content (42%) ── */}
+        <div className="flex-1 flex flex-col px-10 py-10 relative z-10 overflow-hidden">
+
+          {/* Subtle dot grid background */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              backgroundImage: "radial-gradient(circle, rgba(201,169,110,0.08) 1px, transparent 1px)",
+              backgroundSize: "24px 24px",
+              opacity: isHovered ? 1 : 0.4,
+              transition: "opacity 0.6s ease",
+            }}
+          />
+
+          {/* Ghost number watermark */}
+          <div
+            className="absolute bottom-2 right-2 font-black leading-none pointer-events-none select-none"
+            style={{
+              fontSize: "clamp(7rem,13vw,12rem)",
+              color: "transparent",
+              WebkitTextStroke: "1px rgba(201,169,110,0.1)",
+              letterSpacing: "-0.06em",
+            }}
+          >
+            {num}
+          </div>
+
+          {/* Corner bracket – top right */}
+          <div className="absolute top-6 right-6 pointer-events-none opacity-30">
+            <div className="w-6 h-px" style={{ backgroundColor: "#c9a96e" }} />
+            <div className="w-px h-6 mt-0" style={{ backgroundColor: "#c9a96e" }} />
+          </div>
+          {/* Corner bracket – bottom left */}
+          <div className="absolute bottom-6 left-10 pointer-events-none opacity-30">
+            <div className="w-px h-6" style={{ backgroundColor: "#c9a96e" }} />
+            <div className="w-6 h-px" style={{ backgroundColor: "#c9a96e" }} />
+          </div>
+
+          {/* Series label */}
+          <div className="flex items-center gap-3 mb-auto relative z-10">
+            <div className="w-5 h-px" style={{ backgroundColor: "#c9a96e" }} />
+            <span
+              className="text-[9px] font-black uppercase tracking-[0.45em] font-mono"
+              style={{ color: "#c9a96e" }}
+            >
+              Featured Work
+            </span>
+          </div>
+
+          {/* Title */}
+          <div className="my-auto relative z-10">
+            <h3
+              className="font-black uppercase leading-[0.88] text-white"
+              style={{
+                fontSize: "clamp(2.2rem,4.2vw,3.8rem)",
+                letterSpacing: "-0.04em",
+              }}
+            >
+              {name.split(" ").map((word, i) => (
+                <span key={i} className="block">
+                  {word}
+                </span>
+              ))}
+            </h3>
+
+            {/* Animated gold underline with glow */}
+            <div
+              style={{
+                marginTop: "1.25rem",
+                height: "3px",
+                width: isHovered ? "5rem" : "2rem",
+                backgroundColor: "#c9a96e",
+                borderRadius: "999px",
+                boxShadow: isHovered ? "0 0 18px rgba(201,169,110,0.7)" : "none",
+                transition: "width 0.55s cubic-bezier(0.16,1,0.3,1), box-shadow 0.55s ease",
+              }}
+            />
+          </div>
+
+          {/* CTA */}
+          <div
+            className="relative z-10"
+            style={{ borderTop: "1px solid rgba(201,169,110,0.1)", paddingTop: "1.75rem" }}
+          >
+            {card.link ? (
+              <a
+                href={card.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between w-full h-14 px-6 rounded-xl"
+                style={{
+                  background: isHovered
+                    ? "linear-gradient(135deg, #c9a96e, #a07840)"
+                    : "rgba(201,169,110,0.07)",
+                  border: "1px solid rgba(201,169,110,0.25)",
+                  transition: "background 0.5s ease",
+                }}
+              >
+                <span
+                  className="font-black uppercase tracking-tight text-sm"
+                  style={{
+                    color: isHovered ? "#1c2430" : "#c9a96e",
+                    transition: "color 0.4s ease",
+                  }}
+                >
+                  View Live Project
+                </span>
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center"
+                  style={{
+                    background: isHovered ? "rgba(28,36,48,0.3)" : "rgba(201,169,110,0.12)",
+                    border: "1px solid rgba(201,169,110,0.3)",
+                    transform: isHovered ? "rotate(-45deg)" : "rotate(0deg)",
+                    transition: "transform 0.5s cubic-bezier(0.16,1,0.3,1), background 0.4s ease",
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M5 12H19M19 12L13 6M19 12L13 18"
+                      stroke={isHovered ? "#1c2430" : "#c9a96e"}
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      style={{ transition: "stroke 0.4s ease" }}
+                    />
+                  </svg>
+                </div>
+              </a>
+            ) : (
+              <div
+                className="flex items-center gap-3 px-6 py-4 rounded-xl"
+                style={{
+                  background: "rgba(255,255,255,0.02)",
+                  border: "1px dashed rgba(201,169,110,0.15)",
+                }}
+              >
+                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: "rgba(201,169,110,0.3)" }} />
+                <span className="font-bold uppercase tracking-widest text-[10px] font-mono" style={{ color: "rgba(201,169,110,0.35)" }}>
+                  Internal / Design Study
+                </span>
+              </div>
+            )}
+
+            {/* UIverse bottom-text: site URL fades in on hover */}
+            <div
+              className="mt-4 flex items-center justify-between px-1"
+              style={{
+                opacity: isHovered ? 1 : 0,
+                letterSpacing: isHovered ? "0.2em" : "0.6em",
+                transition: "opacity 0.5s ease 0.15s, letter-spacing 0.5s ease 0.15s",
+              }}
+            >
+              <span
+                className="text-[8px] font-black uppercase font-mono"
+                style={{ color: "#c9a96e" }}
+              >
+                jenixweblancer.in
+              </span>
+              <div className="flex items-center gap-1.5">
+                <div className="w-1 h-2.5 rounded-sm animate-pulse" style={{ backgroundColor: "#c9a96e" }} />
+                <div className="w-1 h-1.5 rounded-sm animate-pulse" style={{ backgroundColor: "rgba(201,169,110,0.5)", animationDelay: "0.2s" }} />
+                <div className="w-1 h-3 rounded-sm animate-pulse" style={{ backgroundColor: "rgba(201,169,110,0.3)", animationDelay: "0.4s" }} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

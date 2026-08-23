@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useAnimation } from "framer-motion";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useMemo } from "react";
 import {
   gridToXY,
   getResponsiveValues,
@@ -28,6 +28,20 @@ export default function AppIcon({
   const wasDragged = useRef(false);
   const controls = useAnimation();
 
+  // Compute responsive layout values once per render (avoids 3+ redundant calls per icon)
+  const { startX, startY, cell, gap } = useMemo(() => getResponsiveValues(), []);
+
+  const dragConstraints = useMemo(() => {
+    const cols = 4;
+    const rows = 6;
+    return {
+      left: startX,
+      right: startX + (cols * cell + (cols - 1) * gap) - cell,
+      top: startY,
+      bottom: startY + rows * (cell + gap) - cell,
+    };
+  }, [startX, startY, cell, gap]);
+
   useEffect(() => {
     controls.start(gridToXY(index));
   }, [index, controls]);
@@ -39,20 +53,11 @@ export default function AppIcon({
       role="button"
       tabIndex={0}
       drag
-      dragConstraints={(() => {
-        const { startX, startY, cell, gap } = getResponsiveValues();
-        const cols = 4;
-        const rows = 6;
-        return {
-          left: startX,
-          right: startX + (cols * cell + (cols - 1) * gap) - cell,
-          top: startY,
-          bottom: startY + rows * (cell + gap) - cell,
-        };
-      })()}
+      dragConstraints={dragConstraints}
       dragMomentum={false}
       animate={controls}
       transition={{ type: "spring", stiffness: 500, damping: 30 }}
+      style={{ willChange: "transform" }}
       whileTap={{ scale: 0.94 }}   
       onDragStart={() => {
         wasDragged.current = true;
@@ -89,9 +94,9 @@ export default function AppIcon({
       <div 
         className="relative shadow-[0_8px_20px_-5px_rgba(0,0,0,0.5)] overflow-hidden"
         style={{ 
-          width: (() => { const { cell } = getResponsiveValues(); return cell; })(), 
-          height: (() => { const { cell } = getResponsiveValues(); return cell; })(),
-          borderRadius: (() => { const { cell } = getResponsiveValues(); return cell * 0.22; })() 
+          width: cell, 
+          height: cell,
+          borderRadius: cell * 0.22
         }}
       >
         {icon.startsWith("INTERNAL:") ? (

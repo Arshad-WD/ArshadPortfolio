@@ -87,7 +87,6 @@ function MobileContent() {
   /* ---------------- app opening logic ---------------- */
 
 function openApp(app: AppType, rect?: DOMRect) {
-  console.log("openApp called:", app, !!rect);
 
   const url = EXTERNAL_APPS[app];
 

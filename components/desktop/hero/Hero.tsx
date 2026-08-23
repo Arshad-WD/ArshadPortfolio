@@ -11,10 +11,11 @@ import type { HeroProps } from "./types";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const Snowflake = ({ className }: { className?: string }) => (
+const Snowflake = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
   <svg 
     viewBox="0 0 100 100" 
     className={`fill-white/60 ${className}`}
+    style={style}
   >
     <g transform="translate(50,50)">
       {[0, 60, 120, 180, 240, 300].map((angle) => (
@@ -91,15 +92,11 @@ const Hero: React.FC<HeroProps> = ({
       >
         <div className="bg-black h-screen w-full text-white overflow-hidden relative">
           
-          {/* Ambient Floating Snowflakes (Random, not in center) */}
-          <Snowflake className="absolute top-[20%] left-[8%] z-10 w-6 h-6 sm:w-8 sm:h-8 text-white/40 animate-[spin_18s_linear_infinite] pointer-events-none" />
-          <Snowflake className="absolute bottom-[22%] left-[16%] z-10 w-5 h-5 sm:w-6 sm:h-6 text-white/30 animate-[spin_14s_linear_infinite_reverse] pointer-events-none" />
-          <Snowflake className="absolute top-[32%] right-[10%] z-10 w-7 h-7 sm:w-9 sm:h-9 text-white/35 animate-[spin_24s_linear_infinite] pointer-events-none" />
-          <Snowflake className="absolute bottom-[28%] right-[8%] z-10 w-6 h-6 text-white/25 animate-[spin_16s_linear_infinite] pointer-events-none" />
-          <Snowflake className="absolute bottom-[10%] left-[6%] z-10 w-4 h-4 text-white/20 animate-[spin_10s_linear_infinite] pointer-events-none" />
-          <Snowflake className="absolute top-[12%] left-[22%] z-10 w-5 h-5 text-white/30 animate-[spin_22s_linear_infinite_reverse] pointer-events-none" />
-          <Snowflake className="absolute top-[15%] right-[25%] z-10 w-4 h-4 text-white/25 animate-[spin_15s_linear_infinite] pointer-events-none" />
-          <Snowflake className="absolute bottom-[12%] right-[15%] z-10 w-5 h-5 text-white/20 animate-[spin_18s_linear_infinite_reverse] pointer-events-none" />
+          {/* Ambient Floating Snowflakes — GPU composited via will-change */}
+          <Snowflake className="absolute top-[20%] left-[8%] z-10 w-6 h-6 sm:w-8 sm:h-8 text-white/40 animate-[spin_18s_linear_infinite] pointer-events-none" style={{ willChange: 'transform' }} />
+          <Snowflake className="absolute top-[32%] right-[10%] z-10 w-7 h-7 sm:w-9 sm:h-9 text-white/35 animate-[spin_24s_linear_infinite] pointer-events-none" style={{ willChange: 'transform' }} />
+          <Snowflake className="absolute bottom-[28%] right-[8%] z-10 w-6 h-6 text-white/25 animate-[spin_16s_linear_infinite] pointer-events-none" style={{ willChange: 'transform' }} />
+          <Snowflake className="absolute top-[12%] left-[22%] z-10 w-5 h-5 text-white/30 animate-[spin_22s_linear_infinite_reverse] pointer-events-none" style={{ willChange: 'transform' }} />
 
           {/* Redesigned Minimalist Top Navbar */}
           <div className="Navbar absolute top-8 left-0 w-full px-6 md:px-12 lg:px-20 z-50 flex items-center justify-between pointer-events-none">
