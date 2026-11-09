@@ -108,7 +108,7 @@ export default function SafariApp() {
                         <span className="text-[11px] font-bold text-blue-500 uppercase tracking-wider">Featured</span>
                         <h2 className="text-xl font-bold tracking-tight text-black dark:text-white mt-1 mb-2">Portfolio Overview</h2>
                         <p className="text-[14px] text-zinc-500 leading-snug mb-5">Explore Arshad's latest full-stack projects, UI/UX designs, and mobile experiences.</p>
-                        <button onClick={() => window.open('https://arshad-portfolio.vercel.app', '_blank')} className="w-full py-3 bg-blue-500 text-white text-[14px] font-semibold rounded-xl active:scale-[0.98] transition-transform">Visit Site</button>
+                        <button onClick={() => window.open('https://jenixweblancer.in', '_blank')} className="w-full py-3 bg-blue-500 text-white text-[14px] font-semibold rounded-xl active:scale-[0.98] transition-transform">Visit Site</button>
                     </div>
                 </motion.div>
             ) : (

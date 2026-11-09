@@ -1,158 +1,154 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence, useMotionValue, useTransform, animate } from "framer-motion";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
-/* ──────────────────────────────────────────────
-   Constants
-────────────────────────────────────────────── */
-const GREETINGS = [
-  "Sharp.",
-  "Crafted.",
-  "Precise.",
-  "Focused.",
-  "Ready.",
+/* ─────────────────────────────────────────────────────────────
+   Apple Setup Inspired Handwriting Sequence
+   Exclusively featuring the two verified, universally recognized greetings:
+   1. English  : "hello"      (Iconic flowing cursive script)
+   2. Japanese : "こんにちは"  (Authentic Hiragana calligraphy stroke order)
+───────────────────────────────────────────────────────────── */
+
+interface StrokeDef {
+  d: string;
+  duration: number;
+  delay: number;
+}
+
+interface GreetingData {
+  id: string;
+  viewBox: string;
+  strokes: StrokeDef[];
+  totalDrawDuration: number; // in seconds
+  holdDuration: number; // in seconds
+}
+
+const GREETINGS: GreetingData[] = [
+  // 1. English: Iconic Apple cursive "hello"
+  {
+    id: "hello",
+    viewBox: "0 0 520 180",
+    strokes: [
+      {
+        d: "M 60,130 C 70,110 82,35 98,30 C 106,26 112,38 104,70 L 92,130 C 104,102 122,86 138,86 C 152,86 158,102 155,125 C 162,125 172,112 180,102 C 188,92 202,90 206,100 C 210,112 196,128 178,128 C 192,128 206,120 220,105 C 230,88 245,28 258,22 C 266,18 272,30 264,62 L 250,128 C 260,128 274,112 284,98 C 294,84 310,28 322,22 C 330,18 336,30 328,62 L 314,128 C 324,128 338,118 350,105 C 360,94 374,86 390,86 C 406,86 418,98 412,116 C 404,130 382,130 376,116 C 370,104 380,90 395,90 C 410,90 425,84 460,82",
+        duration: 1.25,
+        delay: 0.05,
+      },
+    ],
+    totalDrawDuration: 1.35,
+    holdDuration: 1.0,
+  },
+
+  // 2. Japanese: Hiragana "こんにちは" in authentic stroke order (Kakijun)
+  {
+    id: "konnichiwa",
+    viewBox: "0 0 540 180",
+    strokes: [
+      // こ (ko) stroke 1 (top)
+      { d: "M 38,72 C 58,64 78,64 96,68 C 96,75 88,78 82,75", duration: 0.18, delay: 0.05 },
+      // こ (ko) stroke 2 (bottom scoop)
+      { d: "M 35,108 C 45,130 80,132 100,114", duration: 0.22, delay: 0.18 },
+      // ん (n) single continuous stroke
+      { d: "M 142,56 L 130,126 C 145,98 168,98 176,114 C 180,124 176,134 196,130", duration: 0.32, delay: 0.32 },
+      // に (ni) stroke 1 (vertical)
+      { d: "M 230,52 C 226,82 228,114 232,132", duration: 0.2, delay: 0.55 },
+      // に (ni) stroke 2 (top horizontal)
+      { d: "M 256,72 C 272,68 288,68 298,72", duration: 0.15, delay: 0.68 },
+      // に (ni) stroke 3 (bottom scoop)
+      { d: "M 252,112 C 268,130 292,128 302,116", duration: 0.2, delay: 0.78 },
+      // ち (chi) stroke 1 (horizontal)
+      { d: "M 332,70 L 378,68", duration: 0.16, delay: 0.92 },
+      // ち (chi) stroke 2 (loop)
+      { d: "M 356,50 L 346,92 C 334,120 358,136 376,130 C 392,124 398,104 386,94 C 376,86 362,92 358,102", duration: 0.35, delay: 1.02 },
+      // は (ha) stroke 1 (left vertical)
+      { d: "M 428,50 C 424,82 426,114 430,132", duration: 0.2, delay: 1.28 },
+      // は (ha) stroke 2 (cross horizontal)
+      { d: "M 450,72 L 488,72", duration: 0.16, delay: 1.4 },
+      // は (ha) stroke 3 (loop & flourish)
+      { d: "M 472,56 L 472,112 C 472,130 458,130 454,118 C 450,108 464,102 476,108 C 488,114 502,125 515,128", duration: 0.32, delay: 1.5 },
+    ],
+    totalDrawDuration: 1.85,
+    holdDuration: 1.1,
+  },
 ];
 
-const MARQUEE_WORDS = [
-  "FULL STACK DEVELOPER",
-  "◆",
-  "UI / UX DESIGNER",
-  "◆",
-  "NEXT.JS · REACT · NODE",
-  "◆",
-  "OPEN TO WORK",
-  "◆",
-  "BUILT WITH PASSION",
-  "◆",
-];
-
-const NAME = "ARSHAD";
+const TOTAL_SEQUENCE_MS = 5200; // ~5.2 seconds total animation time
 const SESSION_KEY = "arshad_portfolio_loaded";
-const GREETING_HOLD_MS = 540;
-const LOADING_DURATION_MS = 2600;
+type Phase = "playing" | "exit" | "done";
 
-type Phase = "greetings" | "loading" | "exit" | "done";
-
-/* ──────────────────────────────────────────────
-   Easing helper
-────────────────────────────────────────────── */
-function easeOutExpo(t: number) {
-  return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
-}
-
-/* ──────────────────────────────────────────────
-   Marquee strip (left or right scroll)
-────────────────────────────────────────────── */
-function Marquee({
-  reverse = false,
-  durationSecs = 28,
-  dim = true,
-}: {
-  reverse?: boolean;
-  durationSecs?: number;
-  dim?: boolean;
-}) {
-  const items = [...MARQUEE_WORDS, ...MARQUEE_WORDS, ...MARQUEE_WORDS];
-  return (
-    <div className="overflow-hidden w-full">
-      <motion.div
-        className="flex gap-8 whitespace-nowrap will-change-transform"
-        style={{ width: "max-content" }}
-        animate={{ x: reverse ? ["0%", "33.333%"] : ["0%", "-33.333%"] }}
-        transition={{
-          duration: durationSecs,
-          repeat: Infinity,
-          ease: "linear",
-          repeatType: "loop",
-        }}
-      >
-        {[...items, ...items].map((word, i) => (
-          <span
-            key={i}
-            className={`text-[9px] sm:text-[10px] font-black uppercase tracking-[0.45em] transition-colors ${
-              word === "◆"
-                ? dim
-                  ? "text-white/30"
-                  : "text-white/50"
-                : dim
-                ? "text-white/10"
-                : "text-white/25"
-            }`}
-          >
-            {word}
-          </span>
-        ))}
-      </motion.div>
-    </div>
-  );
-}
-
-/* ──────────────────────────────────────────────
-   Main Preloader
-────────────────────────────────────────────── */
 export default function Preloader({ onComplete }: { onComplete: () => void }) {
-  const [phase, setPhase] = useState<Phase>("greetings");
-  const [greetingIdx, setGreetingIdx] = useState(0);
-  const [percent, setPercent] = useState(0);
-  
-  const percentAnim = useMotionValue(0);
-  const clipPathVal = useTransform(percentAnim, (p) => `inset(0 ${100 - p}% 0 0)`);
+  const [phase, setPhase] = useState<Phase>("playing");
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [progress, setProgress] = useState(0);
 
-  /* ── Phase 1: cycle greetings ── */
+  const totalGreetings = GREETINGS.length;
+
+  const handleFinish = useCallback(() => {
+    setProgress(100);
+    setPhase("exit");
+    setTimeout(() => {
+      sessionStorage.setItem(SESSION_KEY, "done");
+      setPhase("done");
+      onComplete();
+    }, 950);
+  }, [onComplete]);
+
+  // Smooth continuous numeric progress counter at bottom-right (0 to 100)
   useEffect(() => {
-    if (phase !== "greetings") return;
-    const isLast = greetingIdx >= GREETINGS.length - 1;
-    const t = window.setTimeout(
-      () => {
-        if (isLast) setPhase("loading");
-        else setGreetingIdx((i) => i + 1);
-      },
-      isLast ? GREETING_HOLD_MS + 180 : GREETING_HOLD_MS
-    );
-    return () => clearTimeout(t);
-  }, [phase, greetingIdx]);
+    if (phase !== "playing") return;
 
-  /* ── Phase 2: run progress counter ── */
-  useEffect(() => {
-    if (phase !== "loading") return;
+    const startTime = performance.now();
+    let frameId: number;
 
-    const controls = animate(percentAnim, 100, {
-      duration: LOADING_DURATION_MS / 1000,
-      ease: [0.16, 1, 0.3, 1], // easeOutExpo custom cubic bezier curve
-      onUpdate: (latest) => {
-        setPercent(Math.floor(latest));
-      },
-      onComplete: () => {
-        // brief hold at 100 then exit
-        setTimeout(() => {
-          setPhase("exit");
-          setTimeout(() => {
-            sessionStorage.setItem(SESSION_KEY, "done");
-            setPhase("done");
-            onComplete();
-          }, 1400); // Wait for the staggered vertical pillars exit animation (delay + duration) to finish
-        }, 420);
+    const tick = (now: number) => {
+      const elapsed = now - startTime;
+      const raw = Math.min(1, elapsed / TOTAL_SEQUENCE_MS);
+      // Gentle cubic ease for organic progression
+      const eased = Math.min(100, Math.floor(raw * 100));
+      setProgress(eased);
+
+      if (raw < 1) {
+        frameId = requestAnimationFrame(tick);
+      } else {
+        setProgress(100);
       }
-    });
+    };
 
-    return () => controls.stop();
-  }, [phase, onComplete, percentAnim]);
+    frameId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frameId);
+  }, [phase]);
+
+  // Advance to next greeting when current word finishes its handwriting animation + hold period
+  const handleWordComplete = useCallback(() => {
+    setCurrentIndex((prev) => {
+      if (prev >= totalGreetings - 1) {
+        handleFinish();
+        return prev;
+      }
+      return prev + 1;
+    });
+  }, [totalGreetings, handleFinish]);
+
+  // Click / tap anywhere to skip instantly
+  const handleSkip = () => {
+    if (phase === "playing") {
+      handleFinish();
+    }
+  };
 
   if (phase === "done") return null;
 
-  const current = GREETINGS[Math.min(greetingIdx, GREETINGS.length - 1)];
+  const currentItem = GREETINGS[Math.min(currentIndex, totalGreetings - 1)];
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] overflow-hidden select-none ${
+      onClick={handleSkip}
+      className={`fixed inset-0 z-[9999] overflow-hidden select-none bg-black cursor-pointer ${
         phase === "exit" ? "pointer-events-none" : "pointer-events-auto"
       }`}
-      style={{
-        backgroundColor: phase === "exit" ? "transparent" : "#030303",
-      }}
     >
-      {/* Staggered Vertical Pillars (reveals content one-by-one by sliding/collapsing upwards) */}
+      {/* Staggered Vertical Pillars Curtain Exit Animation */}
       <div className="absolute inset-0 flex pointer-events-none z-0">
         {Array.from({ length: 10 }).map((_, i) => (
           <motion.div
@@ -160,263 +156,147 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
             initial={{ scaleY: 1 }}
             animate={{ scaleY: phase === "exit" ? 0 : 1 }}
             transition={{
-              duration: 0.85,
-              ease: [0.76, 0, 0.24, 1], // Premium ease-in-out curve
-              delay: i * 0.055, // Staggered delays from left to right
+              duration: 0.8,
+              ease: [0.76, 0, 0.24, 1],
+              delay: i * 0.04,
             }}
             style={{
               flex: 1,
-              backgroundColor: "#030303",
-              transformOrigin: "top", // collapse/slide upwards
-              marginRight: "-1px", // prevent sub-pixel rendering gaps
+              backgroundColor: "#000000",
+              transformOrigin: "top",
+              marginRight: "-1px",
             }}
           />
         ))}
       </div>
 
-      {/* UI Content Wrapper (Fades out when exiting) */}
+      {/* Main Apple iPhone Screen Surface */}
       <motion.div
-        className="relative z-10 flex flex-col h-full w-full pointer-events-none"
+        className="relative z-10 flex flex-col justify-between items-center h-full w-full py-12 px-6"
         animate={{ opacity: phase === "exit" ? 0 : 1 }}
-        transition={{ duration: 0.35, ease: "easeOut" }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
       >
-      {/* ── TOP MARQUEE ── */}
-      <div className="border-b border-white/[0.06] py-[11px]">
-        <Marquee durationSecs={28} />
-      </div>
+        {/* Top Spacer */}
+        <div className="w-full h-8" />
 
-      {/* ── CENTRE STAGE ── */}
-      <div className="flex-1 relative flex flex-col items-center justify-center px-5 overflow-hidden">
-
-        {/* Corner metadata — top only (bottom-right is the counter) */}
-        <CornerLabel position="tl" lines={["SYS_BOOT", "v4.0.2026"]} />
-        <CornerLabel position="tr" lines={["Portfolio", "40.7128°N"]} />
-
-        {/* ── GREETING PHASE ── */}
-        <AnimatePresence mode="wait">
-          {phase === "greetings" && (
+        {/* Center Stage: Authentic Human Handwriting Stroke Drawing */}
+        <div className="flex-1 flex flex-col items-center justify-center w-full max-w-2xl px-4">
+          <AnimatePresence mode="wait">
             <motion.div
-              key="greetings"
+              key={currentItem.id}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0, y: -20, transition: { duration: 0.3 } }}
-              className="absolute inset-0 flex items-center justify-center"
+              exit={{
+                opacity: 0,
+                y: -14,
+                filter: "blur(8px)",
+                transition: { duration: 0.35, ease: [0.4, 0, 1, 1] },
+              }}
+              className="w-full flex items-center justify-center"
             >
-              <AnimatePresence mode="wait">
-                <motion.span
-                  key={`g-${greetingIdx}`}
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -15 }}
-                  transition={{ duration: 0.32, ease: [0.25, 1, 0.5, 1] }}
-                  className="text-[13vw] sm:text-[10vw] md:text-[8vw] font-black tracking-tight text-white leading-none"
-                  style={{ fontFamily: "var(--font-outfit), sans-serif" }}
-                >
-                  {current}
-                </motion.span>
-              </AnimatePresence>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* ── LOADING PHASE ── */}
-        <AnimatePresence>
-          {phase === "loading" && (
-            <motion.div
-              key="loading-content"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.4 }}
-              className="w-full flex flex-col items-center"
-            >
-              {/* Name reveal */}
-              <div className="relative mb-10 sm:mb-14 flex items-end" aria-hidden>
-                {/* Ghost letters */}
-                <div className="flex items-end">
-                  {NAME.split("").map((letter, i) => (
-                    <div key={i} className="overflow-hidden">
-                      <motion.span
-                        initial={{ y: "110%" }}
-                        animate={{ y: 0 }}
-                        transition={{
-                          duration: 0.85,
-                          delay: i * 0.065,
-                          ease: [0.16, 1, 0.3, 1],
-                        }}
-                        className="block font-black uppercase leading-[0.9] text-transparent"
-                        style={{
-                          fontSize: "clamp(4rem, 18vw, 11rem)",
-                          WebkitTextStroke: "1px rgba(255,255,255,0.09)",
-                          fontFamily: "var(--font-outfit), sans-serif",
-                        }}
-                      >
-                        {letter}
-                      </motion.span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Filled overlay — clips left→right with loading percent */}
-                <motion.div
-                  className="absolute inset-0 flex items-end pointer-events-none"
-                  style={{
-                    clipPath: clipPathVal,
-                  }}
-                >
-                  {NAME.split("").map((letter, i) => (
-                    <span
-                      key={i}
-                      className="block font-black uppercase leading-[0.9]"
-                      style={{
-                        fontSize: "clamp(4rem, 18vw, 11rem)",
-                        fontFamily: "var(--font-outfit), sans-serif",
-                        color: "rgba(255,255,255,0.95)",
-                        textShadow:
-                          percent > i * (100 / NAME.length)
-                            ? "0 0 60px rgba(255,255,255,0.15)"
-                            : "none",
-                      }}
-                    >
-                      {letter}
-                    </span>
-                  ))}
-                </motion.div>
-              </div>
-
-              {/* Status label */}
-              <motion.div
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.25, duration: 0.5 }}
-                className="flex items-center gap-4 mb-8 sm:mb-11"
-              >
-                <div className="w-10 h-px bg-white/10" />
-                <GlitchLetters
-                  text={percent < 100 ? "Initializing Experience" : "Experience Ready"}
-                />
-                <div className="w-10 h-px bg-white/10" />
-              </motion.div>
-
-              {/* Thin line — single accent under status label */}
-              <motion.div
-                initial={{ scaleX: 0, opacity: 0 }}
-                animate={{ scaleX: 1, opacity: 1 }}
-                transition={{ delay: 0.35, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                className="w-24 h-px bg-white/12 origin-left"
+              <HandwrittenStrokeWord
+                greeting={currentItem}
+                onComplete={handleWordComplete}
               />
             </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* ── BOTTOM MARQUEE ── */}
-      <div className="border-t border-white/[0.06] py-[11px]">
-        <Marquee reverse durationSecs={24} />
-      </div>
-
-      {/* ── BOTTOM-RIGHT PERCENT COUNTER ── */}
-      <div className="absolute bottom-5 right-5 sm:bottom-8 sm:right-8 flex flex-col items-end gap-1 pointer-events-none">
-        <div className="flex items-end leading-none tabular-nums">
-          <span
-            className="font-black text-white"
-            style={{
-              fontSize: "clamp(3.5rem, 10vw, 7rem)",
-              fontFamily: "var(--font-outfit), sans-serif",
-              lineHeight: 1,
-              textShadow: "0 0 40px rgba(255,255,255,0.08)",
-            }}
-          >
-            {percent.toString().padStart(2, "0")}
-          </span>
-          <span
-            className="font-bold text-white/30 mb-1 ml-1"
-            style={{ fontSize: "clamp(1rem, 3vw, 2rem)", lineHeight: 1 }}
-          >
-            %
-          </span>
+          </AnimatePresence>
         </div>
-        <span className="text-white/20 text-[7px] sm:text-[8px] font-mono uppercase tracking-[0.45em]">
-          Loading
-        </span>
-      </div>
 
-        {/* Film grain */}
-        <div
-          className="absolute inset-0 pointer-events-none opacity-[0.03] mix-blend-screen"
-          style={{
-            backgroundImage: "url('/noise.svg')",
-            backgroundSize: "180px 180px",
-          }}
-        />
+        {/* Bottom Bar: Clean Minimalist Layout (Progress bar completely removed) */}
+        <div className="w-full flex items-center justify-between px-2 sm:px-6 pb-2">
+          {/* Bottom Left: Subtle Skip Hint */}
+          <span className="text-[10px] sm:text-xs text-zinc-600 font-mono tracking-widest uppercase">
+            CLICK TO SKIP
+          </span>
 
-        {/* Vignette */}
-        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_80%_80%_at_50%_50%,transparent_30%,rgba(0,0,0,0.55)_100%)]" />
+          {/* Bottom Right: High-End Progressing Number Counter */}
+          <div className="flex items-baseline gap-1 font-mono select-none">
+            <span className="text-4xl sm:text-6xl font-light text-white tabular-nums tracking-tighter">
+              {progress.toString().padStart(2, "0")}
+            </span>
+            <span className="text-sm sm:text-lg font-mono text-zinc-500">
+              %
+            </span>
+          </div>
+        </div>
       </motion.div>
     </div>
   );
 }
 
-/* ──────────────────────────────────────────────
-   CornerLabel helper
-────────────────────────────────────────────── */
-function CornerLabel({
-  position,
-  lines,
+/* ─────────────────────────────────────────────────────────────
+   HandwrittenStrokeWord Component:
+   Renders genuine SVG stroke-draw animation using pathLength.
+   Ink flows progressively along continuous curves and calligraphy brush lines.
+   Zero typing, zero blinking cursors, zero language subtitles.
+───────────────────────────────────────────────────────────── */
+function HandwrittenStrokeWord({
+  greeting,
+  onComplete,
 }: {
-  position: "tl" | "tr" | "bl" | "br";
-  lines: string[];
+  greeting: GreetingData;
+  onComplete: () => void;
 }) {
-  const posClass = {
-    tl: "top-4 left-4 sm:top-7 sm:left-7 items-start",
-    tr: "top-4 right-4 sm:top-7 sm:right-7 items-end",
-    bl: "bottom-4 left-4 sm:bottom-7 sm:left-7 items-start",
-    br: "bottom-4 right-4 sm:bottom-7 sm:right-7 items-end",
-  }[position];
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+
+  useEffect(() => {
+    // Total time = drawing duration + peaceful admiring hold
+    const totalTimeMs =
+      (greeting.totalDrawDuration + greeting.holdDuration) * 1000;
+
+    const timer = setTimeout(() => {
+      onCompleteRef.current();
+    }, totalTimeMs);
+
+    return () => clearTimeout(timer);
+  }, [greeting]);
 
   return (
-    <div className={`absolute flex flex-col gap-[3px] ${posClass}`}>
-      {lines.map((l, i) => (
-        <span
-          key={i}
-          className={`font-mono uppercase tracking-[0.4em] ${
-            i === 0
-              ? "text-white/14 text-[7px] sm:text-[8px]"
-              : "text-white/7 text-[6px] sm:text-[7px]"
-          }`}
-        >
-          {l}
-        </span>
-      ))}
-    </div>
-  );
-}
+    <div className="w-full flex items-center justify-center py-6">
+      <svg
+        viewBox={greeting.viewBox}
+        className="w-full max-w-lg md:max-w-xl max-h-[32vh] overflow-visible drop-shadow-[0_0_20px_rgba(255,255,255,0.18)]"
+        style={{
+          strokeLinecap: "round",
+          strokeLinejoin: "round",
+        }}
+      >
+        <defs>
+          {/* Subtle soft organic ink bloom filter */}
+          <filter id={`bloom-${greeting.id}`} x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="2.2" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
 
-/* ──────────────────────────────────────────────
-   Glitch letter animation (QuantumPulse-inspired)
-────────────────────────────────────────────── */
-function GlitchLetters({ text }: { text: string }) {
-  return (
-    <span className="flex items-center gap-[1px]">
-      {text.split("").map((char, i) =>
-        char === " " ? (
-          <span key={i} className="w-[0.35em]" />
-        ) : (
-          <motion.span
-            key={`${text}-${i}`}
-            initial={{ opacity: 0, y: 6, rotateX: -80 }}
-            animate={{ opacity: 0.45, y: 0, rotateX: 0 }}
+        {greeting.strokes.map((stroke, idx) => (
+          <motion.path
+            key={`${greeting.id}-stroke-${idx}`}
+            d={stroke.d}
+            fill="none"
+            stroke="#FFFFFF"
+            strokeWidth="5.5"
+            filter={`url(#bloom-${greeting.id})`}
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
             transition={{
-              delay: i * 0.018,
-              duration: 0.4,
-              ease: [0.22, 1, 0.36, 1],
+              pathLength: {
+                duration: stroke.duration,
+                delay: stroke.delay,
+                ease: [0.38, 0.05, 0.22, 1],
+              },
+              opacity: {
+                duration: 0.06,
+                delay: stroke.delay,
+              },
             }}
-            className="inline-block text-white text-[8px] sm:text-[9px] font-mono uppercase tracking-[0.4em]"
-            style={{ transformOrigin: "50% 100%", perspective: "400px" }}
-          >
-            {char}
-          </motion.span>
-        )
-      )}
-    </span>
+          />
+        ))}
+      </svg>
+    </div>
   );
 }

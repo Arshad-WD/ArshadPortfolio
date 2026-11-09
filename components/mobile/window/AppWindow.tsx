@@ -28,35 +28,29 @@ export default function AppWindow({
 }) {
   return (
     <motion.div
-      className="absolute inset-0 z-[110] bg-black/95 backdrop-blur-lg overflow-hidden"
+      className="absolute inset-0 z-[500] bg-black text-white overflow-hidden select-none"
       style={{ willChange: "transform" }}
-      initial={{ scale: 0.8, opacity: 0, borderRadius: 40 }}
+      initial={{ scale: 0.85, opacity: 0, borderRadius: 36 }}
       animate={{ scale: 1, opacity: 1, borderRadius: 0 }}
-      exit={{ scale: 0.8, opacity: 0, borderRadius: 40 }}
-      transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
-      drag="y"
-      dragConstraints={{ top: 0 }}
-      dragElastic={0.2}
-      onDragEnd={(_, info) => {
-        if (info.offset.y > 140 || info.velocity.y > 900) {
-          close();
-        }
-      }}
+      exit={{ scale: 0.85, opacity: 0, borderRadius: 36 }}
+      transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
     >
-      {/* APP HEADER / BACK INDICATOR */}
-      <div className="absolute top-[50px] left-0 w-full h-14 z-50 flex items-center px-6">
+      {/* FLOATING TOP NAV BAR (NON-COLLIDING PILL) */}
+      <div className="absolute top-4 left-4 z-[510] flex items-center pointer-events-auto">
         <button
           onClick={close}
-          className="w-12 h-12 rounded-full bg-black/10 dark:bg-white/10 flex items-center justify-center backdrop-blur-md active:scale-95 transition-transform"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/80 dark:bg-zinc-900/90 backdrop-blur-xl border border-white/20 text-white shadow-xl active:scale-95 transition-transform cursor-pointer"
+          aria-label="Return to Home"
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-black dark:text-white">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M15 18l-6-6 6-6" />
           </svg>
+          <span className="text-[12px] font-medium tracking-tight">Home</span>
         </button>
       </div>
 
-      {/* APP CONTENT */}
-      <div className="w-full h-full pt-[44px]">
+      {/* APP CONTENT AREA */}
+      <div className="w-full h-full overflow-hidden">
         {payload.app === "About" && <AboutApp />}
         {payload.app === "Resume" && <ResumeApp />}
         {payload.app === "Camera" && <CameraApp />}
@@ -71,7 +65,6 @@ export default function AppWindow({
         {payload.app === "Notes" && <NoteApp />}
         {payload.app === "AppStore" && <AppStoreApp />}
         {payload.app === "Google" && <ChromeApp />}
-        {payload.app === "Photos" && <GalleryApp />}
 
         {/* fallback */}
         {!["About", "Resume", "Camera", "Projects", "Settings", "Safari", "Contact", "Photos", "Mail", "Maps", "Music", "Notes", "AppStore", "Google"].includes(payload.app) && (
@@ -81,8 +74,14 @@ export default function AppWindow({
         )}
       </div>
 
-      {/* iOS HOME BAR */}
-      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1.5 bg-white/20 rounded-full z-50" />
+      {/* iOS HOME INDICATOR BAR (TAP TO RETURN) */}
+      <div
+        onClick={close}
+        className="absolute bottom-2 left-1/2 -translate-x-1/2 z-[510] py-2 px-6 cursor-pointer pointer-events-auto"
+        aria-label="Tap to close app"
+      >
+        <div className="w-32 h-1 rounded-full bg-white/40 hover:bg-white/80 active:scale-95 transition-all shadow-md" />
+      </div>
     </motion.div>
   );
 }

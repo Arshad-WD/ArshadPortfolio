@@ -1,10 +1,13 @@
 "use client";
 
 import { motion, useAnimation } from "framer-motion";
-import { useRef, useEffect, useMemo } from "react";
+import { useRef, useEffect, useMemo, useState } from "react";
 import {
   gridToXY,
+  xyToGrid,
   getResponsiveValues,
+  COLS,
+  ROWS,
 } from "../../utils/grid";
 
 interface Props {
@@ -27,58 +30,77 @@ export default function AppIcon({
   const ref = useRef<HTMLDivElement>(null);
   const wasDragged = useRef(false);
   const controls = useAnimation();
+  const [isDragging, setIsDragging] = useState(false);
 
-  // Compute responsive layout values once per render (avoids 3+ redundant calls per icon)
-  const { startX, startY, cell, gap } = useMemo(() => getResponsiveValues(), []);
+  // Compute responsive layout values once per render
+  const { cell, gap } = useMemo(() => getResponsiveValues(), []);
 
+  const col = index % COLS;
+  const row = Math.floor(index / COLS);
+  const step = cell + gap;
+
+  // Exact relative drag constraints for Framer Motion: bounds the icon strictly to the 4x3 grid
   const dragConstraints = useMemo(() => {
-    const cols = 4;
-    const rows = 6;
     return {
-      left: startX,
-      right: startX + (cols * cell + (cols - 1) * gap) - cell,
-      top: startY,
-      bottom: startY + rows * (cell + gap) - cell,
+      left: -col * step,
+      right: (COLS - 1 - col) * step,
+      top: -row * step,
+      bottom: (ROWS - 1 - row) * step,
     };
-  }, [startX, startY, cell, gap]);
+  }, [col, row, step]);
 
   useEffect(() => {
-    controls.start(gridToXY(index));
+    const updatePosition = () => {
+      controls.start(gridToXY(index));
+    };
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    return () => window.removeEventListener("resize", updatePosition);
   }, [index, controls]);
 
   return (
     <motion.div
       ref={ref}
-      className="absolute"
+      className={`absolute ${isDragging ? "z-50" : "z-10"}`}
       role="button"
       tabIndex={0}
       drag
       dragConstraints={dragConstraints}
+      dragElastic={0.1}
       dragMomentum={false}
       animate={controls}
-      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+      transition={{ type: "spring", stiffness: 450, damping: 32 }}
       style={{ willChange: "transform" }}
-      whileTap={{ scale: 0.94 }}   
+      whileTap={{ scale: isDragging ? 1.08 : 0.94 }}
       onDragStart={() => {
         wasDragged.current = true;
+        setIsDragging(true);
       }}
       onDragEnd={(_, info) => {
+        setIsDragging(false);
         const startPos = gridToXY(index);
         const targetX = startPos.x + info.offset.x;
         const targetY = startPos.y + info.offset.y;
-        
-        onMove(targetX, targetY);
+        const targetIndex = xyToGrid(targetX, targetY);
 
-        // Force snap back visually regardless of whether the index updated
-        controls.start(gridToXY(index));
+        if (targetIndex !== index) {
+          onMove(targetX, targetY);
+          // Animate dragged icon directly to target slot so it snaps into place immediately
+          controls.start(gridToXY(targetIndex));
+        } else {
+          // Returned to origin cell: snap back
+          controls.start(startPos);
+        }
 
-        // reset after drag finishes
-        requestAnimationFrame(() => {
+        // Prevent click/launch event from triggering right after drop
+        setTimeout(() => {
           wasDragged.current = false;
-        });
+        }, 150);
       }}
-      onPointerDown={() => {
+      onPointerDown={(e) => {
         wasDragged.current = false;
+        // Stop pointer event bubbling so parent horizontal page slider does not intercept drag
+        e.stopPropagation();
       }}
       onClick={() => {
         if (!ref.current || wasDragged.current) return;
@@ -92,7 +114,11 @@ export default function AppIcon({
     >
       {/* APP ICON */}
       <div 
-        className="relative shadow-[0_8px_20px_-5px_rgba(0,0,0,0.5)] overflow-hidden"
+        className={`relative overflow-hidden transition-all duration-200 ${
+          isDragging 
+            ? "scale-108 shadow-[0_20px_35px_rgba(0,0,0,0.6)]" 
+            : "shadow-[0_8px_20px_-5px_rgba(0,0,0,0.5)]"
+        }`}
         style={{ 
           width: cell, 
           height: cell,

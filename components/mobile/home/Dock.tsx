@@ -6,9 +6,9 @@ import { APP_ICONS } from "./appConfig";
 
 const DOCK_APPS: AppType[] = [
   "Contact",
-  "Google",
-  "Camera",
-  "Photos",
+  "Safari",
+  "Mail",
+  "Music",
 ];
 
 export default function Dock({

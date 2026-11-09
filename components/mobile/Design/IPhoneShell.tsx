@@ -2,15 +2,21 @@
 
 import { useEffect, useState } from "react";
 
-export default function IPhoneShell({ children }: { children: React.ReactNode }) {
-  const [isMobile, setIsMobile] = useState(false);
+export default function IPhoneShell({
+  children,
+  isMobile: isMobileProp,
+}: {
+  children: React.ReactNode;
+  isMobile?: boolean;
+}) {
+  const [isMobile, setIsMobile] = useState(isMobileProp ?? false);
   const [scale, setScale] = useState(1);
 
   useEffect(() => {
     const handleResize = () => {
-      const mobile = window.innerWidth < 640;
+      const mobile = isMobileProp !== undefined ? isMobileProp : window.innerWidth < 768;
       setIsMobile(mobile);
-      
+
       if (!mobile) {
         // Desktop: scale the decorative shell to fit viewport
         const vh = window.innerHeight;
@@ -21,12 +27,12 @@ export default function IPhoneShell({ children }: { children: React.ReactNode })
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [isMobileProp]);
 
-  // On real mobile: go full screen, no shell chrome
+  // On real mobile: go full screen, no shell chrome, using 100dvh
   if (isMobile) {
     return (
-      <div className="fixed inset-0 w-full h-full bg-black overflow-hidden">
+      <div className="fixed inset-0 w-full h-[100dvh] bg-black overflow-hidden">
         <div className="relative w-full h-full">
           {children}
         </div>
@@ -38,16 +44,16 @@ export default function IPhoneShell({ children }: { children: React.ReactNode })
   return (
     <div className="flex justify-center items-center h-screen bg-black overflow-hidden py-4">
       <div
-         style={{ transform: `scale(${scale})`, transformOrigin: "center center" }}
-         className="relative w-[405px] h-[864px] shrink-0 transition-transform duration-300 ease-out"
+        style={{ transform: `scale(${scale})`, transformOrigin: "center center" }}
+        className="relative w-[405px] h-[864px] shrink-0 transition-transform duration-300 ease-out"
       >
         {/* PHYSICAL BUTTONS (LEFT) */}
-        <div className="absolute left-[0px] top-[110px] w-[3px] h-8 bg-zinc-700 rounded-l-md shadow-[inset_-1px_0_1px_rgba(255,255,255,0.1)] z-10" /> {/* Action Button */}
-        <div className="absolute left-[0px] top-[166px] w-[3px] h-14 bg-zinc-700 rounded-l-md shadow-[inset_-1px_0_1px_rgba(255,255,255,0.1)] z-10" /> {/* Vol Up */}
-        <div className="absolute left-[0px] top-[236px] w-[3px] h-14 bg-zinc-700 rounded-l-md shadow-[inset_-1px_0_1px_rgba(255,255,255,0.1)] z-10" /> {/* Vol Down */}
-        
+        <div className="absolute left-[0px] top-[110px] w-[3px] h-8 bg-zinc-700 rounded-l-md shadow-[inset_-1px_0_1px_rgba(255,255,255,0.1)] z-10" />
+        <div className="absolute left-[0px] top-[166px] w-[3px] h-14 bg-zinc-700 rounded-l-md shadow-[inset_-1px_0_1px_rgba(255,255,255,0.1)] z-10" />
+        <div className="absolute left-[0px] top-[236px] w-[3px] h-14 bg-zinc-700 rounded-l-md shadow-[inset_-1px_0_1px_rgba(255,255,255,0.1)] z-10" />
+
         {/* PHYSICAL BUTTONS (RIGHT) */}
-        <div className="absolute right-[0px] top-[186px] w-[3px] h-24 bg-zinc-700 rounded-r-md shadow-[inset_1px_0_1px_rgba(255,255,255,0.1)] z-10" /> {/* Power */}
+        <div className="absolute right-[0px] top-[186px] w-[3px] h-24 bg-zinc-700 rounded-r-md shadow-[inset_1px_0_1px_rgba(255,255,255,0.1)] z-10" />
 
         {/* OUTER TITANIUM FRAME */}
         <div className="
@@ -61,7 +67,7 @@ export default function IPhoneShell({ children }: { children: React.ReactNode })
           <div className="absolute top-12 left-0 w-full h-[2px] bg-black/40" />
           <div className="absolute bottom-12 left-0 w-full h-[2px] bg-black/40" />
 
-          {/* INNER PROTECTIVE RIM (Slightly lighter) */}
+          {/* INNER PROTECTIVE RIM */}
           <div className="
             absolute inset-[4px]
             rounded-[56px]
@@ -69,7 +75,7 @@ export default function IPhoneShell({ children }: { children: React.ReactNode })
             border-[0.5px] border-white/5
             shadow-[inset_0_0_1px_1px_rgba(255,255,255,0.05)]
           ">
-            {/* SCREEN CONTAINER (BLACK PROTECTIVE BORDER) */}
+            {/* SCREEN CONTAINER */}
             <div className="
               absolute inset-[4px]
               rounded-[52px]

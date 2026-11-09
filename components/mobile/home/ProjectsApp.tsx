@@ -1,16 +1,35 @@
 "use client";
 
-
 import { useEffect, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { motion } from "framer-motion";
 import { PROJECTS } from "../../../libs/data";
 
+const HANKO_STAMPS = ["壱", "弐", "参", "四"];
+
+const PROJECT_DETAILS: Record<number, { desc: string; role: string; specs: string[] }> = {
+  1: {
+    desc: "High-performance URL management engine featuring real-time click tracking, latency metrics, and custom slug routing.",
+    role: "Full-Stack Engineer",
+    specs: ["Next.js App Router", "Server Actions", "PostgreSQL", "Tailwind CSS"],
+  },
+  2: {
+    desc: "Interactive movie discovery application integrating the TMDB API with real-time genre filtering, live search, and dynamic ratings.",
+    role: "Frontend Engineer",
+    specs: ["React 18", "TMDB REST API", "Debounced Search", "Responsive UI"],
+  },
+  3: {
+    desc: "Full-stack personal finance tracker providing instant transaction analysis, categorization logic, and interactive visual charts.",
+    role: "Full-Stack Engineer",
+    specs: ["React & Chart.js", "Expense Aggregation", "State Management", "Data Export"],
+  },
+  4: {
+    desc: "Next-gen conversational AI interface concept focusing on low-latency voice interaction, live wave animations, and adaptive prompts.",
+    role: "Design & Prototype",
+    specs: ["Generative UI", "Audio Waveform", "Framer Motion", "Figma Design"],
+  },
+};
+
 export default function ProjectsApp() {
-  const [container, setContainer] = useState<HTMLDivElement | null>(null);
-  const { scrollY } = useScroll({
-    container: container ? { current: container } : undefined
-  });
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -18,135 +37,143 @@ export default function ProjectsApp() {
   }, []);
 
   function openProject(url: string) {
+    if (!url) return;
     window.open(url, "_blank", "noopener,noreferrer");
   }
 
   if (!mounted) return null;
 
   return (
-    <div 
-        ref={setContainer}
-        className="w-full h-full bg-[#f2f2f7] dark:bg-black text-black dark:text-white overflow-y-auto overflow-x-hidden pt-20 pb-32"
-    >
-      <div className="max-w-md mx-auto px-5 space-y-12">
-        
+    <div className="w-full h-full bg-[#0a0a0c] text-white overflow-y-auto overflow-x-hidden pt-16 pb-24 px-4 select-none">
+      <div className="max-w-md mx-auto space-y-5">
         {/* HEADER */}
-        <div className="flex flex-col gap-1 mb-6">
-          <motion.h1 
-             initial={{ y: 20, opacity: 0 }}
-             whileInView={{ y: 0, opacity: 1 }}
-             viewport={{ once: true }}
-             transition={{ duration: 0.6, ease: "easeOut" }}
-             className="text-[34px] font-bold tracking-tight text-black dark:text-white"
-          >
+        <div className="pt-2 pb-1 space-y-1">
+          <div className="text-xs font-medium text-zinc-400">
+            Selected work
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight text-white leading-tight">
             Projects
-          </motion.h1>
-          <motion.p
-             initial={{ opacity: 0 }}
-             whileInView={{ opacity: 1 }}
-             viewport={{ once: true }}
-             transition={{ duration: 0.6, delay: 0.2 }}
-             className="text-[15px] font-medium text-zinc-500"
-          >
-             Selected Works
-          </motion.p>
+          </h1>
+          <p className="text-xs text-zinc-400 font-normal leading-relaxed">
+            Full-stack engineering systems and interactive digital products built with focus on latency and polish.
+          </p>
         </div>
-        
-        {/* PROJECTS GRID */}
-        <div className="space-y-10">
-            {PROJECTS.map((project, idx) => (
-                <ProjectSection 
-                    key={project.id} 
-                    project={project} 
-                    index={idx} 
-                    openProject={openProject} 
-                />
-            ))}
+
+        {/* PROJECTS CARDS LIST */}
+        <div className="space-y-4">
+          {PROJECTS.map((project, idx) => {
+            const detail = PROJECT_DETAILS[project.id] || {
+              desc: "Engineered with modern architecture and fluid interactions.",
+              role: "Developer",
+              specs: project.tags || ["Next.js", "TypeScript"],
+            };
+            const hanko = HANKO_STAMPS[idx] || "壱";
+
+            return (
+              <motion.article
+                key={project.id}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: idx * 0.06 }}
+                className="bg-[#141416] border border-white/10 rounded-2xl overflow-hidden p-5 flex flex-col gap-3.5"
+              >
+                {/* CARD TOP META */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-zinc-500 font-mono text-xs">
+                      0{idx + 1}
+                    </span>
+                    <span className="w-1 h-1 rounded-full bg-zinc-600" />
+                    <span className="text-zinc-400 text-xs">
+                      {detail.role}
+                    </span>
+                  </div>
+
+                  {/* Japanese Hanko Seal Stamp (Clean hairline border, quiet surface) */}
+                  <div
+                    title={`Hanko Seal ${hanko}`}
+                    className="w-6 h-6 rounded border border-rose-500/50 bg-rose-500/10 flex items-center justify-center font-serif text-rose-300 text-xs select-none"
+                  >
+                    {hanko}
+                  </div>
+                </div>
+
+                {/* PROJECT IMAGE PREVIEW */}
+                <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-zinc-900 border border-white/5">
+                  <img
+                    src={project.img}
+                    alt={project.title}
+                    className="w-full h-full object-cover object-top"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+                </div>
+
+                {/* CONTENT DECK */}
+                <div className="space-y-2.5">
+                  <h2 className="text-lg font-bold tracking-tight text-white leading-snug">
+                    {project.title.replace(/^\d+\s/, "")}
+                  </h2>
+
+                  <p className="text-zinc-400 text-xs leading-relaxed">
+                    {detail.desc}
+                  </p>
+
+                  {/* TECH SPECS PILLS */}
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {detail.specs.map((spec) => (
+                      <span
+                        key={spec}
+                        className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-zinc-300 text-[11px]"
+                      >
+                        {spec}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* ACTION BUTTON */}
+                  <div className="pt-1.5">
+                    {project.link ? (
+                      <button
+                        onClick={() => openProject(project.link)}
+                        className="w-full py-2.5 rounded-xl bg-white text-black font-semibold text-xs active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <span>Open application</span>
+                        <svg
+                          width="13"
+                          height="13"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M7 17L17 7M17 7H7M17 7V17" />
+                        </svg>
+                      </button>
+                    ) : (
+                      <div className="w-full py-2 rounded-xl bg-white/5 border border-white/10 text-zinc-500 font-medium text-xs flex items-center justify-center select-none">
+                        Concept design prototype
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </motion.article>
+            );
+          })}
         </div>
 
         {/* FOOTER METADATA */}
-        <div className="pt-16 pb-8 flex flex-col items-center gap-3 opacity-60">
-            <span className="text-[11px] font-medium text-zinc-500 uppercase tracking-widest text-center">
-                Arshad Chaudhary Portfolio
-            </span>
+        <div className="pt-6 pb-2 flex flex-col items-center gap-1 opacity-60 text-center">
+          <span className="text-xs text-zinc-500">
+            Arshad Chaudhary • Portfolio 2026
+          </span>
+          <span className="text-[11px] text-zinc-600">
+            India • Open to engineering roles
+          </span>
         </div>
       </div>
     </div>
   );
-}
-
-function ProjectSection({ project, index, openProject }: { project: any, index: number, openProject: (url: string) => void }) {
-    const sectionRef = useRef(null);
-    const { scrollYProgress } = useScroll({
-        target: sectionRef,
-        offset: ["start end", "end start"]
-    });
-
-    const y = useTransform(scrollYProgress, [0, 1], [15, -15]);
-
-    return (
-        <motion.section 
-            ref={sectionRef}
-            className="relative"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-        >
-            <div className="relative group overflow-hidden bg-white dark:bg-[#1C1C1E] border border-black/5 dark:border-white/5 shadow-sm rounded-3xl flex flex-col">
-                {/* Image Section */}
-                <div className="relative aspect-[4/3] overflow-hidden bg-zinc-100 dark:bg-zinc-800">
-                    <motion.img 
-                        style={{ y }}
-                        src={project.img.replace('.png', '.webp').replace('.jpg', '.webp')} 
-                        alt={project.title}
-                        className="w-full h-[120%] object-cover object-top transition-transform duration-700 group-hover:scale-105"
-                    />
-                </div>
-
-                {/* Content Deck */}
-                <div className="p-6 flex flex-col relative bg-white dark:bg-[#1C1C1E]">
-                    <div className="space-y-2 mb-4">
-                        <span className="text-blue-500 text-[12px] font-bold uppercase tracking-wider">0{index + 1}</span>
-                        <h2 className="text-[22px] font-bold tracking-tight text-black dark:text-white leading-tight">
-                            {project.title.replace(/^\d+\s/, '')}
-                        </h2>
-                    </div>
-
-                    <div className="space-y-5">
-                        <p className="text-zinc-500 text-[14px] leading-relaxed">
-                            A comprehensive web application featuring a modern UI and highly interactive components. Built with focus on user experience.
-                        </p>
-                        
-                        <div className="flex flex-wrap gap-2">
-                            {project.tags?.map((t: string) => (
-                                <span key={t} className="px-3 py-1 bg-zinc-100 dark:bg-[#2C2C2E] text-[11px] font-semibold text-zinc-600 dark:text-zinc-300 rounded-full">
-                                    {t}
-                                </span>
-                            ))}
-                        </div>
-
-                        {/* ACTION SECTION MOBILE */}
-                        <div className="pt-2">
-                              {project.link ? (
-                                  <button 
-                                     onClick={() => openProject(project.link)}
-                                     className="w-full py-3.5 bg-blue-500 rounded-xl active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
-                                  >
-                                     <span className="text-white text-[15px] font-semibold">View Project</span>
-                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-white">
-                                        <path d="M5 12H19M19 12L13 6M19 12L13 18"/>
-                                     </svg>
-                                  </button>
-                              ) : (
-                                  <div className="w-full py-3.5 bg-zinc-100 dark:bg-[#2C2C2E] rounded-xl flex items-center justify-center">
-                                      <span className="text-zinc-400 font-semibold text-[15px]">Design Only</span>
-                                  </div>
-                              )}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </motion.section>
-    );
 }

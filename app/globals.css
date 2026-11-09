@@ -18,6 +18,9 @@
 html {
   background-color: black;
   color-scheme: dark;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Global styles */

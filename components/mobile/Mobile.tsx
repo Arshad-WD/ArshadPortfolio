@@ -34,18 +34,16 @@ function MobileContent() {
 
   const [pages, setPages] = useState<(AppType | null)[][]>([
     [
-      "About", "Projects", "Resume", "Safari",
-      "Mail", "Music", "Settings", "Notes",
-      "Instagram", null, null, null,
-      null, null, null, null,
-      null, null, null, null,
-      null, null, null, null,
+      // Row 0: Core Portfolio Pillars
+      "About", "Projects", "Resume", "Notes",
+      // Row 1: Professional & Social Channels
+      "Linkedin", "X", "Instagram", "Youtube",
+      // Row 2: Media & System Tools
+      "Photos", "Camera", "Google", "Settings",
     ],
     [
-      "Youtube", "Linkedin", "X", "Maps",
-      "AppStore", "Camera", "Contact", "Photos",
-      "Google", null, null, null,
-      null, null, null, null,
+      // Page 1
+      "Maps", "AppStore", null, null,
       null, null, null, null,
       null, null, null, null,
     ],
@@ -54,35 +52,6 @@ function MobileContent() {
   const [pageIndex, setPageIndex] = useState(0);
 
   const [launchRect, setLaunchRect] = useState<DOMRect | null>(null);
-
-  /* ---------------- mock notifications ---------------- */
-  useEffect(() => {
-    let timers: NodeJS.Timeout[] = [];
-    
-    // Initial simulated notifications
-    timers.push(setTimeout(() => {
-      triggerNotification("Contact", "Recruiter", "Hi Arshad, we reviewed your portfolio and were really impressed!");
-    }, 4000));
-    
-    timers.push(setTimeout(() => {
-      triggerNotification("Mail", "Vercel", "Deployment arshad-portfolio-improved.vercel.app completed.");
-    }, 12000));
-
-    timers.push(setTimeout(() => {
-      triggerNotification("Linkedin", "Profile Views", "You appeared in 18 searches this week. See who's looking.");
-    }, 25000));
-
-    // Recurring Instagram Notification
-    const id = setInterval(() => {
-      triggerNotification("Instagram", "New Message", "Design Team: The new animations are fire! 🔥");
-    }, 60000);
-    timers.push(id as any);
-
-    return () => {
-      timers.forEach(t => clearTimeout(t));
-      clearInterval(id);
-    };
-  }, []);
 
   /* ---------------- app opening logic ---------------- */
 
@@ -120,17 +89,21 @@ function openApp(app: AppType, rect?: DOMRect) {
       {/* Dynamic Island */}
       <DynamicIsland activeApp={active?.app || null} />
 
-      {/* NOTIFICATION CENTER PULL TRIGGER (Left Ear) */}
-      <div 
-        className="absolute top-0 left-0 w-[140px] h-[55px] z-[160] cursor-pointer"
-        onClick={() => setShowNotiCenter(true)}
-      />
+      {/* NOTIFICATION CENTER PULL TRIGGER (Left Ear - only active on Home Screen) */}
+      {!active && !showNotiCenter && !showControlCenter && (
+        <div 
+          className="absolute top-0 left-0 w-[140px] h-[45px] z-[160] cursor-pointer"
+          onClick={() => setShowNotiCenter(true)}
+        />
+      )}
 
-      {/* CONTROL CENTER PULL TRIGGER (Right Ear) */}
-      <div 
-        className="absolute top-0 right-0 w-[140px] h-[55px] z-[160] cursor-pointer"
-        onClick={() => setShowControlCenter(true)}
-      />
+      {/* CONTROL CENTER PULL TRIGGER (Right Ear - only active on Home Screen) */}
+      {!active && !showNotiCenter && !showControlCenter && (
+        <div 
+          className="absolute top-0 right-0 w-[140px] h-[45px] z-[160] cursor-pointer"
+          onClick={() => setShowControlCenter(true)}
+        />
+      )}
 
       {/* NOTIFICATION CENTER PANEL */}
       <NotificationCenter
@@ -146,9 +119,9 @@ function openApp(app: AppType, rect?: DOMRect) {
         onClose={() => setShowControlCenter(false)}
       />
 
-      {/* NOTIFICATION LAYER (BANNER) */}
+      {/* NOTIFICATION LAYER (BANNER - suppressed while reading inside an App) */}
       <NotificationBanner
-        notification={currentNoti}
+        notification={!active ? currentNoti : null}
         onClose={() => setCurrentNoti(null)}
       />
 
@@ -188,7 +161,7 @@ function openApp(app: AppType, rect?: DOMRect) {
       />
 
       {/* page dots */}
-      <div className={`absolute bottom-[168px] w-full flex justify-center gap-2 z-40 transition-opacity duration-300 ${active || launchRect || showNotiCenter || showControlCenter ? "opacity-0" : "opacity-100"}`}>
+      <div className={`absolute bottom-[130px] w-full flex justify-center gap-2 z-40 transition-opacity duration-300 ${active || launchRect || showNotiCenter || showControlCenter ? "opacity-0" : "opacity-100"}`}>
         {pages.map((_, i) => (
           <div
             key={i}
@@ -198,17 +171,6 @@ function openApp(app: AppType, rect?: DOMRect) {
           />
         ))}
       </div>
-
-      {/* SEARCH PILL */}
-      {!active && !launchRect && !showNotiCenter && !showControlCenter && (
-        <div className="absolute bottom-[145px] left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full border border-white/5 shadow-sm active:scale-95 transition-transform z-40">
-           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4">
-             <circle cx="11" cy="11" r="8" />
-             <path d="M21 21l-4.35-4.35" />
-           </svg>
-           <span className="text-[10px] font-semibold text-white/90 tracking-tight">Search</span>
-        </div>
-      )}
 
       {/* DOCK (always mounted) */}
       <Dock
@@ -220,8 +182,10 @@ function openApp(app: AppType, rect?: DOMRect) {
         }}
       />
 
-      {/* iOS HOME BAR (Global Indicator) */}
-      <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-[130px] h-[5px] bg-white/30 rounded-full z-[300] pointer-events-none" />
+      {/* iOS HOME BAR (Global Indicator - only on Home Screen) */}
+      {!active && (
+        <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-[130px] h-[5px] bg-white/30 rounded-full z-[300] pointer-events-none" />
+      )}
 
       {/* INTERNAL APP WINDOW */}
       <AnimatePresence>

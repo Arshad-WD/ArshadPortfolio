@@ -77,44 +77,73 @@ const Contact = () => {
     if (!headingRef.current || !paragraphRef.current || !containerRef.current) return;
 
     const ctx = gsap.context(() => {
-      // Heading reveal
-      gsap.fromTo(
+      // Orchestrated Entrance Timeline — only starts when the user scrolls into the contact section
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top 75%", // Triggers right when the contact section appears on the screen
+          toggleActions: "play none none reverse",
+          invalidateOnRefresh: true,
+        },
+      });
+
+      // 1. Heading spans reveal
+      tl.fromTo(
         headingRef.current!.querySelectorAll("span"),
-        { opacity: 0, y: 100, skewX: -20 },
+        { opacity: 0, y: 80, skewX: -10 },
         {
           opacity: 1,
           y: 0,
           skewX: 0,
-          stagger: 0.1,
-          duration: 1.5,
-          ease: "power4.out",
-          scrollTrigger: {
-            trigger: headingRef.current,
-            start: "top 90%",
-            end: "top 40%",
-            scrub: 1,
-          },
+          stagger: 0.15,
+          duration: 1.2,
+          ease: "power3.out",
         }
+      )
+      // 2. Subtitle paragraph fade and rise
+      .fromTo(
+        paragraphRef.current,
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.9,
+          ease: "power2.out",
+        },
+        "-=0.7"
+      )
+      // 3. Form card entrance with soft scale
+      .fromTo(
+        formRef.current,
+        { opacity: 0, y: 50, scale: 0.97 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 1.1,
+          ease: "power3.out",
+        },
+        "-=0.6"
       );
 
-      // Blobs parallax
+      // Blobs parallax scrub
       imageRefs.current.forEach((img, i) => {
         if (!img) return;
         gsap.to(img, {
-          y: (i + 1) * -100,
-          rotate: (i + 1) * 10,
+          y: (i + 1) * -80,
+          rotate: (i + 1) * 8,
           scrollTrigger: {
             trigger: containerRef.current,
             start: "top bottom",
             end: "bottom top",
-            scrub: 1,
-          }
+            scrub: 1.2,
+          },
         });
       });
     }, containerRef.current);
 
     return () => ctx.revert();
-  }, [imagesReady]);
+  }, []);
 
   return (
     <div 
@@ -170,8 +199,8 @@ const Contact = () => {
 
           <p
             ref={paragraphRef}
-            className="text-zinc-350 text-lg md:text-xl font-medium max-w-md mx-auto lg:mx-0 leading-tight"
-            style={{ fontFamily: "LastTrunk" }}
+            className="text-zinc-400 text-base md:text-lg font-normal max-w-md mx-auto lg:mx-0 leading-relaxed"
+            style={{ fontFamily: "Outfit, sans-serif" }}
           >
             Got a project in mind? Reach out and let&apos;s build something exceptional together.
           </p>

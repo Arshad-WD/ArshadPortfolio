@@ -29,17 +29,73 @@ CONTACT & SOCIALS:
 - LinkedIn: linkedin.com/in/arshad-chaudhary-388312288
 - X (Twitter): x.com/dark_arsha78045`;
 
+/* ── In-memory rate limiter (per IP) ── */
+const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute
+const RATE_LIMIT_MAX = 10;           // max 10 requests per minute per IP
+
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return false;
+  }
+
+  if (entry.count >= RATE_LIMIT_MAX) return true;
+
+  entry.count++;
+  return false;
+}
+
+/* ── Allowed section values ── */
+const ALLOWED_SECTIONS = new Set(["home", "projects", "skills", "contact", "about"]);
+
+/* ── Max message length ── */
+const MAX_MESSAGE_LENGTH = 500;
+
 export async function POST(req: Request) {
   try {
-    const { message, section } = await req.json();
+    /* ── Rate limiting ── */
+    const forwarded = req.headers.get("x-forwarded-for");
+    const ip = forwarded ? forwarded.split(",")[0].trim() : "unknown";
 
-    if (!message) {
+    if (isRateLimited(ip)) {
+      return NextResponse.json(
+        { reply: "Too many requests. Please wait a moment before asking again." },
+        { status: 429 }
+      );
+    }
+
+    /* ── Parse & validate body ── */
+    let body: { message?: unknown; section?: unknown };
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ reply: "Invalid request." }, { status: 400 });
+    }
+
+    const { message, section } = body;
+
+    if (!message || typeof message !== "string") {
       return NextResponse.json({ reply: "Please provide a message." }, { status: 400 });
     }
 
+    // Cap message length
+    const sanitizedMessage = message.slice(0, MAX_MESSAGE_LENGTH).trim();
+    if (!sanitizedMessage) {
+      return NextResponse.json({ reply: "Message cannot be empty." }, { status: 400 });
+    }
+
+    // Allowlist section
+    const safeSection =
+      typeof section === "string" && ALLOWED_SECTIONS.has(section) ? section : "home";
+
     if (!process.env.NVIDIA_API_KEY) {
       return NextResponse.json({
-        reply: "System offline. Please configure NVIDIA_API_KEY in the .env file.",
+        reply: "System offline. Please configure NVIDIA_API_KEY in the environment.",
       });
     }
 
@@ -61,9 +117,9 @@ export async function POST(req: Request) {
           messages: [
             {
               role: "system",
-              content: SYSTEM_PROMPT + `\nContext: User is viewing the "${section}" section. Be brief.`,
+              content: SYSTEM_PROMPT + `\nContext: User is viewing the "${safeSection}" section. Be brief.`,
             },
-            { role: "user", content: message },
+            { role: "user", content: sanitizedMessage },
           ],
           temperature: 0.4,
           top_p: 0.7,
@@ -75,21 +131,20 @@ export async function POST(req: Request) {
       clearTimeout(timeout);
 
       if (!res.ok) {
-        const errText = await res.text();
-        console.error("NVIDIA API HTTP error:", res.status, errText);
+        console.error("NVIDIA API HTTP error:", res.status);
         return NextResponse.json(
-          { reply: "My neural network is temporarily unavailable. Try again shortly! 🔄" },
+          { reply: "My neural network is temporarily unavailable. Try again shortly!" },
           { status: 500 }
         );
       }
 
       const data = await res.json();
       reply = data.choices?.[0]?.message?.content ?? reply;
-    } catch (fetchErr: any) {
+    } catch (fetchErr: unknown) {
       clearTimeout(timeout);
-      if (fetchErr.name === "AbortError") {
+      if (fetchErr instanceof Error && fetchErr.name === "AbortError") {
         return NextResponse.json(
-          { reply: "Response timed out — the AI took too long. Please try again! ⏱️" },
+          { reply: "Response timed out — please try again!" },
           { status: 504 }
         );
       }
@@ -98,9 +153,14 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ reply });
   } catch (error) {
-    console.error("NVIDIA API Error:", error);
+    // Log safely without leaking details in production
+    if (process.env.NODE_ENV !== "production") {
+      console.error("Chat API error:", error);
+    } else {
+      console.error("Chat API error occurred");
+    }
     return NextResponse.json(
-      { reply: "I'm having trouble connecting right now. Please try again later! 🤖" },
+      { reply: "I'm having trouble connecting right now. Please try again later!" },
       { status: 500 }
     );
   }

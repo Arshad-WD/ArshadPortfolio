@@ -1,13 +1,99 @@
 "use client";
 
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { PROJECTS } from "@/libs/data";
 import type { ProjectCard as ProjectCardType } from "./types";
+
+interface ProjectDetails {
+  name: string;
+  kanji: string;
+  category: string;
+  description: string;
+  architecture: string[];
+  metrics: { label: string; value: string }[];
+  tags: string[];
+}
+
+const PROJECT_DETAILS: Record<number, ProjectDetails> = {
+  1: {
+    name: "URL Memory",
+    kanji: "壱",
+    category: "Full-Stack Web App",
+    description:
+      "A high-speed bookmark vault and resource management platform engineered for instant search indexing, real-time synchronization, and categorized filtering.",
+    architecture: [
+      "Client-side search indexing for sub-10ms query execution",
+      "Optimistic UI updates with instant local storage persistence",
+      "Tag-based resource categorization and quick filters",
+    ],
+    metrics: [
+      { label: "Search Latency", value: "< 10ms" },
+      { label: "State Sync", value: "Real-time" },
+      { label: "UX Performance", value: "60 FPS" },
+    ],
+    tags: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
+  },
+  2: {
+    name: "Movie Rating",
+    kanji: "弐",
+    category: "Media Discovery Engine",
+    description:
+      "Interactive media discovery web application integrating external APIs with dynamic ratings aggregation, genre filtering, and responsive modal previews.",
+    architecture: [
+      "Streaming API client with debounced auto-complete query cache",
+      "Zero-layout-shift responsive media grid with smooth modals",
+      "Dynamic genre clustering and score weighting algorithms",
+    ],
+    metrics: [
+      { label: "API Fetching", value: "Cached" },
+      { label: "Layout Shift", value: "0.00 CLS" },
+      { label: "Modal Motion", value: "Spring" },
+    ],
+    tags: ["React", "REST API", "Tailwind CSS", "Data Fetching"],
+  },
+  3: {
+    name: "Expense Tracker",
+    kanji: "参",
+    category: "Financial Dashboard",
+    description:
+      "Personal finance tracking dashboard providing visual expense breakdowns, real-time transaction recording, and interactive budget analytics.",
+    architecture: [
+      "Real-time ledger computation with persistent local state",
+      "Multi-timeframe cashflow charting and category aggregations",
+      "Local-first offline availability with quick record logging",
+    ],
+    metrics: [
+      { label: "Calculation", value: "Instant" },
+      { label: "Offline Mode", value: "Supported" },
+      { label: "Visualizations", value: "Vector" },
+    ],
+    tags: ["React", "Analytics", "Data Visualization", "State"],
+  },
+  4: {
+    name: "AI Conversation",
+    kanji: "四",
+    category: "Interface Exploration",
+    description:
+      "Conceptual conversational assistant exploring modern dark UI patterns, generative message flows, and minimalist micro-interactions.",
+    architecture: [
+      "Fluid message bubble animations with physics-driven springs",
+      "Adaptive token render states with clean syntax highlighting",
+      "Minimalist typography and deliberate layout hierarchy",
+    ],
+    metrics: [
+      { label: "Design System", value: "Custom" },
+      { label: "Tokens", value: "Obsidian" },
+      { label: "Interactions", value: "Tactile" },
+    ],
+    tags: ["UI/UX Design", "Prototyping", "Modern Web", "Figma"],
+  },
+};
 
 export default function StackingCards() {
   return (
     <div className="relative w-full h-screen flex items-center justify-center overflow-hidden">
-      <div className="relative w-full h-[92vh] max-w-7xl pt-20 pb-12">
+      <div className="relative w-full h-[92vh] max-w-7xl pt-16 pb-10">
         {PROJECTS.map((card, index) => (
           <Card key={card.id} card={card} index={index} />
         ))}
@@ -24,13 +110,30 @@ function Card({
   index: number;
 }) {
   const [isHovered, setIsHovered] = useState(false);
+  const [activeTab, setActiveTab] = useState<"overview" | "specs">("overview");
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
-  const [num, ...rest] = card.title.split(" ");
-  const name = rest.join(" ");
+  const detail = PROJECT_DETAILS[card.id] || {
+    name: card.title.replace(/^\d+\s*/, ""),
+    kanji: "零",
+    category: "Featured Project",
+    description: "Production web application engineered with modern full-stack technologies.",
+    architecture: ["Modern reactive architecture", "Responsive performance"],
+    metrics: [{ label: "Status", value: "Live" }],
+    tags: card.tags || ["Next.js", "React"],
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMousePos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
 
   return (
     <div
-      className={`project-card-${index} absolute inset-0 m-auto w-full h-[85%] max-h-[720px] flex items-center justify-center pointer-events-none opacity-0`}
+      className={`project-card-${index} absolute inset-0 m-auto w-full h-[86%] max-h-[700px] flex items-center justify-center pointer-events-none opacity-0`}
       style={{
         zIndex: index,
         transform: "translate3d(0, 500px, 0) scale(0.86)",
@@ -38,329 +141,272 @@ function Card({
         willChange: "transform, opacity",
       }}
     >
-      {/* ─── CARD ─── */}
+      {/* ─── MAIN CARD CONTAINER ─── */}
       <div
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="relative w-full max-w-6xl h-full rounded-2xl overflow-hidden flex pointer-events-auto"
+        onMouseMove={handleMouseMove}
+        className="relative w-full max-w-6xl h-full rounded-2xl md:rounded-3xl overflow-hidden flex flex-col lg:flex-row pointer-events-auto border transition-all duration-500 shadow-2xl group"
         style={{
-          background: "#1c2430",
+          background: "#0c0e14",
+          borderColor: isHovered ? "rgba(255, 153, 51, 0.45)" : "rgba(255, 255, 255, 0.08)",
           boxShadow: isHovered
-            ? "0 0 0 1px rgba(201,169,110,0.2), 0 40px 100px rgba(0,0,0,0.6), 0 0 60px rgba(201,169,110,0.06)"
-            : "0 0 0 1px rgba(255,255,255,0.05), 0 30px 70px rgba(0,0,0,0.5)",
-          transition: "box-shadow 0.6s ease",
+            ? "0 30px 80px -15px rgba(0, 0, 0, 0.85), 0 0 40px -10px rgba(255, 153, 51, 0.15)"
+            : "0 25px 60px -15px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08)",
         }}
       >
-        {/* GSAP dim layer */}
-        <div className={`project-card-dim-${index} absolute inset-0 bg-zinc-950 pointer-events-none z-[35] opacity-0`} />
-
-        {/* ── Film grain noise ── */}
+        {/* Dynamic Interactive Cursor-Tracking Spotlight */}
         <div
-          className="absolute inset-0 pointer-events-none z-[1] opacity-[0.035]"
+          className="absolute inset-0 pointer-events-none z-10 transition-opacity duration-300"
           style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-            backgroundSize: "128px 128px",
-          }}
-        />
-
-        {/* ── UIverse animated border with glow ── */}
-        <div
-          className="absolute pointer-events-none z-[30] rounded-2xl"
-          style={{
-            inset: isHovered ? "14px" : "0px",
-            border: "1.5px solid #c9a96e",
             opacity: isHovered ? 1 : 0,
-            transform: isHovered ? "rotate(0deg)" : "rotate(8deg)",
-            boxShadow: isHovered ? "inset 0 0 30px rgba(201,169,110,0.05), 0 0 20px rgba(201,169,110,0.08)" : "none",
-            transition: "all 0.55s cubic-bezier(0.23,1,0.32,1)",
+            background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, rgba(255, 153, 51, 0.08), transparent 50%)`,
           }}
         />
 
-        {/* ── Holographic shimmer (ticket-inspired) ── */}
+        {/* GSAP dim layer for stacking depth */}
         <div
-          className="absolute inset-0 pointer-events-none z-[2]"
-          style={{
-            background:
-              "conic-gradient(at 60% 40%, transparent 0%, rgba(255,107,254,0.07) 15%, rgba(0,249,248,0.07) 30%, transparent 45%, rgba(0,129,253,0.07) 60%, rgba(238,240,188,0.05) 75%, transparent 90%)",
-            opacity: isHovered ? 1 : 0,
-            transition: "opacity 0.6s ease",
-            mixBlendMode: "screen",
-          }}
+          className={`project-card-dim-${index} absolute inset-0 bg-black pointer-events-none z-[35] opacity-0`}
         />
 
-        {/* ── LEFT: Image (58%) ── */}
-        <div className="relative w-[58%] h-full shrink-0 overflow-hidden">
-          <img
-            src={card.img}
-            alt={card.title}
-            className="w-full h-full object-cover"
-            style={{
-              transform: isHovered ? "scale(1.06)" : "scale(1)",
-              filter: isHovered
-                ? "brightness(0.7) saturate(1.15)"
-                : "brightness(0.5) saturate(0.85)",
-              transition: "transform 1.2s cubic-bezier(0.16,1,0.3,1), filter 0.8s ease",
-            }}
-            loading="lazy"
-          />
+        {/* Top Amber Katana Hairline Sheen */}
+        <div
+          className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#FF9933]/70 to-transparent transition-opacity duration-300 pointer-events-none z-30"
+          style={{ opacity: isHovered ? 1 : 0 }}
+        />
 
-          {/* Gradient toward right seam + bottom */}
+        {/* ── LEFT: Product Showcase Stage (56%) ── */}
+        <div className="relative w-full lg:w-[56%] h-[48%] lg:h-full shrink-0 flex items-center justify-center p-5 sm:p-7 lg:p-9 bg-gradient-to-br from-[#07080b] via-[#0b0d13] to-[#090b10] overflow-hidden border-b lg:border-b-0 lg:border-r border-zinc-800/80">
+          {/* Subtle Stage Grid Texture */}
           <div
-            className="absolute inset-0"
+            className="absolute inset-0 opacity-[0.03] pointer-events-none"
             style={{
-              background:
-                "linear-gradient(to right, transparent 55%, #1c2430 100%), linear-gradient(to top, #1c2430 0%, transparent 35%)",
+              backgroundImage:
+                "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)",
+              backgroundSize: "36px 36px",
             }}
           />
 
-          {/* Holographic reflection on image */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background:
-                "linear-gradient(135deg, rgba(201,169,110,0.1) 0%, transparent 50%, rgba(0,249,248,0.07) 100%)",
-              opacity: isHovered ? 1 : 0,
-              transition: "opacity 0.7s ease",
-              mixBlendMode: "overlay",
-            }}
-          />
-
-          {/* Perforated divider on right edge (ticket-inspired) */}
-          <div
-            className="absolute top-0 right-0 h-full w-[2px] pointer-events-none"
-            style={{
-              background: `repeating-linear-gradient(
-                to bottom,
-                transparent 0px,
-                transparent 8px,
-                rgba(201,169,110,0.15) 8px,
-                rgba(201,169,110,0.15) 14px
-              )`,
-            }}
-          />
-
-          {/* Project badge – top left */}
-          <div
-            className="absolute top-6 left-6 flex items-center gap-2 px-3.5 py-1.5 rounded-full z-10"
-            style={{
-              background: "rgba(28,36,48,0.85)",
-              border: "1px solid rgba(201,169,110,0.3)",
-              backdropFilter: "blur(8px)",
-            }}
-          >
-            <div
-              className="w-1.5 h-1.5 rounded-full animate-pulse"
-              style={{ backgroundColor: "#c9a96e" }}
-            />
-            <span
-              className="text-[10px] font-black uppercase tracking-[0.3em]"
-              style={{ color: "#c9a96e" }}
-            >
-              Project {num}
+          {/* Authentic Hanko Stamp Seal with Clean Index */}
+          <div className="absolute top-4 left-5 z-20 flex items-center gap-2.5">
+            <div className="relative w-9 h-9 rounded-md bg-[#FF9933]/15 border border-[#FF9933]/50 flex items-center justify-center text-[#FF9933] font-bold text-sm select-none shadow-[0_0_15px_rgba(255,153,51,0.25)]">
+              <span className="relative z-10 font-serif">{detail.kanji}</span>
+              <span className="absolute inset-0.5 rounded-[4px] border border-[#FF9933]/25 pointer-events-none" />
+            </div>
+            <span className="text-[11px] font-mono uppercase tracking-[0.16em] text-zinc-400 font-semibold select-none">
+              Project 0{index + 1}
             </span>
           </div>
 
-          {/* Vertical rotated label – left edge */}
-          <div
-            className="absolute top-1/2 left-0 pointer-events-none z-10"
-            style={{
-              transform: "translateY(-50%) rotate(-90deg)",
-              transformOrigin: "center center",
-              opacity: 0.2,
-            }}
-          >
-            <span
-              className="text-[7px] font-black uppercase tracking-[0.6em] whitespace-nowrap"
-              style={{ color: "#c9a96e" }}
+          {/* Screenshot Display Frame */}
+          {card.link ? (
+            <a
+              href={card.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative w-full h-full rounded-xl lg:rounded-2xl overflow-hidden border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.85)] bg-zinc-950 transition-all duration-700 ease-out cursor-pointer group/preview block"
+              style={{
+                transform: isHovered ? "translateY(-4px) scale(1.02)" : "translateY(0) scale(1)",
+              }}
             >
-              ARSHAD · JENIXWEBLANCER
-            </span>
-          </div>
+              <img
+                src={card.img}
+                alt={detail.name}
+                className="w-full h-full object-cover object-top"
+                loading="lazy"
+              />
 
-          {/* Tags – bottom left */}
-          {card.tags && (
-            <div className="absolute bottom-5 left-5 z-10 flex flex-wrap gap-1.5">
-              {card.tags.map((t) => (
-                <span
-                  key={t}
-                  className="px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest rounded-sm text-white/70"
-                  style={{
-                    background: "rgba(0,0,0,0.5)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    backdropFilter: "blur(4px)",
-                  }}
-                >
-                  {t}
+              {/* Floating Magnifier Overlay Pill on Hover */}
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/preview:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
+                <span className="px-4 py-2 rounded-full bg-zinc-950/90 border border-[#FF9933]/50 text-white font-mono text-xs tracking-wider uppercase flex items-center gap-2 shadow-xl">
+                  <span>Open Live Demo</span>
+                  <span className="text-[#FF9933]">↗</span>
                 </span>
-              ))}
+              </div>
+            </a>
+          ) : (
+            <div
+              className="relative w-full h-full rounded-xl lg:rounded-2xl overflow-hidden border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.85)] bg-zinc-950 transition-all duration-700 ease-out"
+              style={{
+                transform: isHovered ? "translateY(-4px) scale(1.02)" : "translateY(0) scale(1)",
+              }}
+            >
+              <img
+                src={card.img}
+                alt={detail.name}
+                className="w-full h-full object-cover object-top"
+                loading="lazy"
+              />
             </div>
           )}
         </div>
 
-        {/* ── RIGHT: Content (42%) ── */}
-        <div className="flex-1 flex flex-col px-10 py-10 relative z-10 overflow-hidden">
+        {/* ── RIGHT: Project Intelligence with Interactive Mode Switcher (44%) ── */}
+        <div className="flex-1 flex flex-col justify-between p-6 sm:p-8 lg:p-10 relative z-20 overflow-hidden bg-[#0c0e14]">
+          {/* Subtle Grand Kanji Watermark in Background */}
+          <span className="absolute right-4 bottom-2 text-[11rem] font-serif font-black text-white/[0.03] select-none pointer-events-none leading-none z-0">
+            {detail.kanji}
+          </span>
 
-          {/* Subtle dot grid background */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              backgroundImage: "radial-gradient(circle, rgba(201,169,110,0.08) 1px, transparent 1px)",
-              backgroundSize: "24px 24px",
-              opacity: isHovered ? 1 : 0.4,
-              transition: "opacity 0.6s ease",
-            }}
-          />
-
-          {/* Ghost number watermark */}
-          <div
-            className="absolute bottom-2 right-2 font-black leading-none pointer-events-none select-none"
-            style={{
-              fontSize: "clamp(7rem,13vw,12rem)",
-              color: "transparent",
-              WebkitTextStroke: "1px rgba(201,169,110,0.1)",
-              letterSpacing: "-0.06em",
-            }}
-          >
-            {num}
-          </div>
-
-          {/* Corner bracket – top right */}
-          <div className="absolute top-6 right-6 pointer-events-none opacity-30">
-            <div className="w-6 h-px" style={{ backgroundColor: "#c9a96e" }} />
-            <div className="w-px h-6 mt-0" style={{ backgroundColor: "#c9a96e" }} />
-          </div>
-          {/* Corner bracket – bottom left */}
-          <div className="absolute bottom-6 left-10 pointer-events-none opacity-30">
-            <div className="w-px h-6" style={{ backgroundColor: "#c9a96e" }} />
-            <div className="w-6 h-px" style={{ backgroundColor: "#c9a96e" }} />
-          </div>
-
-          {/* Series label */}
-          <div className="flex items-center gap-3 mb-auto relative z-10">
-            <div className="w-5 h-px" style={{ backgroundColor: "#c9a96e" }} />
-            <span
-              className="text-[9px] font-black uppercase tracking-[0.45em] font-mono"
-              style={{ color: "#c9a96e" }}
-            >
-              Featured Work
-            </span>
-          </div>
-
-          {/* Title */}
-          <div className="my-auto relative z-10">
-            <h3
-              className="font-black uppercase leading-[0.88] text-white"
-              style={{
-                fontSize: "clamp(2.2rem,4.2vw,3.8rem)",
-                letterSpacing: "-0.04em",
-              }}
-            >
-              {name.split(" ").map((word, i) => (
-                <span key={i} className="block">
-                  {word}
+          {/* Top Bar: Counter & Mode Switcher */}
+          <div className="relative z-10">
+            <div className="flex items-center justify-between pb-4 border-b border-zinc-800/80">
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-xs font-bold text-[#FF9933] tracking-widest uppercase">
+                  0{index + 1}
                 </span>
-              ))}
-            </h3>
+                <span className="text-zinc-600 font-mono text-xs">/</span>
+                <span className="text-zinc-500 font-mono text-xs">0{PROJECTS.length}</span>
+              </div>
 
-            {/* Animated gold underline with glow */}
-            <div
-              style={{
-                marginTop: "1.25rem",
-                height: "3px",
-                width: isHovered ? "5rem" : "2rem",
-                backgroundColor: "#c9a96e",
-                borderRadius: "999px",
-                boxShadow: isHovered ? "0 0 18px rgba(201,169,110,0.7)" : "none",
-                transition: "width 0.55s cubic-bezier(0.16,1,0.3,1), box-shadow 0.55s ease",
-              }}
-            />
+              {/* Interactive Sliding Pill Switcher */}
+              <div className="relative flex items-center p-1 rounded-lg bg-zinc-900/90 border border-zinc-800">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("overview")}
+                  className={`relative z-10 px-3 py-1 text-[11px] font-mono tracking-wider uppercase transition-colors ${
+                    activeTab === "overview" ? "text-white font-semibold" : "text-zinc-400 hover:text-zinc-200"
+                  }`}
+                >
+                  Overview
+                  {activeTab === "overview" && (
+                    <motion.span
+                      layoutId={`tab-bubble-${index}`}
+                      className="absolute inset-0 bg-zinc-800 rounded-md -z-10 shadow-sm"
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    />
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("specs")}
+                  className={`relative z-10 px-3 py-1 text-[11px] font-mono tracking-wider uppercase transition-colors ${
+                    activeTab === "specs" ? "text-[#FF9933] font-semibold" : "text-zinc-400 hover:text-zinc-200"
+                  }`}
+                >
+                  Specs
+                  {activeTab === "specs" && (
+                    <motion.span
+                      layoutId={`tab-bubble-${index}`}
+                      className="absolute inset-0 bg-[#FF9933]/15 border border-[#FF9933]/30 rounded-md -z-10 shadow-sm"
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Title & Category */}
+            <div className="pt-4 space-y-1">
+              <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider block">
+                {detail.category}
+              </span>
+              <h3
+                style={{ fontFamily: "Outfit, sans-serif" }}
+                className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.6rem] font-black uppercase text-white tracking-tight leading-[0.98]"
+              >
+                {detail.name}
+              </h3>
+            </div>
+
+            {/* Interactive Tab Content */}
+            <div className="pt-4 min-h-[140px]">
+              <AnimatePresence mode="wait">
+                {activeTab === "overview" ? (
+                  <motion.div
+                    key="overview"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-4"
+                  >
+                    <p className="text-zinc-300 text-xs sm:text-sm lg:text-[15px] font-normal leading-relaxed">
+                      {detail.description}
+                    </p>
+
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {detail.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="px-2.5 py-1 rounded-md bg-zinc-900 border border-zinc-800 text-[11px] font-mono text-zinc-300 tracking-wide"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="specs"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-3.5"
+                  >
+                    <div className="space-y-2">
+                      {detail.architecture.map((item, i) => (
+                        <div key={i} className="flex items-start gap-2 text-xs text-zinc-300 font-mono">
+                          <span className="text-[#FF9933] font-bold">›</span>
+                          <span className="leading-relaxed">{item}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="pt-2 grid grid-cols-3 gap-2 border-t border-zinc-800/80">
+                      {detail.metrics.map((m, i) => (
+                        <div key={i} className="p-2 rounded bg-zinc-900/60 border border-zinc-800 text-center">
+                          <span className="block font-mono text-xs font-bold text-[#FF9933]">{m.value}</span>
+                          <span className="block text-[9px] font-mono text-zinc-500 uppercase mt-0.5">{m.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
 
-          {/* CTA */}
-          <div
-            className="relative z-10"
-            style={{ borderTop: "1px solid rgba(201,169,110,0.1)", paddingTop: "1.75rem" }}
-          >
+          {/* Action Link Button */}
+          <div className="pt-4 border-t border-zinc-800/80 relative z-10">
             {card.link ? (
               <a
                 href={card.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-between w-full h-14 px-6 rounded-xl"
-                style={{
-                  background: isHovered
-                    ? "linear-gradient(135deg, #c9a96e, #a07840)"
-                    : "rgba(201,169,110,0.07)",
-                  border: "1px solid rgba(201,169,110,0.25)",
-                  transition: "background 0.5s ease",
-                }}
+                className="group/btn relative overflow-hidden flex items-center justify-between w-full h-12 sm:h-13 px-6 rounded-xl bg-zinc-900 hover:bg-zinc-850 border border-zinc-700 hover:border-[#FF9933]/60 transition-all duration-300 shadow-lg"
               >
-                <span
-                  className="font-black uppercase tracking-tight text-sm"
-                  style={{
-                    color: isHovered ? "#1c2430" : "#c9a96e",
-                    transition: "color 0.4s ease",
-                  }}
-                >
-                  View Live Project
+                <span className="font-bold uppercase tracking-[0.14em] text-xs text-zinc-100 group-hover/btn:text-white relative z-10">
+                  Launch Live Project
                 </span>
-                <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center"
-                  style={{
-                    background: isHovered ? "rgba(28,36,48,0.3)" : "rgba(201,169,110,0.12)",
-                    border: "1px solid rgba(201,169,110,0.3)",
-                    transform: isHovered ? "rotate(-45deg)" : "rotate(0deg)",
-                    transition: "transform 0.5s cubic-bezier(0.16,1,0.3,1), background 0.4s ease",
-                  }}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                    <path
-                      d="M5 12H19M19 12L13 6M19 12L13 18"
-                      stroke={isHovered ? "#1c2430" : "#c9a96e"}
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      style={{ transition: "stroke 0.4s ease" }}
-                    />
+
+                <div className="w-8 h-8 rounded-full bg-zinc-950 flex items-center justify-center border border-zinc-800 text-[#FF9933] group-hover/btn:border-[#FF9933]/50 transition-all duration-300 relative z-10">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="transition-transform duration-300 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5"
+                  >
+                    <line x1="7" y1="17" x2="17" y2="7" />
+                    <polyline points="7 7 17 7 17 17" />
                   </svg>
                 </div>
               </a>
             ) : (
-              <div
-                className="flex items-center gap-3 px-6 py-4 rounded-xl"
-                style={{
-                  background: "rgba(255,255,255,0.02)",
-                  border: "1px dashed rgba(201,169,110,0.15)",
-                }}
-              >
-                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: "rgba(201,169,110,0.3)" }} />
-                <span className="font-bold uppercase tracking-widest text-[10px] font-mono" style={{ color: "rgba(201,169,110,0.35)" }}>
-                  Internal / Design Study
+              <div className="flex items-center justify-between w-full h-12 sm:h-13 px-6 rounded-xl bg-zinc-900/40 border border-dashed border-zinc-800 text-zinc-400">
+                <span className="font-mono uppercase tracking-widest text-[11px]">
+                  Concept Interface Prototype
                 </span>
+                <span className="w-2 h-2 rounded-full bg-[#FF9933]/60" />
               </div>
             )}
-
-            {/* UIverse bottom-text: site URL fades in on hover */}
-            <div
-              className="mt-4 flex items-center justify-between px-1"
-              style={{
-                opacity: isHovered ? 1 : 0,
-                letterSpacing: isHovered ? "0.2em" : "0.6em",
-                transition: "opacity 0.5s ease 0.15s, letter-spacing 0.5s ease 0.15s",
-              }}
-            >
-              <span
-                className="text-[8px] font-black uppercase font-mono"
-                style={{ color: "#c9a96e" }}
-              >
-                jenixweblancer.in
-              </span>
-              <div className="flex items-center gap-1.5">
-                <div className="w-1 h-2.5 rounded-sm animate-pulse" style={{ backgroundColor: "#c9a96e" }} />
-                <div className="w-1 h-1.5 rounded-sm animate-pulse" style={{ backgroundColor: "rgba(201,169,110,0.5)", animationDelay: "0.2s" }} />
-                <div className="w-1 h-3 rounded-sm animate-pulse" style={{ backgroundColor: "rgba(201,169,110,0.3)", animationDelay: "0.4s" }} />
-              </div>
-            </div>
           </div>
         </div>
       </div>

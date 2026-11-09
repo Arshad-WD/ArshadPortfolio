@@ -26,7 +26,7 @@ const LinkedinIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export default function SharePortfolio() {
   const [copied, setCopied] = useState(false);
-  const [shareUrl, setShareUrl] = useState("https://arshad-portfolio.vercel.app");
+  const [shareUrl, setShareUrl] = useState("https://jenixweblancer.in");
 
   useEffect(() => {
     if (typeof window !== "undefined") {

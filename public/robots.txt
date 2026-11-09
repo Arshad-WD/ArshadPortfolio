@@ -1,10 +1,42 @@
+# Robots.txt for Arshad Chaudhary Portfolio
+# https://jenixweblancer.in
+
 User-agent: *
 Allow: /
-
-# Block internal API routes from crawlers
 Disallow: /api/
-
-# Block Next.js internals
 Disallow: /_next/
 
-Sitemap: https://arshad-portfolio.vercel.app/sitemap.xml
+# Generative AI & Answer Engine Crawlers (AEO / GEO)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+# Canonical Sitemaps & Machine-Readable Context
+Sitemap: https://jenixweblancer.in/sitemap.xml
+
+# LLMs Context Standard (https://llmstxt.org/)
+# LLMs: https://jenixweblancer.in/llms.txt
+# LLMs-Full: https://jenixweblancer.in/llms-full.txt

@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Suspense } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { useGLTF, ContactShadows, Center, Environment, Float } from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { useGLTF, Center } from "@react-three/drei";
 import * as THREE from "three";
 
 /* ─────────────────────────── constants ─────────────────────────── */
@@ -18,6 +18,7 @@ const API_URL = "/api/chat";
 
 const SECTION_MESSAGES = {
   home: "Hey — I'm Arshad's AI assistant. Ask me anything.",
+  about: "Full-stack engineer with a backend-first focus.",
   projects: "Explore Arshad's projects. What would you like to know?",
   skills: "Full-stack by craft. Ask about his tech stack.",
   contact: "Looking to collaborate? I can help with that.",
@@ -79,21 +80,9 @@ function BotModel({ mouseNear, mouseDir }) {
     const mats = [];
     clone.traverse((child) => {
       if (child.isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
-        
         if (child.material) {
           child.material = child.material.clone();
-          child.material.roughness = 0.25; // Premium brushed chrome roughness
-          child.material.metalness = 0.90; // Gorgeous metallic reflection capability
-          
-          // Force high-definition texture filtering and maximum anisotropy
-          if (child.material.map) {
-            child.material.map.anisotropy = 16;
-            child.material.map.minFilter = THREE.LinearMipmapLinearFilter;
-            child.material.map.magFilter = THREE.LinearFilter;
-          }
-          
+          // Preserve original textures — only tweak emissive for glow effect
           if (child.material.emissive) {
             mats.push(child.material);
           }
@@ -117,9 +106,22 @@ function BotModel({ mouseNear, mouseDir }) {
     return clone;
   }, [scene]);
 
-  useFrame((state, delta) => {
+  useFrame(({ invalidate }, delta) => {
     if (!groupRef.current) return;
-    const t = state.clock.elapsedTime;
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+    const t = performance.now() * 0.001;
+
+    // Pause animation/rendering on mobile when not hovered to save CPU/GPU/battery
+    if (isMobile && !mouseNear) {
+      const ns = normalizedScale.current;
+      groupRef.current.scale.set(ns, ns, ns);
+      groupRef.current.rotation.y = 0;
+      emissiveMats.current.forEach((mat) => {
+        mat.emissiveIntensity = 1.0;
+        mat.emissive.setHex(0x4A90E2);
+      });
+      return;
+    }
 
     if (mouseNear && !prevMouseNear.current) {
       bounceTimer.current = 0.3;
@@ -165,10 +167,11 @@ function BotModel({ mouseNear, mouseDir }) {
         glowIntensity,
         0.08
       );
-      // Subtle color pulse for a "living" effect
       const pulse = 0.9 + 0.1 * Math.sin(t * 2);
       mat.emissive.setHex(0x4A90E2).multiplyScalar(pulse);
     });
+
+    invalidate();
   });
 
   if (!clonedScene) return null;
@@ -190,15 +193,22 @@ function ChatPanel({ pos, onClose, section, windowSize }) {
 
   const chips = ["Who is Arshad?", "His projects?", "Contact?"];
 
-  const panelW = 320,
-    panelH = 400;
-  let left = pos.x - panelW / 2;
-  let top = pos.y - panelH - 80;
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+  const parentW = isMobile ? (windowSize.w < 768 ? windowSize.w : 405) : 320;
+  const parentH = isMobile ? (windowSize.w < 768 ? windowSize.h : 864) : 400;
 
-  if (top < 10) top = pos.y + 80;
-  if (left < 10) left = 10;
-  if (left + panelW > windowSize.w - 10) left = windowSize.w - panelW - 10;
-  if (top + panelH > windowSize.h - 10) top = windowSize.h - panelH - 10;
+  const panelW = isMobile ? parentW - 32 : 320;
+  const panelH = isMobile ? 320 : 400;
+
+  let left = isMobile ? 16 : pos.x - panelW / 2;
+  let top = isMobile ? parentH - panelH - 180 : pos.y - panelH - 80;
+
+  if (!isMobile) {
+    if (top < 10) top = pos.y + 80;
+    if (left < 10) left = 10;
+    if (left + panelW > windowSize.w - 10) left = windowSize.w - panelW - 10;
+    if (top + panelH > windowSize.h - 10) top = windowSize.h - panelH - 10;
+  }
 
   const sendMessage = useCallback(
     async (msg) => {
@@ -248,7 +258,7 @@ function ChatPanel({ pos, onClose, section, windowSize }) {
     <div
       className="arshad-bot-cyber-box"
       style={{
-        position: "fixed",
+        position: isMobile ? "absolute" : "fixed",
         left: `${left}px`,
         top: `${top}px`,
         width: `${panelW}px`,
@@ -321,12 +331,13 @@ function ChatPanel({ pos, onClose, section, windowSize }) {
 /* ──────────────────── Reaction Bubble ──────────────────── */
 function ReactionBubble({ text, pos }) {
   if (!text) return null;
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
   return (
     <div
       style={{
-        position: "fixed",
+        position: isMobile ? "absolute" : "fixed",
         left: `${pos.x}px`,
-        top: `${pos.y - 58}px`,
+        top: `${pos.y - (isMobile ? 38 : 58)}px`,
         transform: "translateX(-50%)",
         display: "inline-flex",
         alignItems: "center",
@@ -354,17 +365,17 @@ function ReactionBubble({ text, pos }) {
 }
 
 /* ──────────────────── Small Canvas that follows the bot ──────────────────── */
-function BotCanvas({ botRef, mouseNear, mouseDir }) {
-  const SIZE = 180;
+function BotCanvas({ botRef, mouseNear, mouseDir, size = 180 }) {
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
   return (
     <div
       ref={botRef}
       style={{
-        position: "fixed",
+        position: isMobile ? "absolute" : "fixed",
         left: 0,
         top: 0,
-        width: SIZE,
-        height: SIZE,
+        width: size,
+        height: size,
         pointerEvents: "none",
         zIndex: 100000,
         willChange: "transform",
@@ -373,30 +384,26 @@ function BotCanvas({ botRef, mouseNear, mouseDir }) {
       <Canvas
         style={{ background: "transparent" }}
         camera={{ position: [0, 0.2, 2.2], fov: 35 }}
-        gl={{ 
-          alpha: true, 
-          antialias: true,
+        gl={{
+          alpha: true,
+          antialias: false,
           powerPreference: "high-performance",
           toneMapping: THREE.NoToneMapping,
           toneMappingExposure: 1.0,
-          logarithmicDepthBuffer: false,
         }}
-        dpr={[1, 2]}
+        dpr={[1, 1.5]}
+        frameloop="demand"
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0);
         }}
       >
-        <ambientLight intensity={0.4} />
-        <hemisphereLight intensity={0.2} groundColor="#000" />
-        <directionalLight position={[5, 10, 5]} intensity={1.2} color="#fff" />
-        <pointLight position={[-4, 2, 6]} intensity={1.0} color={ACCENT} />
-        <spotLight position={[0, 5, 2]} angle={0.5} penumbra={1} intensity={1.0} />
-        
+        <ambientLight intensity={0.8} />
+        <directionalLight position={[5, 10, 5]} intensity={1.4} color="#fff" />
+        <pointLight position={[-4, 2, 6]} intensity={1.2} color={ACCENT} />
+
         <Suspense fallback={null}>
           <Center>
-            <Float speed={2.5} rotationIntensity={0.6} floatIntensity={0.6}>
-              <BotModel mouseNear={mouseNear} mouseDir={mouseDir} />
-            </Float>
+            <BotModel mouseNear={mouseNear} mouseDir={mouseDir} />
           </Center>
         </Suspense>
       </Canvas>
@@ -430,11 +437,14 @@ export default function ArshadBot3D() {
   const sectionBubbleTimeoutRef = useRef(null);
   const prevNearRef = useRef(false);
 
+  const isMobileRef = useRef(false);
+
   useEffect(() => {
     const check = () => {
-      const isDesktop = window.innerWidth >= 768;
-      setVisible(isDesktop);
-      setWindowSize({ w: window.innerWidth, h: window.innerHeight });
+      const w = window.innerWidth;
+      isMobileRef.current = w < 768;
+      setVisible(true); // show on ALL screen sizes
+      setWindowSize({ w, h: window.innerHeight });
     };
     check();
     window.addEventListener("resize", check);
@@ -496,8 +506,10 @@ export default function ArshadBot3D() {
     targetRef.current = randomTarget(windowSize.w, windowSize.h);
 
     const scheduleWander = () => {
+      if (isMobileRef.current) return;
       const nextMoveIn = randBetween(4000, 8000);
       wanderRef.current = setTimeout(() => {
+        if (isMobileRef.current) return;
         targetRef.current = randomTarget(windowSize.w, windowSize.h);
         const idleAfter = randBetween(2000, 6000);
         wanderRef.current = setTimeout(scheduleWander, idleAfter);
@@ -518,17 +530,26 @@ export default function ArshadBot3D() {
       const p = posRef.current;
       const t = targetRef.current;
 
-      p.x += (t.x - p.x) * LERP_FACTOR;
-      p.y += (t.y - p.y) * LERP_FACTOR;
+      if (isMobileRef.current) {
+        const parentW = windowSize.w < 768 ? windowSize.w : 405;
+        const parentH = windowSize.w < 768 ? windowSize.h : 864;
+        p.x = parentW - 70;
+        p.y = parentH - 180;
+        t.x = p.x;
+        t.y = p.y;
+      } else {
+        p.x += (t.x - p.x) * LERP_FACTOR;
+        p.y += (t.y - p.y) * LERP_FACTOR;
 
-      const clamped = clampPos(
-        p.x,
-        p.y,
-        windowSize.w || 1200,
-        windowSize.h || 800
-      );
-      p.x = clamped.x;
-      p.y = clamped.y;
+        const clamped = clampPos(
+          p.x,
+          p.y,
+          windowSize.w || 1200,
+          windowSize.h || 800
+        );
+        p.x = clamped.x;
+        p.y = clamped.y;
+      }
 
       const mx = mouseRef.current.x;
       const my = mouseRef.current.y;
@@ -555,10 +576,12 @@ export default function ArshadBot3D() {
 
       // Update positions via Refs for performance
       if (botContainerRef.current) {
-        botContainerRef.current.style.transform = `translate3d(${p.x - 90}px, ${p.y - 90}px, 0)`;
+        const offset = isMobileRef.current ? 60 : 90;
+        botContainerRef.current.style.transform = `translate3d(${p.x - offset}px, ${p.y - offset}px, 0)`;
       }
       if (chatHitAreaRef.current) {
-        chatHitAreaRef.current.style.transform = `translate3d(${p.x - 40}px, ${p.y - 40}px, 0)`;
+        const offset = isMobileRef.current ? 30 : 40;
+        chatHitAreaRef.current.style.transform = `translate3d(${p.x - offset}px, ${p.y - offset}px, 0)`;
       }
 
       setRenderPos({ x: Math.round(p.x), y: Math.round(p.y) });
@@ -581,13 +604,14 @@ export default function ArshadBot3D() {
 
   if (!visible) return null;
 
+  const isMobileLayout = windowSize.w < 768 && windowSize.w > 0;
+
   return (
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
         .arshad-bot-wrapper { display: block; }
-        @media (max-width: 767px) { .arshad-bot-wrapper { display: none !important; } }
 
         .arshad-bot-cyber-box {
           background: rgba(15, 15, 25, 0.4);
@@ -763,17 +787,17 @@ export default function ArshadBot3D() {
 
       <div className="arshad-bot-wrapper">
         {/* Small canvas that follows the bot */}
-        <BotCanvas botRef={botContainerRef} mouseNear={mouseNear} mouseDir={mouseDir} />
+        <BotCanvas botRef={botContainerRef} mouseNear={mouseNear} mouseDir={mouseDir} size={isMobileLayout ? 120 : 180} />
 
         {/* Clickable hit area */}
         <div
           ref={chatHitAreaRef}
           style={{
-            position: "fixed",
+            position: isMobileLayout ? "absolute" : "fixed",
             left: 0,
             top: 0,
-            width: 80,
-            height: 80,
+            width: isMobileLayout ? 60 : 80,
+            height: isMobileLayout ? 60 : 80,
             borderRadius: "50%",
             cursor: "pointer",
             pointerEvents: "auto",
@@ -814,4 +838,5 @@ useGLTF.preload("/texture/michi_bot.glb");
  *  The bot is hidden on mobile (<768px) and visible
  *  on all desktop pages. No props required.
  * ──────────────────────────────────────────────
+ *  UPGRADE: Now enabled on mobile screens as well.
  */

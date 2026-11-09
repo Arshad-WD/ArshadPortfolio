@@ -26,12 +26,13 @@ export default function HomeClient() {
   const [isMobile, setIsMobile] = useState<boolean>(false);
 
   useEffect(() => {
-    // Mobile view paused — always show desktop
-    // const mobile = window.innerWidth < 640;
-    // setIsMobile(mobile);
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
 
-    // Eagerly prefetch desktop layout
+    // Eagerly prefetch layouts
     import("@/components/desktop/home/HomePage").catch(() => {});
+    import("@/components/mobile/Mobile").catch(() => {});
 
     // Preload critical hero images in the browser cache
     const images = ["/images/Layer1.png", "/images/Layer2.png"];
@@ -46,16 +47,13 @@ export default function HomeClient() {
       setLoading(false);
     }
 
-    // const checkMobile = () => setIsMobile(window.innerWidth < 640);
-    // window.addEventListener("resize", checkMobile);
-    // return () => window.removeEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   const [loadBot, setLoadBot] = useState(false);
 
   const handleLoadingComplete = () => {
     setLoading(false);
-    // sessionStorage key is written by the Preloader itself when it finishes
   };
 
   useEffect(() => {
@@ -67,8 +65,8 @@ export default function HomeClient() {
     }
   }, [loading]);
 
-  // Load the 3D bot (Three.js + GLB) only when the user interacts with the page (mousemove, scroll, touch)
-  // to ensure automated audits (like Lighthouse) load with 0ms blocking time and 0B 3D asset downloads.
+  // Load the 3D bot (Three.js + GLB) only on desktop when the user interacts with the page (mousemove, scroll)
+  // to ensure mobile devices have 0% 3D overhead, 0B 3D downloads, and zero canvas clutter.
   useEffect(() => {
     if (loading || isMobile) return;
 
@@ -80,12 +78,10 @@ export default function HomeClient() {
     const cleanup = () => {
       window.removeEventListener("mousemove", triggerLoad);
       window.removeEventListener("scroll", triggerLoad);
-      window.removeEventListener("touchstart", triggerLoad);
     };
 
     window.addEventListener("mousemove", triggerLoad, { passive: true });
     window.addEventListener("scroll", triggerLoad, { passive: true });
-    window.addEventListener("touchstart", triggerLoad, { passive: true });
 
     return cleanup;
   }, [loading, isMobile]);
@@ -96,7 +92,7 @@ export default function HomeClient() {
       <div className="h-full w-full">
         {isMobile ? (
           <div className="fixed inset-0 z-[9999] bg-black">
-            <IPhoneShell>
+            <IPhoneShell isMobile={isMobile}>
               <Mobile />
             </IPhoneShell>
           </div>

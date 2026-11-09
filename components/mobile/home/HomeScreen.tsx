@@ -41,20 +41,28 @@ export default function HomeScreen({
 
   function move(app: AppType, x: number, y: number, page: number) {
     const targetIndex = xyToGrid(x, y);
-    const fromIndex = pages[page].indexOf(app);
-
-    if (fromIndex === -1 || fromIndex === targetIndex) return;
 
     setPages((prev) => {
+      if (page >= prev.length) return prev;
+      const pageApps = [...prev[page]];
+      const fromIndex = pageApps.indexOf(app);
+
+      if (
+        fromIndex === -1 ||
+        fromIndex === targetIndex ||
+        targetIndex < 0 ||
+        targetIndex >= pageApps.length
+      ) {
+        return prev;
+      }
+
       const next = [...prev];
-      const pageApps = [...next[page]];
+      const newPageApps = [...pageApps];
+      const targetApp = newPageApps[targetIndex];
+      newPageApps[targetIndex] = app;
+      newPageApps[fromIndex] = targetApp;
 
-      // Swap the dragged app with whatever is at the target index (app or null)
-      const targetApp = pageApps[targetIndex];
-      pageApps[targetIndex] = app;
-      pageApps[fromIndex] = targetApp;
-
-      next[page] = pageApps;
+      next[page] = newPageApps;
       return next;
     });
   }

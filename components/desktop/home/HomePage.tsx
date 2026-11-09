@@ -48,7 +48,7 @@ export default function HomePage() {
           <Techstack />
         </section>
 
-        <section ref={aboutRef} id="about" className="relative min-h-screen bg-black">
+        <section ref={aboutRef} id="about" data-section="about" className="relative min-h-[140vh] bg-black">
           <About />
         </section>
 

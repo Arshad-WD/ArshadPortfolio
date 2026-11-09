@@ -4,101 +4,45 @@ import { memo } from "react";
 
 const Wallpaper = memo(function Wallpaper() {
   return (
-    <div className="absolute inset-0 overflow-hidden">
-      {/* ── Base: deep rich navy-black ── */}
-      <div className="absolute inset-0" style={{ background: "#060612" }} />
+    <div className="absolute inset-0 overflow-hidden select-none pointer-events-none">
+      {/* Base: Deep Matte Obsidian Neutral */}
+      <div className="absolute inset-0 bg-[#09090b]" />
 
-      {/* ── Mesh layer 1: violet sweep top-left ── */}
+      {/* Titanium Satin Diagonal Sweep (Pure neutral graphite tone shift) */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 120% 80% at 10% 0%, #5b21b6cc 0%, transparent 60%)",
+            "radial-gradient(ellipse 100% 70% at 30% 20%, rgba(255, 255, 255, 0.04) 0%, transparent 70%)",
         }}
       />
 
-      {/* ── Mesh layer 2: indigo centre-top ── */}
+      {/* Gentle Bottom-Right Dark Warmth (Understated carbon tone) */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 90% 70% at 60% -10%, #3730a3aa 0%, transparent 55%)",
+            "radial-gradient(ellipse 80% 50% at 80% 80%, rgba(255, 255, 255, 0.02) 0%, transparent 60%)",
         }}
       />
 
-      {/* ── Mesh layer 3: rose/pink bottom-right warmth ── */}
+      {/* Edge Vignette: Pulls corners deep black so app icons read with maximum clarity */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 100% 60% at 100% 100%, #be185d99 0%, transparent 55%)",
+            "radial-gradient(ellipse 95% 85% at 50% 45%, transparent 40%, rgba(0, 0, 0, 0.85) 100%)",
         }}
       />
 
-      {/* ── Mesh layer 4: cyan teal bottom-left cool accent ── */}
+      {/* Subtle Bottom Ambient Gradient behind Dock */}
       <div
-        className="absolute inset-0"
+        className="absolute bottom-0 left-0 right-0 h-48"
         style={{
           background:
-            "radial-gradient(ellipse 80% 50% at -5% 90%, #0891b288 0%, transparent 50%)",
+            "linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.6))",
         }}
       />
-
-      {/* ── Mesh layer 5: soft gold mid-right warmth ── */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 60% 40% at 95% 45%, #92400e44 0%, transparent 50%)",
-        }}
-      />
-
-      {/* ── Animated shimmer sweep — GPU-composited via transform ── */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div
-          className="absolute inset-0 -translate-x-full"
-          style={{
-            background:
-              "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.025) 50%, transparent 60%)",
-            animation: "shimmer 8s ease-in-out infinite",
-          }}
-        />
-      </div>
-
-      {/* ── Subtle 45° line texture ── */}
-      <div
-        className="absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(45deg, #fff 0px, #fff 1px, transparent 1px, transparent 12px)",
-        }}
-      />
-
-      {/* ── Deep vignette — pulls edges dark so icons pop ── */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse 90% 80% at 50% 40%, transparent 30%, rgba(0,0,0,0.72) 100%)",
-        }}
-      />
-
-      {/* ── Bottom fade — ensures dock legibility ── */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-[35%] pointer-events-none"
-        style={{
-          background:
-            "linear-gradient(to bottom, transparent, rgba(0,0,0,0.55))",
-        }}
-      />
-
-      <style>{`
-        @keyframes shimmer {
-          0%   { transform: translateX(-100%); }
-          50%  { transform: translateX(200%); }
-          100% { transform: translateX(-100%); }
-        }
-      `}</style>
     </div>
   );
 });

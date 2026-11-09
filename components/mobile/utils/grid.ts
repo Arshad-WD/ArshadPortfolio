@@ -1,5 +1,5 @@
 export const COLS = 4;
-export const ROWS = 6;
+export const ROWS = 3;
 
 // Base dimensions (for the 405px-wide iPhone shell on desktop)
 const BASE_WIDTH = 395; // inner content width of the shell
@@ -62,7 +62,7 @@ export function xyToGrid(x: number, y: number) {
   const row = Math.round((y - startY) / (cell + gap));
 
   const safeCol = Math.max(0, Math.min(COLS - 1, col));
-  const safeRow = Math.max(0, row);
+  const safeRow = Math.max(0, Math.min(ROWS - 1, row));
 
   return safeRow * COLS + safeCol;
 }

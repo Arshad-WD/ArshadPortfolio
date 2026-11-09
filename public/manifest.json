@@ -1,0 +1,26 @@
+{
+  "name": "Arshad Chaudhary | Full Stack Developer & UI/UX Specialist",
+  "short_name": "Arshad Portfolio",
+  "description": "Portfolio of Arshad Chaudhary — Premium Full Stack Developer specializing in Next.js, React, TypeScript, and Apple-grade UI/UX Design.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0c",
+  "theme_color": "#000000",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["portfolio", "developer", "technology"],
+  "lang": "en"
+}
